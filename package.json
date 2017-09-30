@@ -16,8 +16,8 @@
     ""
   ],
   "scripts": {
-    "bot": "node --harmony_trailing_commas ./index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --harmony_trailing_commas ./index.js"
+    "bot": "node --preserve-symlinks --harmony_trailing_commas ./index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks --harmony_trailing_commas ./index.js"
   },
   "devDependencies": {
     "eslint": "^4.8.0"
@@ -25,9 +25,9 @@
   "repository": "https://github.com/SpyMaster356/nix-discord-bot",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.2.1",
+    "discord.js": "git+https://github.com/hydrabolt/discord.js.git",
     "git-rev": "^0.2.1",
-    "nix-core": "git+https://github.com/SpyMaster356/jasmine-discord-bot.git",
+    "nix-core": "github:SpyMaster356/nix-core#v1.0.0",
     "rx": "^4.1.0"
   }
 }
