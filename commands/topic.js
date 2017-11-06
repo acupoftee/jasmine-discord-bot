@@ -32,7 +32,9 @@ module.exports = {
       return response.send();
     }
 
-    return Rx.Observable.fromPromise(context.guild.createChannel(channelName, 'text', { parent: openCategory }))
+    return Rx.Observable
+      .fromPromise(context.guild.createChannel(channelName, 'text', { parent: openCategory }))
+      .flatMap((channel) => channel.setPosition(0))
       .flatMap((channel) => {
         response.type = 'reply';
         response.content = 'I have opened the channel ' + channel.toString() + '.';
