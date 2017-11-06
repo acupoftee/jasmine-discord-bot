@@ -36,21 +36,20 @@ module.exports = {
         return response.send();
       })
       .catch((error) => {
+        response.type = 'message';
+
         if (error.name === 'DiscordAPIError') {
           if (error.message === "Missing Permissions") {
-            response.type = 'message';
-            response.content = '' +
+            response.content =
               'I\'m sorry, but I do not have permission to create channels. I need the "Manage Channels" permission.';
           }
           else {
-            response.type = 'message';
             response.content =
               'I\'m sorry, but Discord returned an unexpected error when I tried to create the channel.';
           }
         }
         else {
-          response.type = 'message';
-          response.content = '' +
+          response.content =
             'I\'m sorry, but an unexpected problem occurred.';
         }
 
