@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const OPEN_DISSCUSSIONS_CAT = 'Open Discussions';
+const OPEN_TOPICS_CAT = '!topic';
 
 module.exports = {
   name: 'topic',
@@ -23,7 +23,7 @@ module.exports = {
   run(context, response) {
     let channelName = context.args.channelName;
 
-    let openCategory = getCategory(context.guild, OPEN_DISSCUSSIONS_CAT);
+    let openCategory = getCategory(context.guild, OPEN_TOPICS_CAT);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -65,5 +65,5 @@ module.exports = {
 function getCategory(guild, name) {
   return guild.channels
     .filter((c) => c.type === 'category')
-    .find((c) => c.name.toLowerCase() === name.toLowerCase());
+    .find((c) => c.name.toLowerCase().includes(name.toLowerCase()));
 }
