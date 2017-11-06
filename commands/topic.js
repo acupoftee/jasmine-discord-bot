@@ -13,11 +13,6 @@ module.exports = {
       description: 'The name of the channel to open',
       required: true,
     },
-    {
-      name: 'message',
-      description: 'An opening message to explain the topic of the discussion',
-      required: false,
-    },
   ],
 
   run(context, response) {
