@@ -25,9 +25,9 @@
   "repository": "https://github.com/SpyMaster356/nix-discord-bot",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "git+https://github.com/hydrabolt/discord.js.git",
+    "discord.js": "github:hydrabolt/discord.js#master",
     "git-rev": "^0.2.1",
-    "nix-core": "github:SpyMaster356/nix-core#discord-12",
+    "nix-core": "github:SpyMaster356/nix-core#develop",
     "rx": "^4.1.0"
   }
 }
