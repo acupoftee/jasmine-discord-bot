@@ -20,7 +20,7 @@
     "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks --harmony_trailing_commas ./index.js"
   },
   "devDependencies": {
-    "eslint": "^4.8.0"
+    "eslint": "^4.11.0"
   },
   "repository": "https://github.com/SpyMaster356/nix-discord-bot",
   "license": "MIT",
