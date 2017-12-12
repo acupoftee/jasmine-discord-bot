@@ -6,3 +6,5 @@
 /config/private.js
 
 *.log
+
+\.idea/
