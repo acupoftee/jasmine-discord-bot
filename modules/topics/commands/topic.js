@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const util = require('./../lib/utilities');
+const util = require('../../../lib/utilities');
 
 const OPEN_TOPICS_CAT = '!topic';
 
@@ -8,7 +8,6 @@ module.exports = {
   name: 'topic',
   description: 'Open a new discussion channel',
   scope: 'text',
-  enabledByDefault: false,
 
   args: [
     {

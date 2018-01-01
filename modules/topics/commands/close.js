@@ -1,20 +1,19 @@
 const Rx = require('rx');
 
-const util = require('./../lib/utilities');
+const util = require('../../../lib/utilities');
 
 const OPEN_TOPICS_CAT = '!topic';
 const CLOSED_TOPICS_CAT = '!close';
 
 module.exports = {
-  name: 'reopen',
-  description: 'reopen the current topic, or specify a topic to reopen.',
+  name: 'close',
+  description: 'Close the current topic, or specify a topic to close.',
   scope: 'text',
-  enabledByDefault: false,
 
   args: [
     {
       name: 'channelName',
-      description: 'The name of the channel to reopen',
+      description: 'The name of the channel to close',
       required: false,
     },
   ],
@@ -26,10 +25,10 @@ module.exports = {
     let openCategory = util.findCategory(context.guild, OPEN_TOPICS_CAT);
     let closedCategory = util.findCategory(context.guild, CLOSED_TOPICS_CAT);
 
-    if (!openCategory) {
+    if (!closedCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, I was not able to find the open topics category.\n" +
+        "My apologies, I was not able to find the closed topics category.\n" +
         "Please let SpyMaster know about the issue";
       return response.send();
     }
@@ -48,24 +47,24 @@ module.exports = {
       return response.send();
     }
 
-    if (!topicChannel.parent || topicChannel.parent.id !== closedCategory.id) {
+    if (!topicChannel.parent || topicChannel.parent.id !== openCategory.id) {
       response.type = 'message';
       response.content =
-        `My apologies, I can not move ${topicChannel.toString()} as it is not in the closed topics category.`;
+        `My apologies, I can not close ${topicChannel.toString()} as it is not in the open topics category.`;
       return response.send();
     }
 
     return Rx.Observable
-      .fromPromise(topicChannel.setParent(openCategory))
+      .fromPromise(topicChannel.setParent(closedCategory))
       .flatMap((topicChannel) => topicChannel.setPosition(0))
-      .flatMap((topicChannel) => topicChannel.send('===== Reopened =====').then(() => topicChannel))
+      .flatMap((topicChannel) => topicChannel.send('===== Closed =====').then(() => topicChannel))
       .flatMap((topicChannel) => {
         if (topicChannel.id !== context.channel.id) {
           response.type = 'reply';
-          response.content = `I have reopened the channel ${topicChannel.toString()}.`;
+          response.content = `I have closed the channel ${topicChannel.toString()}.`;
           return response.send();
         }
-        return Rx.Observable.return(topicChannel);
+        return Rx.Observable.return();
       })
       .catch((error) => {
         response.type = 'message';

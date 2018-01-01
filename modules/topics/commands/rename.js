@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const util = require('./../lib/utilities');
+const util = require('../../../lib/utilities');
 
 const OPEN_TOPICS_CAT = '!topic';
 const CLOSED_TOPICS_CAT = '!close';
@@ -9,7 +9,6 @@ module.exports = {
   name: 'rename',
   description: 'rename the current topic',
   scope: 'text',
-  enabledByDefault: false,
 
   args: [
     {
