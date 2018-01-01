@@ -16,8 +16,8 @@
     ""
   ],
   "scripts": {
-    "bot": "node --preserve-symlinks --harmony_trailing_commas ./index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks --harmony_trailing_commas ./index.js"
+    "bot": "node --preserve-symlinks ./index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./index.js"
   },
   "devDependencies": {
     "eslint": "^4.12.1"
