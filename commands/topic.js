@@ -8,6 +8,7 @@ module.exports = {
   name: 'topic',
   description: 'Open a new discussion channel',
   scope: 'text',
+  enabledByDefault: false,
 
   args: [
     {

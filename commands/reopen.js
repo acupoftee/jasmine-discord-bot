@@ -9,6 +9,7 @@ module.exports = {
   name: 'reopen',
   description: 'reopen the current topic, or specify a topic to reopen.',
   scope: 'text',
+  enabledByDefault: false,
 
   args: [
     {

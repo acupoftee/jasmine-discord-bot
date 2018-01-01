@@ -9,6 +9,7 @@ module.exports = {
   name: 'close',
   description: 'Close the current topic, or specify a topic to close.',
   scope: 'text',
+  enabledByDefault: false,
 
   args: [
     {
