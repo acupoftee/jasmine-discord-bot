@@ -3,7 +3,7 @@ const {DATAKEYS} = require('./utility');
 module.exports = {
   name: 'owMains',
   permissions: [
-    'broadcast',
+    'broadcaster',
   ],
   defaultData: [
     {
@@ -20,5 +20,6 @@ module.exports = {
     require('./config/disable-broadcast'),
   ],
   commands: [
+    require('./commands/broadcast'),
   ],
 };
