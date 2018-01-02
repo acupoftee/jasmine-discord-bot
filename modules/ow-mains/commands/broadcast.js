@@ -27,7 +27,7 @@ module.exports = {
 
     if (!BROADCAST_TYPES[broadcastType]) {
       return response.send({
-        content: `Broadcast type ${type} is not valid. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+        content: `Broadcast type ${broadcastType} is not valid. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
       });
     }
 
