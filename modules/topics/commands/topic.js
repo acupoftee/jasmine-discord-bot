@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const util = require('./../lib/utilities');
+const {findCategory} = require('../../../lib/utilities');
 
 const OPEN_TOPICS_CAT = '!topic';
 
@@ -20,7 +20,7 @@ module.exports = {
   run(context, response) {
     let channelName = context.args.channelName;
 
-    let openCategory = util.findCategory(context.guild, OPEN_TOPICS_CAT);
+    let openCategory = findCategory(context.guild, OPEN_TOPICS_CAT);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -30,7 +30,7 @@ module.exports = {
     }
 
     return Rx.Observable
-      .fromPromise(context.guild.createChannel(channelName, 'text', { parent: openCategory }))
+      .fromPromise(context.guild.createChannel(channelName, {parent: openCategory}))
       .flatMap((channel) => channel.setPosition(1))
       .flatMap((channel) => {
         response.type = 'reply';

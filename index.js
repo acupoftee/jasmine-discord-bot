@@ -6,10 +6,10 @@ const config = require('./config.js');
 
 let nix = new Nix(config);
 
-// Load every command in the commands folder
-fs.readdirSync('./commands')
+// Load every module in the modules folder
+fs.readdirSync('./modules')
   .forEach((file) => {
-    nix.addCommand(require('./commands/' + file));
+    nix.addModule(require('./modules/' + file));
   });
 
 nix.listen()
@@ -31,7 +31,7 @@ function onNixError(error) {
 
 function onNixComplete() {
   console.log('Shutting down');
-  nix.messageOwner('Nix shutting down')
+  nix.messageOwner('Jasmine shutting down')
     .subscribe(
       () => {},
       () => {},

@@ -1,6 +1,6 @@
 {
   "name": "jasmine-discord-bot",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "",
   "homepage": "",
   "author": {
@@ -16,18 +16,18 @@
     ""
   ],
   "scripts": {
-    "bot": "node --preserve-symlinks --harmony_trailing_commas ./index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks --harmony_trailing_commas ./index.js"
+    "bot": "node --preserve-symlinks ./index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./index.js"
   },
   "devDependencies": {
-    "eslint": "^4.12.1"
+    "eslint": "^4.14.0"
   },
   "repository": "https://github.com/SpyMaster356/nix-discord-bot",
   "license": "MIT",
   "dependencies": {
     "discord.js": "github:hydrabolt/discord.js#master",
     "git-rev": "^0.2.1",
-    "nix-core": "github:SpyMaster356/nix-core#master",
+    "nix-core": "github:SpyMaster356/nix-core#v5.2.1",
     "rx": "^4.1.0"
   }
 }
