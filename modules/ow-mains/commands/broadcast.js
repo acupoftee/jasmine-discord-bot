@@ -1,4 +1,5 @@
 const Rx = require('rx');
+const Discord = require('discord.js');
 
 const {BROADCAST_TYPES} = require('../utility');
 
@@ -14,7 +15,7 @@ module.exports = {
     },
     {
       name: 'message',
-      description: 'the message to broadcast. @everyone and @here are currently not allowed.',
+      description: 'the message to broadcast. @ everyone and @ here are currently not allowed.',
       required: true,
       greedy: true,
     },
@@ -22,7 +23,7 @@ module.exports = {
   run(context, response) {
     let nix = context.nix;
     let broadcastType = context.args.type;
-    let message = context.args.message;
+    let message = context.args.message + `\n*- ${context.member.displayName}*`;
 
     if (!BROADCAST_TYPES[broadcastType]) {
       return response.send({
@@ -50,6 +51,7 @@ module.exports = {
           .filter((channel) => channel !== null)
           .map((channelId) => guild.channels.get(channelId))
       )
+      .filter((channel) => channel.permissionsFor(nix.discord.user).has(Discord.Permissions.FLAGS.SEND_MESSAGES))
       .flatMap((channel) => channel.send(message))
       .toArray()
       .flatMap((sentMessages) => {
