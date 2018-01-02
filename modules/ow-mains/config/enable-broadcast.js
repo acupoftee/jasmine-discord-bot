@@ -38,7 +38,7 @@ module.exports = {
       .flatMap(() => response.send({content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
-          if (error.message === "Missing Access") {
+          if (error.message === "Missing Access" || error.message === "Missing Permissions") {
             return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
           }
 
