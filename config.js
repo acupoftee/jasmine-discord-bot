@@ -10,4 +10,6 @@ module.exports = {
     type: 'disk',
     dataDir: Path.join(__dirname, './data'),
   },
+
+  broadcastTokens: privateConfig.broadcastTokens,
 };
