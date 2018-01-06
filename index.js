@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 const Nix = require('nix-core');
-const config = require('./config.js');
+const config = require('./config/config.js');
 
 let nix = new Nix(config);
 
