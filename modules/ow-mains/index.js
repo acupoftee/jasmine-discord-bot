@@ -14,10 +14,15 @@ module.exports = {
       keyword: DATAKEYS.BROADCAST_NETWORK,
       data: null,
     },
+    {
+      keyword: DATAKEYS.BROADCAST_TOKENS,
+      data: {},
+    },
   ],
   configActions: [
+    require('./config/sub-broadcast'),
+    require('./config/unsub-broadcast'),
     require('./config/enable-broadcast'),
-    require('./config/disable-broadcast'),
   ],
   commands: [
     require('./commands/broadcast'),

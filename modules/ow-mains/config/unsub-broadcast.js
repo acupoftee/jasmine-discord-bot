@@ -1,8 +1,8 @@
 const {BROADCAST_TYPES} = require('../utility');
 
 module.exports = {
-  name: 'disableBroadcast',
-  description: `Disable receiving broadcast for a broadcast type. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+  name: 'unsubBroadcast',
+  description: `Unsubscribe from a type of broadcast. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
   inputs: [
     {
       name: 'type',
