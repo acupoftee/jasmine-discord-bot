@@ -1,7 +1,7 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const {BROADCAST_TYPES} = require('../utility');
+const {BROADCAST_TYPES, BROADCAST_TOKENS, DATAKEYS, ERRORS} = require('../utility');
 
 module.exports = {
   name: 'broadcast',
@@ -22,6 +22,7 @@ module.exports = {
   ],
   run(context, response) {
     let nix = context.nix;
+    let guild = context.guild;
     let broadcastType = context.args.type;
     let message = context.args.message + `\n*- ${context.member.displayName}*`;
 
@@ -44,7 +45,13 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return Rx.Observable.from(nix.discord.guilds.values())
+    return nix.data
+      .getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
+      .map((allowedTokens) => {
+        if (allowedTokens[broadcastType] !== BROADCAST_TOKENS[broadcastType]) { throw new Error(ERRORS.TOKEN_INVALID); }
+        return true;
+      })
+      .flatMap(() => Rx.Observable.from(nix.discord.guilds.values()))
       .flatMap((guild) =>
         nix.data
           .getGuildData(guild.id, datakey)
@@ -54,8 +61,14 @@ module.exports = {
       .filter((channel) => channel.permissionsFor(nix.discord.user).has(Discord.Permissions.FLAGS.SEND_MESSAGES))
       .flatMap((channel) => channel.send(message))
       .toArray()
-      .flatMap((sentMessages) => {
-        return response.send({content: `Sent ${sentMessages.length} messages`});
+      .flatMap((sentMessages) => response.send({content: `Sent ${sentMessages.length} messages`}))
+      .catch((error) => {
+        switch (error.message) {
+          case ERRORS.TOKEN_INVALID:
+            return response.send({content: `I'm sorry, but sending ${broadcastType} broadcasts from this server is not allowed.`});
+          default:
+            return nix.handleError(context, error);
+        }
       });
   },
 };

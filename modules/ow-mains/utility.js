@@ -13,7 +13,12 @@ const BROADCAST_TYPES = {
 
 const BROADCAST_TOKENS = config.broadcastTokens;
 
+const ERRORS = {
+  TOKEN_INVALID: 'Token is invalid',
+};
+
 module.exports = {
+  ERRORS,
   DATAKEYS,
   BROADCAST_TYPES,
   BROADCAST_TOKENS,

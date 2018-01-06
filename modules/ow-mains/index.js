@@ -17,7 +17,7 @@ module.exports = {
     {
       keyword: DATAKEYS.BROADCAST_TOKENS,
       data: {},
-    }
+    },
   ],
   configActions: [
     require('./config/sub-broadcast'),
