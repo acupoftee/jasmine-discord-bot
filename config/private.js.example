@@ -1,4 +1,9 @@
 module.exports = {
- loginToken: 'some.string',
- ownerUserId: 'some_id',
+  loginToken: 'some.string',
+  ownerUserId: 'some_id',
+
+  broadcastTokens: {
+    'blizzard': 'some_key',
+    'network': 'some_key',
+  },
 }

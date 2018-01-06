@@ -1,23 +1,28 @@
-const {BROADCAST_TYPES} = require('../utility');
+const {
+  DATAKEYS,
+  BROADCAST_TYPES,
+  BROADCAST_TOKENS,
+} = require('../utility');
 
 module.exports = {
   name: 'enableBroadcast',
-  description: `Set the channel that broadcasts should go to. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+  description: `Enable broadcasting from this server.`,
   inputs: [
     {
       name: 'type',
       required: true,
     },
     {
-      name: 'channel',
+      name: 'token',
       required: true,
     },
   ],
 
-  run(context, response) {
+  run: (context, response) => {
+    let nix = context.nix;
     let guild = context.guild;
     let typeString = context.args.input1;
-    let channelString = context.args.input2;
+    let token = context.args.input2;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
@@ -25,33 +30,13 @@ module.exports = {
       return response.send();
     }
 
-    let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
-    if (!channel) {
-      response.content = "I was not able to find that channel";
-      return response.send();
+    if (token !== BROADCAST_TOKENS[broadcastType]) {
+      return response.send({content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`});
     }
 
-    let datakey = BROADCAST_TYPES[broadcastType];
-    return context.nix.data
-      .setGuildData(guild.id, datakey, channel.id)
-      .flatMap(() => channel.send({content: `I will send ${broadcastType} broadcasts here.`}))
-      .flatMap(() => response.send({content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`}))
-      .catch((error) => {
-        if (error.name === 'DiscordAPIError') {
-          if (error.message === "Missing Access" || error.message === "Missing Permissions") {
-            return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
-          }
-
-          response.content = `Err... Discord returned an unexpected error when I tried to talk in that channel.`;
-          context.nix.messageOwner(
-            "I got this error when I tried to talk in a channel",
-            {embed: context.nix.createErrorEmbed(context, error)}
-          );
-
-          return response.send();
-        }
-
-        return Rx.Observable.throw(error);
-      });
+    return nix.data.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
+      .do((savedData) => savedData[broadcastType] = token)
+      .flatMap((savedData) => nix.data.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
+      .flatMap(() => response.send({content: `This server is now allowed to send ${broadcastType} broadcasts.`}));
   },
 };
