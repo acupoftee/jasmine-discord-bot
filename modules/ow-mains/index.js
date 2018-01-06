@@ -16,8 +16,8 @@ module.exports = {
     },
   ],
   configActions: [
-    require('./config/enable-broadcast'),
-    require('./config/disable-broadcast'),
+    require('./config/sub-broadcast'),
+    require('./config/unsub-broadcast'),
   ],
   commands: [
     require('./commands/broadcast'),

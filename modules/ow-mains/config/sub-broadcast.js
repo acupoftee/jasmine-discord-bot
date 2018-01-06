@@ -1,8 +1,8 @@
 const {BROADCAST_TYPES} = require('../utility');
 
 module.exports = {
-  name: 'enableBroadcast',
-  description: `Set the channel that broadcasts should go to. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+  name: 'subBroadcast',
+  description: `Subscribe to a type of broadcast in a channel. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
   inputs: [
     {
       name: 'type',
