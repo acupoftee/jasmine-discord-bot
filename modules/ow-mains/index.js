@@ -22,6 +22,7 @@ module.exports = {
   configActions: [
     require('./config/sub-broadcast'),
     require('./config/unsub-broadcast'),
+    require('./config/enable-broadcast'),
   ],
   commands: [
     require('./commands/broadcast'),
