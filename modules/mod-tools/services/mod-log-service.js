@@ -1,10 +1,33 @@
 const util = require('util');
+const Rx = require('rx');
 
 const {DATAKEYS} = require('../utility');
+
+const Discord = require('discord.js');
 
 class ModLogService {
   constructor(nix) {
     this.nix = nix;
+  }
+
+  onNixListen() {
+    this.nix.streams.guildMemberAdd$
+      .flatMap((guildMember) => {
+        this.nix.logger.debug(`User joined: ${guildMember.displayName}`);
+
+        let modLogEmbed = new Discord.MessageEmbed();
+        modLogEmbed
+          .setAuthor(`${guildMember.displayName} joined`, guildMember.user.avatarURL())
+          .setColor(Discord.Constants.Colors.GREEN)
+          .setDescription(`User ID: ${guildMember.id}`)
+          .setTimestamp();
+
+        return this.addAuditEntry(guildMember.guild, modLogEmbed);
+      })
+      .catch((error) => console.error(error))
+      .subscribe();
+
+    return Rx.Observable.of(true);
   }
 
   addAuditEntry(guild, embed) {
