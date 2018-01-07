@@ -29,18 +29,15 @@ module.exports = {
       .flatMap((user) => {
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
-          .setTitle('Unbanned')
-          .setThumbnail(user.avatarURL())
+          .setAuthor(`${user.tag} unbanned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_GREEN)
-          .addField('User', `${user}\nTag: ${user.tag}\nID: ${user.id})`, true)
-          .addField('Moderator', context.member, true);
+          .setDescription(`User ID: ${user.id}`)
+          .addField('Unbanned By', context.member)
+          .setTimestamp();
 
         return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
-      .flatMap((user) => {
-        response.content = `${user.tag} has been unbanned`;
-        return response.send();
-      })
+      .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           response.type = 'message';

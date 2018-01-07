@@ -23,7 +23,7 @@ module.exports = {
     {
       name: 'reason',
       description: 'The reason for the ban',
-      required: true,
+      required: false,
       greedy: true,
     },
   ],
@@ -49,13 +49,13 @@ module.exports = {
 
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
-          .setTitle('Issued Ban')
-          .setThumbnail(user.avatarURL())
+          .setAuthor(`${user.tag} banned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_RED)
-          .addField('User', `${user}\nTag: ${user.tag}\nID: ${user.id})`, true)
-          .addField('Moderator', context.member, true)
+          .setDescription(`User ID: ${user.id}`)
+          .addField('Banned By', context.member)
           .addField('Reason', reason || '`none given`')
-          .addField('Unban command', '```' + unbanCmd + '```');
+          .addField('Unban command', '```' + unbanCmd + '```')
+          .setTimestamp();
 
         return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })

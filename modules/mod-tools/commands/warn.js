@@ -40,7 +40,8 @@ module.exports = {
           .setColor(Discord.Constants.Colors.DARK_GOLD)
           .setTitle('WARNING')
           .setDescription(reason)
-          .addField('Server', guild.name);
+          .addField('Server', guild.name)
+          .setTimestamp();
 
         return Rx.Observable
           .fromPromise(user.send({
@@ -52,12 +53,12 @@ module.exports = {
       .flatMap((user) => {
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
-          .setTitle('Issued Warning')
-          .setThumbnail(user.avatarURL())
+          .setAuthor(`${user.tag} warned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_GOLD)
-          .addField('User', `${user}\nTag: ${user.tag}\nID: ${user.id})`, true)
-          .addField('Moderator', context.member, true)
-          .addField('Reason', reason || '`none given`');
+          .setDescription(`User ID: ${user.id}`)
+          .addField('Warned By', context.member)
+          .addField('Reason', reason || '`none given`')
+          .setTimestamp();
 
         return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
