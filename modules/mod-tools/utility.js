@@ -1,9 +1,15 @@
 const Rx = require('rx');
 
+const DATAKEYS = {
+  MOD_LOG_CHANNEL: 'modTools.modLogChannel',
+};
+
 module.exports = {
+  DATAKEYS,
+
   addModLogEntry(context, embed) {
     return context.nix.dataService
-      .getGuildData(context.guild.id, 'modTools.modLogChannel')
+      .getGuildData(context.guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .map((channelId) => context.guild.channels.find("id", channelId))
       .flatMap((channel) => {
         if(channel) {

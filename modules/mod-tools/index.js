@@ -1,9 +1,11 @@
+const {DATAKEYS} = require('./utility');
+
 module.exports = {
   name: 'modTools',
   permissions: ['mod'],
   defaultData: [
     {
-      keyword: 'modTools.modLogChannel',
+      keyword: DATAKEYS.MOD_LOG_CHANNEL,
       data: null,
     },
   ],
