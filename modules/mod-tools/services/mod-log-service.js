@@ -27,6 +27,22 @@ class ModLogService {
       .catch((error) => console.error(error))
       .subscribe();
 
+    this.nix.streams.guildMemberRemove$
+      .flatMap((guildMember) => {
+        this.nix.logger.debug(`User left: ${guildMember.displayName}`);
+
+        let modLogEmbed = new Discord.MessageEmbed();
+        modLogEmbed
+          .setAuthor(`${guildMember.displayName} left`, guildMember.user.avatarURL())
+          .setColor(Discord.Constants.Colors.GREY)
+          .setDescription(`User ID: ${guildMember.id}`)
+          .setTimestamp();
+
+        return this.addAuditEntry(guildMember.guild, modLogEmbed);
+      })
+      .catch((error) => console.error(error))
+      .subscribe();
+
     return Rx.Observable.of(true);
   }
 
