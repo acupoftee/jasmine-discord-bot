@@ -1,8 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const {addModLogEntry} = require('../utility');
-
 module.exports = {
   name: 'unban',
   description: 'unban a user from the server',
@@ -16,6 +14,8 @@ module.exports = {
   ],
 
   run(context, response) {
+    let modLogService = context.nix.getService('modTools', 'ModLogService');
+
     let guild = context.guild;
     let userString = context.args.user;
 
@@ -29,18 +29,15 @@ module.exports = {
       .flatMap((user) => {
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
-          .setTitle('Unbanned')
-          .setThumbnail(user.avatarURL())
+          .setAuthor(`${user.tag} unbanned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_GREEN)
-          .addField('User', `${user}\nTag: ${user.tag}\nID: ${user.id})`, true)
-          .addField('Moderator', context.member, true);
+          .setDescription(`User ID: ${user.id}`)
+          .addField('Unbanned By', context.member)
+          .setTimestamp();
 
-        return addModLogEntry(context, modLogEmbed).map(() => user);
+        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
-      .flatMap((user) => {
-        response.content = `${user.tag} has been unbanned`;
-        return response.send();
-      })
+      .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           response.type = 'message';

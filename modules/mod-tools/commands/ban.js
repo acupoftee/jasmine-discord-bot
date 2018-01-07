@@ -1,8 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const {addModLogEntry} = require('../utility');
-
 module.exports = {
   name: 'ban',
   description: 'Ban a user from the server',
@@ -25,12 +23,14 @@ module.exports = {
     {
       name: 'reason',
       description: 'The reason for the ban',
-      required: true,
+      required: false,
       greedy: true,
     },
   ],
 
   run(context, response) {
+    let modLogService = context.nix.getService('modTools', 'ModLogService');
+
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
@@ -49,15 +49,15 @@ module.exports = {
 
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
-          .setTitle('Issued Ban')
-          .setThumbnail(user.avatarURL())
+          .setAuthor(`${user.tag} banned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_RED)
-          .addField('User', `${user}\nTag: ${user.tag}\nID: ${user.id})`, true)
-          .addField('Moderator', context.member, true)
+          .setDescription(`User ID: ${user.id}`)
+          .addField('Banned By', context.member)
           .addField('Reason', reason || '`none given`')
-          .addField('Unban command', '```' + unbanCmd + '```');
+          .addField('Unban command', '```' + unbanCmd + '```')
+          .setTimestamp();
 
-        return addModLogEntry(context, modLogEmbed).map(() => user);
+        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
       .flatMap((user) => {
         response.content = `${user.tag} has been banned`;
