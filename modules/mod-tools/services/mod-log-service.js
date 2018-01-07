@@ -1,3 +1,5 @@
+const util = require('util');
+
 const {DATAKEYS} = require('../utility');
 
 class ModLogService {
@@ -6,6 +8,8 @@ class ModLogService {
   }
 
   addAuditEntry(guild, embed) {
+    this.nix.logger.debug(`Adding audit entry: ${util.inspect(embed)}`);
+
     return this.nix.dataService
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .map((channelId) => guild.channels.find("id", channelId))
