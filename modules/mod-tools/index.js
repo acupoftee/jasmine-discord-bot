@@ -9,6 +9,9 @@ module.exports = {
       data: null,
     },
   ],
+  services: [
+    require('./services/mod-log-service'),
+  ],
   configActions: [
     require('./config/enableModLog'),
     require('./config/disableModLog'),
