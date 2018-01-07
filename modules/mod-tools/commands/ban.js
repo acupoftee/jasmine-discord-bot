@@ -1,8 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const {addModLogEntry} = require('../utility');
-
 module.exports = {
   name: 'ban',
   description: 'Ban a user from the server',
