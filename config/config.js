@@ -6,6 +6,10 @@ module.exports = {
   ownerUserId: privateConfig.ownerUserId,
   loginToken: privateConfig.loginToken,
 
+  logger: {
+    level: 'debug',
+  },
+
   dataSource: {
     type: 'disk',
     dataDir: Path.join(__dirname, '../data'),
