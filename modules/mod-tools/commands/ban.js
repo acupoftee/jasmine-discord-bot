@@ -31,6 +31,8 @@ module.exports = {
   ],
 
   run(context, response) {
+    let modLogService = context.nix.getService('modTools', 'ModLogService');
+
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
@@ -57,7 +59,7 @@ module.exports = {
           .addField('Reason', reason || '`none given`')
           .addField('Unban command', '```' + unbanCmd + '```');
 
-        return addModLogEntry(context, modLogEmbed).map(() => user);
+        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
       .flatMap((user) => {
         response.content = `${user.tag} has been banned`;

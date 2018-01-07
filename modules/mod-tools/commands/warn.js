@@ -1,8 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const {addModLogEntry} = require('../utility');
-
 module.exports = {
   name: 'warn',
   description: 'Issue a warning to a user',
@@ -22,16 +20,19 @@ module.exports = {
   ],
 
   run(context, response) {
+    let modLogService = context.nix.getService('modTools', 'ModLogService');
+
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
 
     let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable.if(
-      () => member,
-      Rx.Observable.return().map(() => member.user),
-      Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-    )
+    return Rx.Observable
+      .if(
+        () => member,
+        Rx.Observable.return().map(() => member.user),
+        Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
+      )
       .flatMap((user) => {
         let warningEmbed = new Discord.MessageEmbed();
         warningEmbed
@@ -58,8 +59,7 @@ module.exports = {
           .addField('Moderator', context.member, true)
           .addField('Reason', reason || '`none given`');
 
-        return addModLogEntry(context, modLogEmbed)
-          .map(() => user);
+        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
       })
       .flatMap((user) => {
         response.content = `${user.tag} has been warned`;

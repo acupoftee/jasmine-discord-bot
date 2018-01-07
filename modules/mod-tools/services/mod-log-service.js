@@ -1,4 +1,4 @@
-const {ERRORS, DATAKEYS} = require('../utility');
+const {DATAKEYS} = require('../utility');
 
 class ModLogService {
   constructor(nix) {
