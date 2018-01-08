@@ -37,32 +37,15 @@ module.exports = {
     let days = context.flags.days;
 
     let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable.if(
-      () => member,
-      Rx.Observable.return().map(() => member.user),
-      Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-    )
+    return Rx.Observable
+      .if(
+        () => member,
+        Rx.Observable.return().map(() => member.user),
+        Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
+      )
       .flatMap((user) => guild.ban(user, {reason, days}).then(() => user))
-      .flatMap((user) => {
-        let prefix = context.nix.commandManager.getPrefix(context.guild.id);
-        let unbanCmd = `${prefix}unban ${user.id}`;
-
-        let modLogEmbed = new Discord.MessageEmbed();
-        modLogEmbed
-          .setAuthor(`${user.tag} banned`, user.avatarURL())
-          .setColor(Discord.Constants.Colors.DARK_RED)
-          .setDescription(`User ID: ${user.id}`)
-          .addField('Banned By', context.member)
-          .addField('Reason', reason || '`none given`')
-          .addField('Unban command', '```' + unbanCmd + '```')
-          .setTimestamp();
-
-        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
-      })
-      .flatMap((user) => {
-        response.content = `${user.tag} has been banned`;
-        return response.send();
-      })
+      .flatMap((user) => modLogService.addBanEntry(guild, user, context.member, reason).map(user))
+      .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           response.type = 'message';

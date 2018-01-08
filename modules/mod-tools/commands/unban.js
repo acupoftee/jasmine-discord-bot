@@ -20,23 +20,14 @@ module.exports = {
     let userString = context.args.user;
 
     let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable.if(
-      () => member,
-      Rx.Observable.return().map(() => member.user),
-      Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-    )
+    return Rx.Observable
+      .if(
+        () => member,
+        Rx.Observable.return().map(() => member.user),
+        Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
+      )
       .flatMap((user) => guild.unban(user))
-      .flatMap((user) => {
-        let modLogEmbed = new Discord.MessageEmbed();
-        modLogEmbed
-          .setAuthor(`${user.tag} unbanned`, user.avatarURL())
-          .setColor(Discord.Constants.Colors.DARK_GREEN)
-          .setDescription(`User ID: ${user.id}`)
-          .addField('Unbanned By', context.member)
-          .setTimestamp();
-
-        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
-      })
+      .flatMap((user) => modLogService.addUnbanEntry(guild, user, context.member).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {

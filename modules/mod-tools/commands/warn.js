@@ -27,41 +27,30 @@ module.exports = {
     let reason = context.args.reason;
 
     let member = guild.members.find((u) => u.toString() === userString);
+
+    let warningEmbed = new Discord.MessageEmbed();
+    warningEmbed
+      .setThumbnail(guild.iconURL())
+      .setColor(Discord.Constants.Colors.DARK_GOLD)
+      .setTitle('WARNING')
+      .setDescription(reason)
+      .addField('Server', guild.name);
+
     return Rx.Observable
       .if(
         () => member,
         Rx.Observable.return().map(() => member.user),
         Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
       )
-      .flatMap((user) => {
-        let warningEmbed = new Discord.MessageEmbed();
-        warningEmbed
-          .setThumbnail(guild.iconURL())
-          .setColor(Discord.Constants.Colors.DARK_GOLD)
-          .setTitle('WARNING')
-          .setDescription(reason)
-          .addField('Server', guild.name)
-          .setTimestamp();
-
-        return Rx.Observable
+      .flatMap((user) =>
+        Rx.Observable
           .fromPromise(user.send({
             content: 'You have been issued a warning.',
             embed: warningEmbed,
           }))
-          .map(() => user);
-      })
-      .flatMap((user) => {
-        let modLogEmbed = new Discord.MessageEmbed();
-        modLogEmbed
-          .setAuthor(`${user.tag} warned`, user.avatarURL())
-          .setColor(Discord.Constants.Colors.DARK_GOLD)
-          .setDescription(`User ID: ${user.id}`)
-          .addField('Warned By', context.member)
-          .addField('Reason', reason || '`none given`')
-          .setTimestamp();
-
-        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
-      })
+          .map(user)
+      )
+      .flatMap((user) => modLogService.addWarnEntry(guild, user, context.member, reason).map(user))
       .flatMap((user) => {
         response.content = `${user.tag} has been warned`;
         return response.send();
