@@ -50,7 +50,7 @@ module.exports = {
           }))
           .map(user)
       )
-      .flatMap((user) => modLogService.addWarnEntry(guild, user, context.member, reason).map(user))
+      .flatMap((user) => modLogService.addWarnEntry(guild, user).map(user))
       .flatMap((user) => {
         response.content = `${user.tag} has been warned`;
         return response.send();

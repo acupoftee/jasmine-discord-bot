@@ -43,7 +43,6 @@ module.exports = {
         Rx.Observable.return().map(() => member.user),
         Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
       )
-      .flatMap((user) => modLogService.addBanEntry(guild, user, context.member, reason).map(user))
       .flatMap((user) =>
         Rx.Observable
           .fromPromise(
@@ -51,6 +50,7 @@ module.exports = {
           )
           .map(user)
       )
+      .flatMap((user) => modLogService.addBanEntry(guild, user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {

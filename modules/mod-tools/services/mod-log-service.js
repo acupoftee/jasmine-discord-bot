@@ -45,43 +45,34 @@ class ModLogService {
     return this.addAuditEntry(member.guild, modLogEmbed);
   }
 
-  addWarnEntry(guild, user, warnedBy, reason) {
+  addWarnEntry(guild, user) {
     let modLogEmbed = new Discord.MessageEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} warned`, user.avatarURL())
       .setColor(Discord.Constants.Colors.DARK_GOLD)
       .setDescription(`User ID: ${user.id}`)
-      .addField('Warned By', warnedBy)
-      .addField('Reason', reason || '`none given`')
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
   }
 
-  addBanEntry(guild, user, bannedBy, reason) {
-    let prefix = this.nix.commandService.getPrefix(guild.id);
-    let unbanCmd = `${prefix}unban ${user.id}`;
-
+  addBanEntry(guild, user) {
     let modLogEmbed = new Discord.MessageEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} banned`, user.avatarURL())
       .setColor(Discord.Constants.Colors.DARK_RED)
       .setDescription(`User ID: ${user.id}`)
-      .addField('Banned By', bannedBy)
-      .addField('Reason', reason || '`none given`')
-      .addField('Unban command', '```' + unbanCmd + '```')
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
   }
 
-  addUnbanEntry(guild, user, unbannedBy) {
+  addUnbanEntry(guild, user) {
     let modLogEmbed = new Discord.MessageEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} unbanned`, user.avatarURL())
       .setColor(Discord.Constants.Colors.DARK_GREEN)
       .setDescription(`User ID: ${user.id}`)
-      .addField('Unbanned By', unbannedBy)
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
