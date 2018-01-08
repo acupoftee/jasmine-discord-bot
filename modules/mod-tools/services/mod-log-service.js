@@ -7,6 +7,7 @@ const {DATAKEYS} = require('../utility');
 class ModLogService {
   constructor(nix) {
     this.nix = nix;
+    this.justBanned = {};
   }
 
   onNixListen() {
@@ -18,6 +19,13 @@ class ModLogService {
 
     this.nix.logger.debug('Adding listener for guildMemberRemove$ events');
     this.nix.streams.guildMemberRemove$
+      .flatMap((member) => {
+        if (this.justBanned[`${member.id}:${member.guild.id}`]) {
+          this.justBanned[`${user.id}:${guild.id}`] = false;
+          return Rx.Observable.empty();
+        }
+        return Rx.Observable.of(member);
+      })
       .do((member) => this.nix.logger.debug(`User left: ${member.displayName}`))
       .flatMap((member) => this.addUserLeftEntry(member))
       .subscribe();
@@ -25,6 +33,7 @@ class ModLogService {
     this.nix.logger.debug('Adding listener for guildBanAdd$ events');
     this.nix.streams.guildBanAdd$
       .do(([guild, user]) => this.nix.logger.debug(`User banned: ${user.tag}`))
+      .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
       .flatMap(([guild, user]) => this.addBanEntry(guild, user))
       .catch((error) => {
         console.log(error);
