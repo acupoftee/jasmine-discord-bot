@@ -41,6 +41,16 @@ class ModLogService {
       })
       .subscribe();
 
+    this.nix.logger.debug('Adding listener for guildBanRemove$ events');
+    this.nix.streams.guildBanRemove$
+      .do(([guild, user]) => this.nix.logger.debug(`User unbanned: ${user.tag}`))
+      .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
+      .catch((error) => {
+        console.log(error);
+        return Rx.Observable.throw(error);
+      })
+      .subscribe();
+
     return Rx.Observable.of(true);
   }
 
