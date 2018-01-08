@@ -10,14 +10,26 @@ class ModLogService {
   }
 
   onNixListen() {
+    this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
     this.nix.streams.guildMemberAdd$
       .do((member) => this.nix.logger.debug(`User joined: ${member.displayName}`))
       .flatMap((member) => this.addUserJoinedEntry(member))
       .subscribe();
 
+    this.nix.logger.debug('Adding listener for guildMemberRemove$ events');
     this.nix.streams.guildMemberRemove$
       .do((member) => this.nix.logger.debug(`User left: ${member.displayName}`))
       .flatMap((member) => this.addUserLeftEntry(member))
+      .subscribe();
+
+    this.nix.logger.debug('Adding listener for guildBanAdd$ events');
+    this.nix.streams.guildBanAdd$
+      .do(([guild, user]) => this.nix.logger.debug(`User banned: ${user.tag}`))
+      .flatMap(([guild, user]) => this.addBanEntry(guild, user))
+      .catch((error) => {
+        console.log(error);
+        return Rx.Observable.throw(error);
+      })
       .subscribe();
 
     return Rx.Observable.of(true);
