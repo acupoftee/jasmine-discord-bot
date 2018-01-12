@@ -39,8 +39,8 @@ module.exports = {
           .setThumbnail(guild.iconURL())
           .setColor(Discord.Constants.Colors.DARK_GOLD)
           .setTitle('WARNING')
-          .setDescription(reason)
-          .addField('Server', guild.name)
+          .setDescription(reason || '')
+          .addField('From Server', guild.name)
           .setTimestamp();
 
         return Rx.Observable
