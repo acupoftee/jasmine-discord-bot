@@ -69,9 +69,29 @@ module.exports = {
         return response.send();
       })
       .catch((error) => {
+        if (error.name === 'DiscordAPIError') {
+          switch (error.message) {
+            case "Cannot send messages to this user":
+              response.content =`Sorry, I'm not able to direct message that user.`;
+              break;
+            default:
+              response.content = `Err... Discord returned an unexpected error when I tried to ban that user.`;
+              context.nix.messageOwner(
+                "I got this error when I tried to ban a user:",
+                {embed: context.nix.createErrorEmbed(context, error)}
+              );
+          }
+
+          return response.send();
+        }
+
         switch (error.message) {
           case ERRORS.USER_NOT_FOUND:
-            return response.send({content: `Sorry, but I wasn't able to find that user.`});
+            return response.send({
+              content:
+                `Sorry, but I wasn't able to find that user. I can only find users by User Tag if they are in ` +
+                `another guild I'm on. If you know their User ID I can find them by that.`,
+            });
           default:
             return Rx.Observable.throw(error);
         }
