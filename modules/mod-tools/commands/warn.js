@@ -8,7 +8,7 @@ module.exports = {
   args: [
     {
       name: 'user',
-      description: 'The user to warn, by mention or user id',
+      description: 'The user to warn. Valid formats: User mention, userId, or user tag (case sensitive)',
       required: true,
     },
     {
@@ -21,18 +21,18 @@ module.exports = {
 
   run(context, response) {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
+    let userService = context.nix.getService('core', 'UserService');
 
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
 
-    let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable
-      .if(
-        () => member,
-        Rx.Observable.return().map(() => member.user),
-        Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-      )
+    return userService
+      .findUser(userString)
+      .map((member) => {
+        if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        return member;
+      })
       .flatMap((user) => {
         let warningEmbed = new Discord.MessageEmbed();
         warningEmbed
@@ -65,6 +65,14 @@ module.exports = {
       .flatMap((user) => {
         response.content = `${user.tag} has been warned`;
         return response.send();
+      })
+      .catch((error) => {
+        switch (error.message) {
+          case ERRORS.USER_NOT_FOUND:
+            return response.send({content: `Sorry, but I wasn't able to find that user.`});
+          default:
+            return Rx.Observable.throw(error);
+        }
       });
   },
 };

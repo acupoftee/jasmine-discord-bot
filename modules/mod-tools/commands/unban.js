@@ -8,24 +8,25 @@ module.exports = {
   args: [
     {
       name: 'user',
-      description: 'The user to unban, by mention or user id',
+      description: 'The user to unban. Valid formats: User mention, userId, or user tag (case sensitive)',
       required: true,
     },
   ],
 
   run(context, response) {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
+    let userService = context.nix.getService('core', 'UserService');
 
     let guild = context.guild;
     let userString = context.args.user;
 
-    let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable.if(
-      () => member,
-      Rx.Observable.return().map(() => member.user),
-      Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-    )
-      .flatMap((user) => guild.unban(user))
+    return userService
+      .findUser(userString)
+      .map((member) => {
+        if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        return member;
+      })
+      .flatMap((user) => guild.members.unban(user))
       .flatMap((user) => {
         let modLogEmbed = new Discord.MessageEmbed();
         modLogEmbed
@@ -44,8 +45,7 @@ module.exports = {
 
           if (error.message === "Missing Permissions" || error.message === "Privilege is too low...") {
             response.content =
-              `Whoops, I do not have permission to ban that user. Either I'm missing the "Ban members" permission, ` +
-              `or their permissions outrank mine.`;
+              `Whoops, I do not have permission to unban users. Can you check if I have the "Ban members" permission?`;
             return response.send();
           }
 

@@ -1,6 +1,8 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const {ERRORS} = require('../utility');
+
 module.exports = {
   name: 'ban',
   description: 'Ban a user from the server',
@@ -17,7 +19,7 @@ module.exports = {
   args: [
     {
       name: 'user',
-      description: 'The user to ban, by mention or user id',
+      description: 'The user to ban. Valid formats: User mention, userId, or user tag (case sensitive)',
       required: true,
     },
     {
@@ -30,21 +32,23 @@ module.exports = {
 
   run(context, response) {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
+    let userService = context.nix.getService('core', 'UserService');
+    let commandService = context.nix.getService('core', 'CommandService');
 
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
     let days = context.flags.days;
 
-    let member = guild.members.find((u) => u.toString() === userString);
-    return Rx.Observable.if(
-      () => member,
-      Rx.Observable.return().map(() => member.user),
-      Rx.Observable.return().flatMap(() => context.nix.discord.users.fetch(userString))
-    )
-      .flatMap((user) => guild.ban(user, {reason, days}).then(() => user))
+    return userService
+      .findUser(userString)
+      .map((member) => {
+        if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        return member;
+      })
+      .flatMap((user) => guild.members.ban(user, {reason, days}).then(() => user))
       .flatMap((user) => {
-        let prefix = context.nix.commandManager.getPrefix(context.guild.id);
+        let prefix = commandService.getPrefix(context.guild.id);
         let unbanCmd = `${prefix}unban ${user.id}`;
 
         let modLogEmbed = new Discord.MessageEmbed();
@@ -83,7 +87,12 @@ module.exports = {
           return response.send();
         }
 
-        return Rx.Observable.throw(error);
+        switch (error.message) {
+          case ERRORS.USER_NOT_FOUND:
+            return response.send({ content: `Sorry, but I wasn't able to find that user.` });
+          default:
+            return Rx.Observable.throw(error);
+        }
       });
   },
 };
