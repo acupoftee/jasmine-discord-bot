@@ -1,6 +1,8 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const {ERRORS} = require('../utility');
+
 module.exports = {
   name: 'unban',
   description: 'unban a user from the server',
