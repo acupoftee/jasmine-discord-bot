@@ -42,10 +42,18 @@ module.exports = {
 
     return userService
       .findUser(userString)
-      .map((member) => {
-        if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
-        return member;
+      .map((user) => {
+        if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        return user;
       })
+      .flatMap((user) =>
+        Rx.Observable
+          .fromPromise(guild.fetchBans())
+          .map((bans) => {
+            if (bans.get(user.id)) { throw new Error(ERRORS.USER_ALREADY_BANNED); }
+            return user;
+          })
+      )
       .flatMap((user) =>
         Rx.Observable
           .fromPromise(
@@ -76,6 +84,10 @@ module.exports = {
         }
 
         switch (error.message) {
+          case ERRORS.USER_ALREADY_BANNED:
+            return response.send({
+              content: `That user has already been banned`,
+            });
           case ERRORS.USER_NOT_FOUND:
             return response.send({
               content:
