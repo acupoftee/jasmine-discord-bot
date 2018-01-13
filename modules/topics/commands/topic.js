@@ -29,8 +29,9 @@ module.exports = {
 
     return Rx.Observable
       .fromPromise(context.guild.createChannel(channelName))
-      .flatMap((channel) => channel.setParent(openCategory))
-      .flatMap((channel) => channel.setPosition(1))
+      .flatMap((channel) => channel.setParent(openCategory).then(() => channel))
+      .flatMap((channel) => channel.setPosition(1).then(() => channel))
+      .do((channel) => topicService.watchChannel(channel))
       .flatMap((channel) => {
         response.type = 'reply';
         response.content = 'I have opened the channel ' + channel.toString() + '.';
