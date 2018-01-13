@@ -16,7 +16,7 @@ class ModLogService {
     this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
     this.nix.streams
       .guildMemberAdd$
-      .do((member) => this.nix.logger.debug(`User joined: ${member.displayName}`))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} joined ${guild.id}`))
       .flatMap((member) => this.addUserJoinedEntry(member))
       .subscribe();
 
@@ -30,7 +30,7 @@ class ModLogService {
         }
         return Rx.Observable.of(member);
       })
-      .do((member) => this.nix.logger.debug(`User left: ${member.displayName}`))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
       .subscribe();
 
@@ -44,8 +44,8 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user, log]) => this.nix.logger.debug(`User banned: ${user.tag}`))
-      .do(([guild, user, log]) => this.justBanned[`${user.id}:${guild.id}`] = true)
+      .do(([guild, user, log]) => this.nix.logger.debug(`User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
+      .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
       .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason))
       .catch((error) => {
         this.nix.logger.error(error);
@@ -63,8 +63,8 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user, log]) => this.nix.logger.debug(`User unbanned: ${user.tag}`))
-      .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user))
+      .do(([guild, user]) => this.nix.logger.debug(`User ${user.tag} unbanned in ${guild.id}`))
+      .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.throw(error);
