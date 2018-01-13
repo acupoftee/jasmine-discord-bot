@@ -10,6 +10,7 @@ module.exports = {
       name: 'channelName',
       description: 'The name of the channel to open',
       required: true,
+      greedy: true,
     },
   ],
 
@@ -17,7 +18,9 @@ module.exports = {
     let topicService = context.nix.getService('topics', 'TopicService');
 
     let guild = context.guild;
-    let channelName = context.args.channelName;
+    let channelName = context.args.channelName.replace(/\W/g, ' ').trim().replace(/\s+/g, '-');
+
+    context.nix.logger.debug(`attempting to open topic channel: ${channelName}`);
 
     let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {

@@ -10,6 +10,7 @@ module.exports = {
       name: 'channelName',
       description: 'The new name of the channel to close',
       required: true,
+      greedy: true,
     },
   ],
 
@@ -18,7 +19,9 @@ module.exports = {
 
     let topicChannel = context.channel;
     let guild = context.guild;
-    let newName = context.args.channelName;
+    let channelName = context.args.channelName.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-');
+
+    context.nix.logger.debug(`renaming channel: ${topicChannel.name} => ${channelName}`);
 
     let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
@@ -43,7 +46,7 @@ module.exports = {
     }
 
     return Rx.Observable
-      .fromPromise(topicChannel.setName(newName))
+      .fromPromise(topicChannel.setName(channelName))
       .flatMap((topicChannel) => topicChannel.send('===== Renamed =====').then(() => topicChannel))
       .catch((error) => {
         response.type = 'message';
