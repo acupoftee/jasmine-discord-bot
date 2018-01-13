@@ -28,7 +28,7 @@ module.exports = {
         if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
         return member;
       })
-      .flatMap((user) => guild.members.unban(user, `Unbanned by ${context.author.tag}`))
+      .flatMap((user) => guild.unban(user, `Unbanned by ${context.author.tag}`))
       .flatMap((user) => modLogService.addUnbanEntry(guild, user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {

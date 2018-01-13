@@ -55,9 +55,9 @@ class ModLogService {
   }
 
   addUserJoinedEntry(member) {
-    let modLogEmbed = new Discord.MessageEmbed();
+    let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
-      .setAuthor(`${member.displayName} joined`, member.user.avatarURL())
+      .setAuthor(`${member.displayName} joined`, member.user.avatarURL)
       .setColor(Discord.Constants.Colors.GREEN)
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
@@ -66,9 +66,9 @@ class ModLogService {
   }
 
   addUserLeftEntry(member) {
-    let modLogEmbed = new Discord.MessageEmbed();
+    let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
-      .setAuthor(`${member.displayName} left`, member.user.avatarURL())
+      .setAuthor(`${member.displayName} left`, member.user.avatarURL)
       .setColor(Discord.Constants.Colors.GREY)
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
@@ -77,9 +77,9 @@ class ModLogService {
   }
 
   addWarnEntry(guild, user) {
-    let modLogEmbed = new Discord.MessageEmbed();
+    let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
-      .setAuthor(`${user.tag} warned`, user.avatarURL())
+      .setAuthor(`${user.tag} warned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_GOLD)
       .setDescription(`User ID: ${user.id}`)
       .setTimestamp();
@@ -88,9 +88,9 @@ class ModLogService {
   }
 
   addBanEntry(guild, user) {
-    let modLogEmbed = new Discord.MessageEmbed();
+    let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
-      .setAuthor(`${user.tag} banned`, user.avatarURL())
+      .setAuthor(`${user.tag} banned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_RED)
       .setDescription(`User ID: ${user.id}`)
       .setTimestamp();
@@ -99,9 +99,9 @@ class ModLogService {
   }
 
   addUnbanEntry(guild, user) {
-    let modLogEmbed = new Discord.MessageEmbed();
+    let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
-      .setAuthor(`${user.tag} unbanned`, user.avatarURL())
+      .setAuthor(`${user.tag} unbanned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_GREEN)
       .setDescription(`User ID: ${user.id}`)
       .setTimestamp();
