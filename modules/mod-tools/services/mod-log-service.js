@@ -46,7 +46,7 @@ class ModLogService {
       )
       .do(([guild, user, log]) => this.nix.logger.debug(`User banned: ${user.tag}`))
       .do(([guild, user, log]) => this.justBanned[`${user.id}:${guild.id}`] = true)
-      .flatMap(([guild, user]) => this.addBanEntry(guild, user))
+      .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason))
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.throw(error);
@@ -96,23 +96,23 @@ class ModLogService {
     return this.addAuditEntry(member.guild, modLogEmbed);
   }
 
-  addWarnEntry(guild, user) {
+  addWarnEntry(guild, user, reason) {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} warned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_GOLD)
-      .setDescription(`User ID: ${user.id}`)
+      .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
   }
 
-  addBanEntry(guild, user) {
+  addBanEntry(guild, user, reason) {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} banned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_RED)
-      .setDescription(`User ID: ${user.id}`)
+      .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
