@@ -46,12 +46,12 @@ module.exports = {
         if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
         return member;
       })
-      .flatMap((user) => guild.members.ban(user, {reason, days}).then(() => user))
+      .flatMap((user) => guild.ban(user, {reason, days}).then(() => user))
       .flatMap((user) => {
         let prefix = commandService.getPrefix(context.guild.id);
         let unbanCmd = `${prefix}unban ${user.id}`;
 
-        let modLogEmbed = new Discord.MessageEmbed();
+        let modLogEmbed = new Discord.RichEmbed();
         modLogEmbed
           .setAuthor(`${user.tag} banned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_RED)
