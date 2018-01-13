@@ -36,7 +36,7 @@ module.exports = {
         return member;
       })
       .flatMap((user) => {
-        let warningEmbed = new Discord.MessageEmbed();
+        let warningEmbed = new Discord.RichEmbed();
         warningEmbed
           .setThumbnail(guild.iconURL())
           .setColor(Discord.Constants.Colors.DARK_GOLD)
@@ -53,7 +53,7 @@ module.exports = {
           .map(() => user);
       })
       .flatMap((user) => {
-        let modLogEmbed = new Discord.MessageEmbed();
+        let modLogEmbed = new Discord.RichEmbed();
         modLogEmbed
           .setAuthor(`${user.tag} warned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_GOLD)

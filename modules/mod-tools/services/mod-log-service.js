@@ -15,7 +15,7 @@ class ModLogService {
       .flatMap((guildMember) => {
         this.nix.logger.debug(`User joined: ${guildMember.displayName}`);
 
-        let modLogEmbed = new Discord.MessageEmbed();
+        let modLogEmbed = new Discord.RichEmbed();
         modLogEmbed
           .setAuthor(`${guildMember.displayName} joined`, guildMember.user.avatarURL())
           .setColor(Discord.Constants.Colors.GREEN)
@@ -31,7 +31,7 @@ class ModLogService {
       .flatMap((guildMember) => {
         this.nix.logger.debug(`User left: ${guildMember.displayName}`);
 
-        let modLogEmbed = new Discord.MessageEmbed();
+        let modLogEmbed = new Discord.RichEmbed();
         modLogEmbed
           .setAuthor(`${guildMember.displayName} left`, guildMember.user.avatarURL())
           .setColor(Discord.Constants.Colors.GREY)

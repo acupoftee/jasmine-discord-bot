@@ -28,9 +28,9 @@ module.exports = {
         if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
         return member;
       })
-      .flatMap((user) => guild.members.unban(user))
+      .flatMap((user) => guild.unban(user))
       .flatMap((user) => {
-        let modLogEmbed = new Discord.MessageEmbed();
+        let modLogEmbed = new Discord.RichEmbed();
         modLogEmbed
           .setAuthor(`${user.tag} unbanned`, user.avatarURL())
           .setColor(Discord.Constants.Colors.DARK_GREEN)
