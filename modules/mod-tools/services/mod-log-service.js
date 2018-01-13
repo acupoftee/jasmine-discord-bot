@@ -2,6 +2,8 @@ const util = require('util');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const AuditLogActions = Discord.GuildAuditLogs.Actions;
+
 const {DATAKEYS} = require('../utility');
 
 class ModLogService {
@@ -12,13 +14,15 @@ class ModLogService {
 
   onNixListen() {
     this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
-    this.nix.streams.guildMemberAdd$
+    this.nix.streams
+      .guildMemberAdd$
       .do((member) => this.nix.logger.debug(`User joined: ${member.displayName}`))
       .flatMap((member) => this.addUserJoinedEntry(member))
       .subscribe();
 
     this.nix.logger.debug('Adding listener for guildMemberRemove$ events');
-    this.nix.streams.guildMemberRemove$
+    this.nix.streams
+      .guildMemberRemove$
       .flatMap((member) => {
         if (this.justBanned[`${member.id}:${member.guild.id}`]) {
           this.justBanned[`${user.id}:${guild.id}`] = false;
@@ -31,9 +35,17 @@ class ModLogService {
       .subscribe();
 
     this.nix.logger.debug('Adding listener for guildBanAdd$ events');
-    this.nix.streams.guildBanAdd$
-      .do(([guild, user]) => this.nix.logger.debug(`User banned: ${user.tag}`))
-      .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
+    this.nix.streams
+      .guildBanAdd$
+      .flatMap(([guild, user]) =>
+        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_ADD })
+          // Filter out bans by Jasmine, they have already been logged
+          .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          // Add the log to the returned data
+          .map((log) => [guild, user, log])
+      )
+      .do(([guild, user, log]) => this.nix.logger.debug(`User banned: ${user.tag}`))
+      .do(([guild, user, log]) => this.justBanned[`${user.id}:${guild.id}`] = true)
       .flatMap(([guild, user]) => this.addBanEntry(guild, user))
       .catch((error) => {
         this.nix.logger.error(error);
@@ -42,9 +54,17 @@ class ModLogService {
       .subscribe();
 
     this.nix.logger.debug('Adding listener for guildBanRemove$ events');
-    this.nix.streams.guildBanRemove$
-      .do(([guild, user]) => this.nix.logger.debug(`User unbanned: ${user.tag}`))
-      .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
+    this.nix.streams
+      .guildBanRemove$
+      .flatMap(([guild, user]) =>
+        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_REMOVE })
+          // Filter out bans by Jasmine, they have already been logged
+          .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          // Add the log to the returned data
+          .map((log) => [guild, user, log])
+      )
+      .do(([guild, user, log]) => this.nix.logger.debug(`User unbanned: ${user.tag}`))
+      .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user))
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.throw(error);
