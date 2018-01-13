@@ -23,8 +23,7 @@ module.exports = {
     if (!openCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, but I was not able to find the open topics category.\n" +
-        "Please let SpyMaster know about the issue";
+        "My apologies, I was not able to find the open topics category.";
       return response.send();
     }
 
