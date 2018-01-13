@@ -42,31 +42,27 @@ module.exports = {
 
     return userService
       .findUser(userString)
-      .map((member) => {
-        if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
-        return member;
+      .map((user) => {
+        if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        return user;
       })
-      .flatMap((user) => guild.ban(user, {reason, days}).then(() => user))
-      .flatMap((user) => {
-        let prefix = commandService.getPrefix(context.guild.id);
-        let unbanCmd = `${prefix}unban ${user.id}`;
-
-        let modLogEmbed = new Discord.RichEmbed();
-        modLogEmbed
-          .setAuthor(`${user.tag} banned`, user.avatarURL())
-          .setColor(Discord.Constants.Colors.DARK_RED)
-          .setDescription(`User ID: ${user.id}`)
-          .addField('Banned By', context.member)
-          .addField('Reason', reason || '`none given`')
-          .addField('Unban command', '```' + unbanCmd + '```')
-          .setTimestamp();
-
-        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
-      })
-      .flatMap((user) => {
-        response.content = `${user.tag} has been banned`;
-        return response.send();
-      })
+      .flatMap((user) =>
+        Rx.Observable
+          .fromPromise(guild.fetchBans())
+          .map((bans) => {
+            if (bans.get(user.id)) { throw new Error(ERRORS.USER_ALREADY_BANNED); }
+            return user;
+          })
+      )
+      .flatMap((user) =>
+        Rx.Observable
+          .fromPromise(
+            guild.ban(user, { reason: `${reason || '`none given`'} | Banned by ${context.author.tag}`, days})
+          )
+          .map(user)
+      )
+      .flatMap((user) => modLogService.addBanEntry(guild, user, reason, context.member.user).map(user))
+      .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           switch (error.message) {
@@ -88,6 +84,10 @@ module.exports = {
         }
 
         switch (error.message) {
+          case ERRORS.USER_ALREADY_BANNED:
+            return response.send({
+              content: `That user has already been banned`,
+            });
           case ERRORS.USER_NOT_FOUND:
             return response.send({
               content:

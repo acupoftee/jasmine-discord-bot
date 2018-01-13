@@ -1,56 +1,143 @@
 const util = require('util');
 const Rx = require('rx');
+const Discord = require('discord.js');
+
+const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
 const {DATAKEYS} = require('../utility');
-
-const Discord = require('discord.js');
 
 class ModLogService {
   constructor(nix) {
     this.nix = nix;
+    this.justBanned = {};
   }
 
   onNixListen() {
-    this.nix.streams.guildMemberAdd$
-      .flatMap((guildMember) => {
-        this.nix.logger.debug(`User joined: ${guildMember.displayName}`);
-
-        let modLogEmbed = new Discord.RichEmbed();
-        modLogEmbed
-          .setAuthor(`${guildMember.displayName} joined`, guildMember.user.avatarURL())
-          .setColor(Discord.Constants.Colors.GREEN)
-          .setDescription(`User ID: ${guildMember.id}`)
-          .setTimestamp();
-
-        return this.addAuditEntry(guildMember.guild, modLogEmbed);
-      })
-      .catch((error) => console.error(error))
+    this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
+    this.nix.streams
+      .guildMemberAdd$
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} joined ${guild.id}`))
+      .flatMap((member) => this.addUserJoinedEntry(member))
       .subscribe();
 
-    this.nix.streams.guildMemberRemove$
-      .flatMap((guildMember) => {
-        this.nix.logger.debug(`User left: ${guildMember.displayName}`);
-
-        let modLogEmbed = new Discord.RichEmbed();
-        modLogEmbed
-          .setAuthor(`${guildMember.displayName} left`, guildMember.user.avatarURL())
-          .setColor(Discord.Constants.Colors.GREY)
-          .setDescription(`User ID: ${guildMember.id}`)
-          .setTimestamp();
-
-        return this.addAuditEntry(guildMember.guild, modLogEmbed);
+    this.nix.logger.debug('Adding listener for guildMemberRemove$ events');
+    this.nix.streams
+      .guildMemberRemove$
+      .flatMap((member) => {
+        if (this.justBanned[`${member.id}:${member.guild.id}`]) {
+          this.justBanned[`${user.id}:${guild.id}`] = false;
+          return Rx.Observable.empty();
+        }
+        return Rx.Observable.of(member);
       })
-      .catch((error) => console.error(error))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${guild.id}`))
+      .flatMap((member) => this.addUserLeftEntry(member))
+      .subscribe();
+
+    this.nix.logger.debug('Adding listener for guildBanAdd$ events');
+    this.nix.streams
+      .guildBanAdd$
+      .flatMap(([guild, user]) =>
+        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_ADD })
+          // Filter out bans by Jasmine, they have already been logged
+          .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          // Add the log to the returned data
+          .map((log) => [guild, user, log])
+      )
+      .do(([guild, user, log]) => this.nix.logger.debug(`User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
+      .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
+      .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason, log.executor))
+      .catch((error) => {
+        this.nix.logger.error(error);
+        return Rx.Observable.throw(error);
+      })
+      .subscribe();
+
+    this.nix.logger.debug('Adding listener for guildBanRemove$ events');
+    this.nix.streams
+      .guildBanRemove$
+      .flatMap(([guild, user]) =>
+        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_REMOVE })
+          // Filter out bans by Jasmine, they have already been logged
+          .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          // Add the log to the returned data
+          .map((log) => [guild, user, log])
+      )
+      .do(([guild, user]) => this.nix.logger.debug(`User ${user.tag} unbanned in ${guild.id}`))
+      .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
+      .catch((error) => {
+        this.nix.logger.error(error);
+        return Rx.Observable.throw(error);
+      })
       .subscribe();
 
     return Rx.Observable.of(true);
   }
 
+  addUserJoinedEntry(member) {
+    let modLogEmbed = new Discord.RichEmbed();
+    modLogEmbed
+      .setAuthor(`${member.displayName} joined`, member.user.avatarURL)
+      .setColor(Discord.Constants.Colors.GREEN)
+      .setDescription(`User ID: ${member.id}`)
+      .setTimestamp();
+
+    return this.addAuditEntry(member.guild, modLogEmbed);
+  }
+
+  addUserLeftEntry(member) {
+    let modLogEmbed = new Discord.RichEmbed();
+    modLogEmbed
+      .setAuthor(`${member.displayName} left`, member.user.avatarURL)
+      .setColor(Discord.Constants.Colors.GREY)
+      .setDescription(`User ID: ${member.id}`)
+      .setTimestamp();
+
+    return this.addAuditEntry(member.guild, modLogEmbed);
+  }
+
+  addWarnEntry(guild, user, reason, moderator) {
+    let modLogEmbed = new Discord.RichEmbed();
+    modLogEmbed
+      .setAuthor(`${user.tag} warned`, user.avatarURL)
+      .setColor(Discord.Constants.Colors.DARK_GOLD)
+      .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
+      .setTimestamp();
+
+    return this.addAuditEntry(guild, modLogEmbed);
+  }
+
+  addBanEntry(guild, user, reason, moderator) {
+    let modLogEmbed = new Discord.RichEmbed();
+    modLogEmbed
+      .setAuthor(`${user.tag} banned`, user.avatarURL)
+      .setColor(Discord.Constants.Colors.DARK_RED)
+      .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
+      .setTimestamp();
+
+    return this.addAuditEntry(guild, modLogEmbed);
+  }
+
+  addUnbanEntry(guild, user, moderator) {
+    let modLogEmbed = new Discord.RichEmbed();
+    modLogEmbed
+      .setAuthor(`${user.tag} unbanned`, user.avatarURL)
+      .setColor(Discord.Constants.Colors.DARK_GREEN)
+      .setDescription(`User ID: ${user.id}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
+      .setTimestamp();
+
+    return this.addAuditEntry(guild, modLogEmbed);
+  }
+
   addAuditEntry(guild, embed) {
-    this.nix.logger.debug(`Adding audit entry: ${util.inspect(embed)}`);
+    this.nix.logger.debug(`Adding mod log entry`);
 
     return this.nix.dataService
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
+      .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))
       .filter((channel) => typeof channel !== 'undefined')
       .flatMap((channel) => channel.send({embed}))
@@ -67,6 +154,16 @@ class ModLogService {
       })
       .map(true)
       .defaultIfEmpty(true);
+  }
+
+  getLatestAuditLogs(guild, options) {
+    let filter = Object.assign({
+      limit: 1,
+    }, options);
+
+    return Rx.Observable
+      .fromPromise(guild.fetchAuditLogs(filter))
+      .flatMap((logs) => Rx.Observable.from(logs.entries.array()));
   }
 }
 

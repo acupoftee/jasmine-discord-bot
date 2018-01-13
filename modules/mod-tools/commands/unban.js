@@ -28,18 +28,8 @@ module.exports = {
         if (!member) { throw new Error(ERRORS.USER_NOT_FOUND); }
         return member;
       })
-      .flatMap((user) => guild.unban(user))
-      .flatMap((user) => {
-        let modLogEmbed = new Discord.RichEmbed();
-        modLogEmbed
-          .setAuthor(`${user.tag} unbanned`, user.avatarURL())
-          .setColor(Discord.Constants.Colors.DARK_GREEN)
-          .setDescription(`User ID: ${user.id}`)
-          .addField('Unbanned By', context.member)
-          .setTimestamp();
-
-        return modLogService.addAuditEntry(guild, modLogEmbed).map(user);
-      })
+      .flatMap((user) => guild.unban(user, `Unbanned by ${context.author.tag}`))
+      .flatMap((user) => modLogService.addUnbanEntry(guild, user, context.member.user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
