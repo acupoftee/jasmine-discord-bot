@@ -28,7 +28,8 @@ module.exports = {
     }
 
     return Rx.Observable
-      .fromPromise(context.guild.createChannel(channelName, {parent: openCategory}))
+      .fromPromise(context.guild.createChannel(channelName))
+      .flatMap((channel) => channel.setParent(openCategory))
       .flatMap((channel) => channel.setPosition(1))
       .flatMap((channel) => {
         response.type = 'reply';
