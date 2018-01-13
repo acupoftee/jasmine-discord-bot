@@ -110,6 +110,8 @@ class ModLogService {
   }
 
   addAuditEntry(guild, embed) {
+    this.nix.logger.debug(`Adding mod log entry`);
+
     return this.nix.dataService
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .filter((channelId) => typeof channelId !== 'undefined')
@@ -129,6 +131,16 @@ class ModLogService {
       })
       .map(true)
       .defaultIfEmpty(true);
+  }
+
+  getLatestAuditLogs(guild, options) {
+    let filter = Object.assign({
+      limit: 1,
+    }, options);
+
+    return Rx.Observable
+      .fromPromise(guild.fetchAuditLogs(filter))
+      .flatMap((logs) => Rx.Observable.from(logs.entries.array()));
   }
 }
 
