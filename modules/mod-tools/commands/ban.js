@@ -61,7 +61,7 @@ module.exports = {
           )
           .map(user)
       )
-      .flatMap((user) => modLogService.addBanEntry(guild, user, reason).map(user))
+      .flatMap((user) => modLogService.addBanEntry(guild, user, reason, context.member.user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {

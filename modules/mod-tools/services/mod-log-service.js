@@ -46,7 +46,7 @@ class ModLogService {
       )
       .do(([guild, user, log]) => this.nix.logger.debug(`User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
       .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
-      .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason))
+      .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.throw(error);
@@ -64,7 +64,7 @@ class ModLogService {
           .map((log) => [guild, user, log])
       )
       .do(([guild, user]) => this.nix.logger.debug(`User ${user.tag} unbanned in ${guild.id}`))
-      .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
+      .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.throw(error);
@@ -96,34 +96,37 @@ class ModLogService {
     return this.addAuditEntry(member.guild, modLogEmbed);
   }
 
-  addWarnEntry(guild, user, reason) {
+  addWarnEntry(guild, user, reason, moderator) {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} warned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_GOLD)
       .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
   }
 
-  addBanEntry(guild, user, reason) {
+  addBanEntry(guild, user, reason, moderator) {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} banned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_RED)
       .setDescription(`User ID: ${user.id}\nReason: ${reason || '`None`'}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
   }
 
-  addUnbanEntry(guild, user) {
+  addUnbanEntry(guild, user, moderator) {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${user.tag} unbanned`, user.avatarURL)
       .setColor(Discord.Constants.Colors.DARK_GREEN)
       .setDescription(`User ID: ${user.id}`)
+      .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
     return this.addAuditEntry(guild, modLogEmbed);
