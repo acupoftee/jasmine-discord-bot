@@ -1,10 +1,5 @@
 const Rx = require('rx');
 
-const util = require('../../../lib/utilities');
-
-const OPEN_TOPICS_CAT = '!topic';
-const CLOSED_TOPICS_CAT = '!close';
-
 module.exports = {
   name: 'close',
   description: 'Close the current topic, or specify a topic to close.',
@@ -19,12 +14,21 @@ module.exports = {
   ],
 
   run(context, response) {
+    let topicService = context.nix.getService('topics', 'TopicService');
+
     let topicChannel = null;
+    let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = util.findCategory(context.guild, OPEN_TOPICS_CAT);
-    let closedCategory = util.findCategory(context.guild, CLOSED_TOPICS_CAT);
+    let openCategory = topicService.getOpenTopicsCategory(guild);
+    if (!openCategory) {
+      response.type = 'message';
+      response.content =
+        "My apologies, I was not able to find the open topics category.";
+      return response.send();
+    }
 
+    let closedCategory = topicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
@@ -34,7 +38,10 @@ module.exports = {
     }
 
     if (channelName) {
-      topicChannel = util.getChannel(context.guild, channelName);
+      topicChannel =
+        guild.channels
+          .filter((channel) => channel.type === 'text')
+          .find((channel) => channel.name.toLowerCase() === channelName.toLowerCase());
     }
     else {
       topicChannel = context.channel;

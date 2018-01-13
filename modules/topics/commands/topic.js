@@ -1,9 +1,5 @@
 const Rx = require('rx');
 
-const {findCategory} = require('../../../lib/utilities');
-
-const OPEN_TOPICS_CAT = '!topic';
-
 module.exports = {
   name: 'topic',
   description: 'Open a new discussion channel',
@@ -18,9 +14,12 @@ module.exports = {
   ],
 
   run(context, response) {
+    let topicService = context.nix.getService('topics', 'TopicService');
+
+    let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = findCategory(context.guild, OPEN_TOPICS_CAT);
+    let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
