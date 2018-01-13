@@ -36,7 +36,7 @@ class ModLogService {
       .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
       .flatMap(([guild, user]) => this.addBanEntry(guild, user))
       .catch((error) => {
-        console.log(error);
+        this.nix.logger.error(error);
         return Rx.Observable.throw(error);
       })
       .subscribe();
@@ -46,7 +46,7 @@ class ModLogService {
       .do(([guild, user]) => this.nix.logger.debug(`User unbanned: ${user.tag}`))
       .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
       .catch((error) => {
-        console.log(error);
+        this.nix.logger.error(error);
         return Rx.Observable.throw(error);
       })
       .subscribe();
@@ -110,8 +110,6 @@ class ModLogService {
   }
 
   addAuditEntry(guild, embed) {
-    this.nix.logger.debug(`Adding audit entry: ${util.inspect(embed)}`);
-
     return this.nix.dataService
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .filter((channelId) => typeof channelId !== 'undefined')
