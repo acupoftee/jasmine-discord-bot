@@ -1,9 +1,5 @@
 const Rx = require('rx');
 
-const {findCategory} = require('../../../lib/utilities');
-
-const OPEN_TOPICS_CAT = '!topic';
-
 module.exports = {
   name: 'topic',
   description: 'Open a new discussion channel',
@@ -14,24 +10,31 @@ module.exports = {
       name: 'channelName',
       description: 'The name of the channel to open',
       required: true,
+      greedy: true,
     },
   ],
 
   run(context, response) {
-    let channelName = context.args.channelName;
+    let topicService = context.nix.getService('topics', 'TopicService');
 
-    let openCategory = findCategory(context.guild, OPEN_TOPICS_CAT);
+    let guild = context.guild;
+    let channelName = context.args.channelName.replace(/\W/g, ' ').trim().replace(/\s+/g, '-');
+
+    context.nix.logger.debug(`attempting to open topic channel: ${channelName}`);
+
+    let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, but I was not able to find the open topics category.\n" +
-        "Please let SpyMaster know about the issue";
+        "My apologies, I was not able to find the open topics category.";
       return response.send();
     }
 
     return Rx.Observable
-      .fromPromise(context.guild.createChannel(channelName, {parent: openCategory}))
-      .flatMap((channel) => channel.setPosition(1))
+      .fromPromise(context.guild.createChannel(channelName))
+      .flatMap((channel) => channel.setParent(openCategory).then(() => channel))
+      .flatMap((channel) => channel.setPosition(1).then(() => channel))
+      .do((channel) => topicService.watchChannel(channel))
       .flatMap((channel) => {
         response.type = 'reply';
         response.content = 'I have opened the channel ' + channel.toString() + '.';
