@@ -14,8 +14,7 @@
 - Unbans (made via Discord) are reported in the ModLog
 - !topic now allows for spaces in the channel name
 - The first message in a topic channel is automatically pinned
-- A user can now be found by ID, Mention, or Tag for `!ban`, `!unban`, and `!warn`
-- 
+- A user can now be found by ID, Mention, or Tag for `!ban`, `!unban`, and `!warn` 
 
 ## New config actions:
 
