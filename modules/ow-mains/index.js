@@ -9,6 +9,8 @@ module.exports = {
     { keyword: DATAKEYS.BROADCAST_BLIZZARD, data: null },
     { keyword: DATAKEYS.BROADCAST_NETWORK, data: null },
     { keyword: DATAKEYS.BROADCAST_TOKENS, data: {} },
+    { keyword: DATAKEYS.NET_MOD_LOG, data: null },
+    { keyword: DATAKEYS.NET_MOD_LOG_TOKEN, data: null },
   ],
   configActions: [
     require('./config/sub-broadcast'),
