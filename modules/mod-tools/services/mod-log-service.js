@@ -29,7 +29,7 @@ class ModLogService {
           .filter((bannedUser) => !bannedUser)
           .map(member)
       )
-      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${guild.id}`))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${member.guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
       .subscribe();
 
