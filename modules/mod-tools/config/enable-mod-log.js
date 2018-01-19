@@ -21,7 +21,7 @@ module.exports = {
 
     return context.nix.dataService
       .setGuildData(guild.id, 'modTools.modLogChannel', channel.id)
-      .flatMap(() => channel.send({content: 'I will post the moderation log here now.'}))
+      .flatMap(() => channel.send('I will post the moderation log here now.'))
       .flatMap(() => response.send({content: `I have enabled the mod log in the channel ${channel}`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
