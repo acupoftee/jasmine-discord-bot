@@ -12,6 +12,9 @@ module.exports = {
     { keyword: DATAKEYS.NET_MOD_LOG, data: null },
     { keyword: DATAKEYS.NET_MOD_LOG_TOKEN, data: null },
   ],
+  services: [
+    require('./services/net-mod-log-service'),
+  ],
   configActions: [
     require('./config/sub-broadcast'),
     require('./config/unsub-broadcast'),
