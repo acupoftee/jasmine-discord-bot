@@ -76,7 +76,7 @@ class ModLogService {
     let modLogEmbed = new Discord.RichEmbed();
     modLogEmbed
       .setAuthor(`${member.displayName} joined`, member.user.avatarURL)
-      .setColor(Discord.Constants.Colors.GREEN)
+      .setColor(Discord.Constants.Colors.AQUA)
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 

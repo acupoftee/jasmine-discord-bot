@@ -30,13 +30,16 @@ module.exports = {
     let reason = context.args.reason;
 
 
-    let warningEmbed = new Discord.MessageEmbed();
+    let warningEmbed = new Discord.RichEmbed();
     warningEmbed
-      .setThumbnail(guild.iconURL())
+      .setThumbnail(guild.iconURL)
       .setColor(Discord.Constants.Colors.DARK_GOLD)
       .setTitle('WARNING')
-      .setDescription(reason)
       .addField('Server', guild.name);
+
+    if (reason) {
+      warningEmbed.setDescription(reason);
+    }
 
     return userService
       .findUser(userString)
