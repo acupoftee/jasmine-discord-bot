@@ -80,7 +80,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addAuditEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed);
   }
 
   addUserLeftEntry(member) {
@@ -91,7 +91,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addAuditEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed);
   }
 
   addWarnEntry(guild, user, reason, moderator) {
@@ -103,7 +103,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed);
   }
 
   addBanEntry(guild, user, reason, moderator) {
@@ -115,7 +115,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed);
   }
 
   addUnbanEntry(guild, user, moderator) {
@@ -127,10 +127,10 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed);
   }
 
-  addAuditEntry(guild, embed) {
+  addLogEntry(guild, embed) {
     this.nix.logger.debug(`Adding mod log entry`);
 
     return this.nix.dataService
