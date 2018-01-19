@@ -137,7 +137,7 @@ class ModLogService {
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))
-      .filter((channel) => typeof channel !== 'undefined')
+      .filter((channel) => channel !== null)
       .flatMap((channel) => channel.send({embed}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
