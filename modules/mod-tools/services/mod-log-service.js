@@ -1,4 +1,3 @@
-const util = require('util');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
@@ -9,27 +8,27 @@ const {DATAKEYS} = require('../utility');
 class ModLogService {
   constructor(nix) {
     this.nix = nix;
-    this.justBanned = {};
   }
 
   onNixListen() {
     this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
     this.nix.streams
       .guildMemberAdd$
-      .do((member) => this.nix.logger.debug(`User ${member.user.tag} joined ${guild.id}`))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} joined ${member.guild.id}`))
       .flatMap((member) => this.addUserJoinedEntry(member))
       .subscribe();
 
     this.nix.logger.debug('Adding listener for guildMemberRemove$ events');
     this.nix.streams
       .guildMemberRemove$
-      .flatMap((member) => {
-        if (this.justBanned[`${member.id}:${member.guild.id}`]) {
-          this.justBanned[`${user.id}:${guild.id}`] = false;
-          return Rx.Observable.empty();
-        }
-        return Rx.Observable.of(member);
-      })
+      .flatMap((member) =>
+        //filter out members who are banned
+        Rx.Observable
+          .fromPromise(member.guild.fetchBans())
+          .map((bans) => bans.get(member.id))
+          .filter((bannedUser) => !bannedUser)
+          .map(member)
+      )
       .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
       .subscribe();
@@ -44,8 +43,7 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user, log]) => this.nix.logger.debug(`User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
-      .do(([guild, user]) => this.justBanned[`${user.id}:${guild.id}`] = true)
+      .do(([guild, user, log]) => this.nix.logger.debug(`ModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
       .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
@@ -63,7 +61,7 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user]) => this.nix.logger.debug(`User ${user.tag} unbanned in ${guild.id}`))
+      .do(([guild, user]) => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
       .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
@@ -139,7 +137,7 @@ class ModLogService {
       .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))
-      .filter((channel) => typeof channel !== 'undefined')
+      .filter((channel) => channel !== null)
       .flatMap((channel) => channel.send({embed}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {

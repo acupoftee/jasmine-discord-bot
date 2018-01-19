@@ -13,8 +13,8 @@ module.exports = {
     require('./services/mod-log-service'),
   ],
   configActions: [
-    require('./config/enableModLog'),
-    require('./config/disableModLog'),
+    require('./config/enable-mod-log'),
+    require('./config/disable-mod-log'),
   ],
   commands: [
     require('./commands/warn.js'),

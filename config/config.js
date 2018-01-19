@@ -16,4 +16,5 @@ module.exports = {
   },
 
   broadcastTokens: privateConfig.broadcastTokens,
+  networkModLogToken: privateConfig.networkModLogToken,
 };
