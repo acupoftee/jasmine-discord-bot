@@ -6,18 +6,9 @@ module.exports = {
     'broadcaster',
   ],
   defaultData: [
-    {
-      keyword: DATAKEYS.BROADCAST_BLIZZARD,
-      data: null,
-    },
-    {
-      keyword: DATAKEYS.BROADCAST_NETWORK,
-      data: null,
-    },
-    {
-      keyword: DATAKEYS.BROADCAST_TOKENS,
-      data: {},
-    },
+    { keyword: DATAKEYS.BROADCAST_BLIZZARD, data: null },
+    { keyword: DATAKEYS.BROADCAST_NETWORK, data: null },
+    { keyword: DATAKEYS.BROADCAST_TOKENS, data: {} },
   ],
   configActions: [
     require('./config/sub-broadcast'),
