@@ -43,7 +43,7 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user, log]) => this.nix.logger.debug(`User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
+      .do(([guild, user, log]) => this.nix.logger.debug(`ModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
       .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
@@ -61,7 +61,7 @@ class ModLogService {
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
-      .do(([guild, user]) => this.nix.logger.debug(`User ${user.tag} unbanned in ${guild.id}`))
+      .do(([guild, user]) => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
       .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
       .catch((error) => {
         this.nix.logger.error(error);
