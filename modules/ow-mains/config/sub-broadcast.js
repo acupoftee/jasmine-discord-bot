@@ -34,7 +34,7 @@ module.exports = {
     let datakey = BROADCAST_TYPES[broadcastType];
     return context.nix.dataService
       .setGuildData(guild.id, datakey, channel.id)
-      .flatMap(() => channel.send({content: `I will send ${broadcastType} broadcasts here.`}))
+      .flatMap(() => channel.send(`I will send ${broadcastType} broadcasts here.`))
       .flatMap(() => response.send({content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
