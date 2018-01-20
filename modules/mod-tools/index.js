@@ -8,13 +8,17 @@ module.exports = {
       keyword: DATAKEYS.MOD_LOG_CHANNEL,
       data: null,
     },
+    {
+      keyword: DATAKEYS.JOIN_LOG_CHANNEL,
+      data: null,
+    },
   ],
   services: [
     require('./services/mod-log-service'),
   ],
   configActions: [
-    require('./config/enable-mod-log'),
-    require('./config/disable-mod-log'),
+    require('./config/enable-log'),
+    require('./config/disable-log'),
   ],
   commands: [
     require('./commands/warn.js'),

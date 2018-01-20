@@ -67,10 +67,13 @@ module.exports = {
         if (error.name === 'DiscordAPIError') {
           switch (error.message) {
             case "Missing Permissions":
-            case "Privilege is too low...":
               response.content =
                 `Whoops, I do not have permission to unban users. Can you check if I have the ` +
                   `"Ban members" permission?`;
+              break;
+            case "Privilege is too low...":
+              response.content =
+                `I'm sorry, but I don't have permission to ban that user. They have higher permissions then me.`;
               break;
             default:
               response.content = `Err... Discord returned an unexpected error when I tried to ban that user.`;

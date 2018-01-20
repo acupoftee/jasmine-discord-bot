@@ -3,7 +3,10 @@ const Discord = require('discord.js');
 
 const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
-const {DATAKEYS} = require('../utility');
+const {
+  ERRORS,
+  LOG_TYPES,
+} = require('../utility');
 
 class ModLogService {
   constructor(nix) {
@@ -29,7 +32,7 @@ class ModLogService {
           .filter((bannedUser) => !bannedUser)
           .map(member)
       )
-      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${guild.id}`))
+      .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${member.guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
       .subscribe();
 
@@ -80,7 +83,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addAuditEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed, "JoinLog");
   }
 
   addUserLeftEntry(member) {
@@ -91,7 +94,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addAuditEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed, "JoinLog");
   }
 
   addWarnEntry(guild, user, reason, moderator) {
@@ -103,7 +106,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
   addBanEntry(guild, user, reason, moderator) {
@@ -115,7 +118,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
   addUnbanEntry(guild, user, moderator) {
@@ -127,14 +130,17 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addAuditEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
-  addAuditEntry(guild, embed) {
+  addLogEntry(guild, embed, logTypeName) {
     this.nix.logger.debug(`Adding mod log entry`);
 
+    let logType = this.getLogType(logTypeName);
+    if (!logType) { throw new Error(ERRORS.INVALID_LOG_TYPE); }
+
     return this.nix.dataService
-      .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
+      .getGuildData(guild.id, logType.channelDatakey)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))
       .filter((channel) => channel !== null)
@@ -152,6 +158,10 @@ class ModLogService {
       })
       .map(true)
       .defaultIfEmpty(true);
+  }
+
+  getLogType(name) {
+    return LOG_TYPES.find((type) => type.name.toLowerCase() === name.toLowerCase());
   }
 
   getLatestAuditLogs(guild, options) {

@@ -9,10 +9,11 @@ class TopicService {
   onNixListen() {
     this.nix.streams
       .message$
+      .filter((message) => !message.system)
       .filter((message) => this.watchedChannels[message.channel.id])
-      .do((message) => this.nix.logger.debug(`Message in ${message.channel.name}`))
+      .do((message) => delete this.watchedChannels[message.channel.id])
+      .do((message) => this.nix.logger.debug(`Message in ${message.channel.name}: ${message.content}`))
       .flatMap((message) => message.pin())
-      .do((message) => this.watchChannels[message.channel.id] = false)
       .catch((error) => {
         this.nix.logger.error(error);
         return Rx.Observable.of();
