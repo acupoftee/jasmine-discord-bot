@@ -169,6 +169,16 @@ class ModLogService {
       limit: 1,
     }, options);
 
+    let canViewAuditLog = guild.member(this.nix.discord.user).hasPermission(Discord.Permissions.FLAGS.VIEW_AUDIT_LOG);
+    if (!canViewAuditLog) {
+      return Rx.Observable.from([
+        {
+          executor: {id: null},
+          reason: 'ERROR: Unable to view audit log.',
+        },
+      ]);
+    }
+
     return Rx.Observable
       .fromPromise(guild.fetchAuditLogs(filter))
       .flatMap((logs) => Rx.Observable.from(logs.entries.array()));
