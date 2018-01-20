@@ -3,8 +3,8 @@ const { LOG_TYPES } = require('../utility');
 const VALID_LOG_TYPES_NAMES = LOG_TYPES.map((t) => t.name);
 
 module.exports = {
-  name: 'enableModLog',
-  description: 'Report bans, warnings, and unbannings to a channel',
+  name: 'enableLog',
+  description: 'Enable a log in a channel, such as the ModLog or the JoinLog',
   inputs: [
     {
       name: 'type',

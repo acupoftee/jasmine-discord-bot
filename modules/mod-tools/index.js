@@ -17,8 +17,8 @@ module.exports = {
     require('./services/mod-log-service'),
   ],
   configActions: [
-    require('./config/enable-mod-log'),
-    require('./config/disable-mod-log'),
+    require('./config/enable-log'),
+    require('./config/disable-log'),
   ],
   commands: [
     require('./commands/warn.js'),
