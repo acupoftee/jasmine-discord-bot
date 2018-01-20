@@ -31,6 +31,7 @@ class ModLogService {
           .map((bans) => bans.get(member.id))
           .filter((bannedUser) => !bannedUser)
           .map(member)
+          .catch(() => Rx.Observable.of(member)) //Error occurred while trying to fetch bans, just continue anyway.
       )
       .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${member.guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
@@ -168,6 +169,16 @@ class ModLogService {
     let filter = Object.assign({
       limit: 1,
     }, options);
+
+    let canViewAuditLog = guild.member(this.nix.discord.user).hasPermission(Discord.Permissions.FLAGS.VIEW_AUDIT_LOG);
+    if (!canViewAuditLog) {
+      return Rx.Observable.from([
+        {
+          executor: {id: null},
+          reason: 'ERROR: Unable to view audit log.',
+        },
+      ]);
+    }
 
     return Rx.Observable
       .fromPromise(guild.fetchAuditLogs(filter))
