@@ -68,7 +68,7 @@ module.exports = {
           switch (error.message) {
             case "Missing Permissions":
               response.content =
-                `Whoops, I do not have permission to unban users. Can you check if I have the ` +
+                `Whoops, I do not have permission to ban users. Can you check if I have the ` +
                   `"Ban members" permission?`;
               break;
             case "Privilege is too low...":
