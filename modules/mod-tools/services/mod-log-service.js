@@ -31,6 +31,7 @@ class ModLogService {
           .map((bans) => bans.get(member.id))
           .filter((bannedUser) => !bannedUser)
           .map(member)
+          .catch(() => Rx.Observable.of(member)) //Error occurred while trying to fetch bans, just continue anyway.
       )
       .do((member) => this.nix.logger.debug(`User ${member.user.tag} left ${member.guild.id}`))
       .flatMap((member) => this.addUserLeftEntry(member))
