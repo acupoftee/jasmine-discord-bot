@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const Nix = require('nix-core');
 const config = require('./config/config.js');
+const packageJson = require('./package');
 
 let nix = new Nix(config);
 
@@ -14,7 +15,7 @@ fs.readdirSync('./modules')
 
 nix.listen()
   .subscribe(
-    () => {},
+    () => nix.discord.user.setPresence({game: {name: `v${packageJson.version}`}}),
     (error) => onNixError(error),
     () => onNixComplete()
 );
