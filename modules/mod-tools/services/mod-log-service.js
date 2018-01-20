@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
 const {
+  ERRORS,
   LOG_TYPES,
 } = require('../utility');
 
@@ -82,7 +83,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addLogEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed, "JoinLog");
   }
 
   addUserLeftEntry(member) {
@@ -93,7 +94,7 @@ class ModLogService {
       .setDescription(`User ID: ${member.id}`)
       .setTimestamp();
 
-    return this.addLogEntry(member.guild, modLogEmbed);
+    return this.addLogEntry(member.guild, modLogEmbed, "JoinLog");
   }
 
   addWarnEntry(guild, user, reason, moderator) {
@@ -105,7 +106,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addLogEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
   addBanEntry(guild, user, reason, moderator) {
@@ -117,7 +118,7 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addLogEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
   addUnbanEntry(guild, user, moderator) {
@@ -129,14 +130,17 @@ class ModLogService {
       .addField('Moderator:', moderator ? `${moderator.tag}\nID: ${moderator.id}` : '`unknown`')
       .setTimestamp();
 
-    return this.addLogEntry(guild, modLogEmbed);
+    return this.addLogEntry(guild, modLogEmbed, "ModLog");
   }
 
-  addLogEntry(guild, embed) {
+  addLogEntry(guild, embed, logTypeName) {
     this.nix.logger.debug(`Adding mod log entry`);
 
+    let logType = this.getLogType(logTypeName);
+    if (!logType) { throw new Error(ERRORS.INVALID_LOG_TYPE); }
+
     return this.nix.dataService
-      .getGuildData(guild.id, DATAKEYS.MOD_LOG_CHANNEL)
+      .getGuildData(guild.id, logType.channelDatakey)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))
       .filter((channel) => channel !== null)
