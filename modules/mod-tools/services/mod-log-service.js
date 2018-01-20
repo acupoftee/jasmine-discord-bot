@@ -3,7 +3,9 @@ const Discord = require('discord.js');
 
 const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
-const {DATAKEYS} = require('../utility');
+const {
+  LOG_TYPES,
+} = require('../utility');
 
 class ModLogService {
   constructor(nix) {
@@ -152,6 +154,10 @@ class ModLogService {
       })
       .map(true)
       .defaultIfEmpty(true);
+  }
+
+  getLogType(name) {
+    return LOG_TYPES.find((type) => type.name.toLowerCase() === name.toLowerCase());
   }
 
   getLatestAuditLogs(guild, options) {
