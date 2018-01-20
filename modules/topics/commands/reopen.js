@@ -1,10 +1,5 @@
 const Rx = require('rx');
 
-const util = require('../../../lib/utilities');
-
-const OPEN_TOPICS_CAT = '!topic';
-const CLOSED_TOPICS_CAT = '!close';
-
 module.exports = {
   name: 'reopen',
   description: 'reopen the current topic, or specify a topic to reopen.',
@@ -19,22 +14,33 @@ module.exports = {
   ],
 
   run(context, response) {
+    let topicService = context.nix.getService('topics', 'TopicService');
+
     let topicChannel = null;
+    let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = util.findCategory(context.guild, OPEN_TOPICS_CAT);
-    let closedCategory = util.findCategory(context.guild, CLOSED_TOPICS_CAT);
-
+    let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, I was not able to find the open topics category.\n" +
-        "Please let SpyMaster know about the issue";
+        "My apologies, I was not able to find the open topics category.";
+      return response.send();
+    }
+
+    let closedCategory = topicService.getClosedTopicsCategory(guild);
+    if (!closedCategory) {
+      response.type = 'message';
+      response.content =
+        "My apologies, I was not able to find the closed topics category.";
       return response.send();
     }
 
     if (channelName) {
-      topicChannel = util.getChannel(context.guild, channelName);
+      topicChannel =
+        guild.channels
+          .filter((channel) => channel.type === 'text')
+          .find((channel) => channel.name.toLowerCase() === channelName.toLowerCase());
     }
     else {
       topicChannel = context.channel;
@@ -56,7 +62,7 @@ module.exports = {
 
     return Rx.Observable
       .fromPromise(topicChannel.setParent(openCategory))
-      .flatMap((topicChannel) => topicChannel.setPosition(0))
+      .flatMap((topicChannel) => topicChannel.setPosition(0).then(() => topicChannel))
       .flatMap((topicChannel) => topicChannel.send('===== Reopened =====').then(() => topicChannel))
       .flatMap((topicChannel) => {
         if (topicChannel.id !== context.channel.id) {

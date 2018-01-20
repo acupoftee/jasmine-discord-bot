@@ -6,4 +6,6 @@ module.exports = {
     'blizzard': 'some_key',
     'network': 'some_key',
   },
+
+  networkModLogToken: 'some_key',
 }

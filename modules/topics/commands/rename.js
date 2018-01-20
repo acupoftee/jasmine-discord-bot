@@ -1,10 +1,5 @@
 const Rx = require('rx');
 
-const util = require('../../../lib/utilities');
-
-const OPEN_TOPICS_CAT = '!topic';
-const CLOSED_TOPICS_CAT = '!close';
-
 module.exports = {
   name: 'rename',
   description: 'rename the current topic',
@@ -15,28 +10,32 @@ module.exports = {
       name: 'channelName',
       description: 'The new name of the channel to close',
       required: true,
+      greedy: true,
     },
   ],
 
   run(context, response) {
-    let topicChannel = context.channel;
-    let newName = context.args.channelName;
+    let topicService = context.nix.getService('topics', 'TopicService');
 
-    let openCategory = util.findCategory(context.guild, OPEN_TOPICS_CAT);
+    let topicChannel = context.channel;
+    let guild = context.guild;
+    let channelName = context.args.channelName.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-');
+
+    context.nix.logger.debug(`renaming channel: ${topicChannel.name} => ${channelName}`);
+
+    let openCategory = topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, I was not able to find the open topics category.\n" +
-        "Please let SpyMaster know about the issue";
+        "My apologies, I was not able to find the open topics category.";
       return response.send();
     }
 
-    let closedCategory = util.findCategory(context.guild, CLOSED_TOPICS_CAT);
+    let closedCategory = topicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
-        "My apologies, I was not able to find the closed topics category.\n" +
-        "Please let SpyMaster know about the issue";
+        "My apologies, I was not able to find the closed topics category.";
       return response.send();
     }
 
@@ -47,7 +46,7 @@ module.exports = {
     }
 
     return Rx.Observable
-      .fromPromise(topicChannel.setName(newName))
+      .fromPromise(topicChannel.setName(channelName))
       .flatMap((topicChannel) => topicChannel.send('===== Renamed =====').then(() => topicChannel))
       .catch((error) => {
         response.type = 'message';

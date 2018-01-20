@@ -34,9 +34,9 @@ module.exports = {
       return response.send({content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`});
     }
 
-    return nix.data.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
+    return nix.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .do((savedData) => savedData[broadcastType] = token)
-      .flatMap((savedData) => nix.data.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
+      .flatMap((savedData) => nix.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
       .flatMap(() => response.send({content: `This server is now allowed to send ${broadcastType} broadcasts.`}));
   },
 };

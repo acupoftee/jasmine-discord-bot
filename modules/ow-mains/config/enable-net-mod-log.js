@@ -1,17 +1,32 @@
+const {
+  DATAKEYS,
+  NET_MOD_LOG_TOKEN,
+} = require('../utility');
+
 module.exports = {
-  name: 'enableModLog',
-  description: 'Report bans, warnings, and unbannings to a channel',
+  name: 'enableNetModLog',
+  description: `Enable network mod log reporting to this server.`,
   inputs: [
     {
+      name: 'token',
+      required: true,
+    },
+    {
       name: 'channel',
-      description: 'the channel to set the mod log to',
       required: true,
     },
   ],
 
-  run(context, response) {
+  run: (context, response) => {
+    let dataService = context.nix.dataService;
+
     let guild = context.guild;
-    let channelString = context.args.input1;
+    let token = context.args.input1;
+    let channelString = context.args.input2;
+
+    if (token !== NET_MOD_LOG_TOKEN) {
+      return response.send({content: `I'm sorry, but that token is not valid for the network mod log`});
+    }
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
@@ -19,10 +34,10 @@ module.exports = {
       return response.send();
     }
 
-    return context.nix.data
-      .setGuildData(guild.id, 'modTools.modLogChannel', channel.id)
-      .flatMap(() => channel.send({content: 'I will post the moderation log here now.'}))
-      .flatMap(() => response.send({content: `I have enabled the mod log in the channel ${channel}`}))
+    return dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG_TOKEN, token)
+      .flatMap(() => dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
+      .flatMap(() => channel.send('I will post the network moderation log here now.'))
+      .flatMap(() => response.send({content: `This server will now receive the network moderation log.`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           if (error.message === "Missing Access") {

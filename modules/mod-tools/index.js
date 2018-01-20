@@ -1,15 +1,24 @@
+const {DATAKEYS} = require('./utility');
+
 module.exports = {
   name: 'modTools',
   permissions: ['mod'],
   defaultData: [
     {
-      keyword: 'modTools.modLogChannel',
+      keyword: DATAKEYS.MOD_LOG_CHANNEL,
+      data: null,
+    },
+    {
+      keyword: DATAKEYS.JOIN_LOG_CHANNEL,
       data: null,
     },
   ],
+  services: [
+    require('./services/mod-log-service'),
+  ],
   configActions: [
-    require('./config/enableModLog'),
-    require('./config/disableModLog'),
+    require('./config/enable-log'),
+    require('./config/disable-log'),
   ],
   commands: [
     require('./commands/warn.js'),

@@ -21,7 +21,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return context.nix.data
+    return context.nix.dataService
       .setGuildData(guild.id, datakey, null)
       .flatMap(() => response.send({content: `I have disabled ${broadcastType} broadcasts`}));
   },
