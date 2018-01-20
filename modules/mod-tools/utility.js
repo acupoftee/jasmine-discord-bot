@@ -1,5 +1,6 @@
 const DATAKEYS = {
   MOD_LOG_CHANNEL: 'modTools.modLogChannel',
+  JOIN_LOG_CHANNEL: 'modTools.joinLogChannel',
 };
 
 const ERRORS = {

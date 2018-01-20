@@ -8,6 +8,10 @@ module.exports = {
       keyword: DATAKEYS.MOD_LOG_CHANNEL,
       data: null,
     },
+    {
+      keyword: DATAKEYS.JOIN_LOG_CHANNEL,
+      data: null,
+    },
   ],
   services: [
     require('./services/mod-log-service'),
