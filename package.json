@@ -27,7 +27,7 @@
   "dependencies": {
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "git-rev": "^0.2.1",
-    "nix-core": "github:SpyMaster356/nix-core#v0.7.1",
+    "nix-core": "github:nix-core/nix-core#v0.7.1",
     "rx": "^4.1.0"
   }
 }
