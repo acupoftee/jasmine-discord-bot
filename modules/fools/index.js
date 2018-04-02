@@ -2,6 +2,7 @@ const {DATAKEYS} = require('./utility');
 
 module.exports = {
   name: 'fools',
+  enabledByDefault: false,
   permissions: ['admin'],
   defaultData: [
     {
