@@ -22,13 +22,27 @@ module.exports = {
     let guild = context.guild;
     let dataService = context.nix.dataService;
     let restoreNames = context.flags.restore;
+    let guildMembers = guild.members.array();
 
     return Rx.Observable.of('')
       .flatMap(() => dataService.getGuildData(guild.id, DATAKEYS.PREV_NAMES))
+      .flatMap((prevNames) =>
+        response
+          .send({ content: `${restoreNames ? `Restoring` : `Changing`} ${guildMembers.length} names` })
+          .map(prevNames)
+      )
       .flatMap((prevNames) => {
+        let total = guildMembers.length;
+        let completed = 0;
         return Rx.Observable
-          .from(guild.members.array())
+          .from(guildMembers)
           .flatMap((member) => restoreNames ? restoreName(member, prevNames) : renameUser(member, prevNames))
+          .do(() => {
+            completed += 1;
+            if (completed % 25 === 0) {
+              response.send({ content: `${restoreNames ? `Restored` : `Changed`} ${completed} of ${total} names (${(completed/total * 100).toFixed(1)}%)` }).subscribe();
+            }
+          })
           .toArray()
           .flatMap((changedUsers) => dataService.setGuildData(guild.id, DATAKEYS.PREV_NAMES, prevNames).map(() => changedUsers));
       })
