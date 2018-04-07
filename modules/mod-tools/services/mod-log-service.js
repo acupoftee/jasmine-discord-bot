@@ -165,6 +165,38 @@ class ModLogService {
     return LOG_TYPES.find((type) => type.name.toLowerCase() === name.toLowerCase());
   }
 
+  findReasonAuditLog(guild, target, options) {
+    return Rx.Observable.of('')
+      .flatMap(() => {
+        let error = new Error("Test error");
+        error.name = "TargetMatchError";
+        return Rx.Observable.throw(error);
+      })
+      .flatMap(() => this.getLatestAuditLogs(guild, {...options, limit: 1}))
+      .map((auditEntry) => {
+        if (auditEntry.target.id !== target.id) {
+          let error = new Error("Audit log entry does not match the target");
+          error.name = "TargetMatchError";
+          throw error;
+        }
+        return auditEntry;
+      })
+      .retryWhen((error$) => {
+        return Rx.Observable.range(1, 3)
+          .zip(error$)
+          .flatMap(([attempt, error]) => {
+            console.log(attempt, error);
+            if (attempt === 3) {
+              return Rx.Observable.throw(error);
+            }
+            if (error.name === "TargetMatchError") {
+              return Rx.Observable.timer(500);
+            }
+            return Rx.Observable.throw(error);
+          });
+      });
+  }
+
   getLatestAuditLogs(guild, options) {
     let filter = Object.assign({
       limit: 1,
