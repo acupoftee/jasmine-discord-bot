@@ -228,19 +228,16 @@ class ModLogService {
       });
   }
 
-  getLatestAuditLogs(guild, options) {
+  getLatestAuditLogs(guild, options = {}) {
     let filter = Object.assign({
       limit: 1,
     }, options);
 
     let canViewAuditLog = guild.member(this.nix.discord.user).hasPermission(Discord.Permissions.FLAGS.VIEW_AUDIT_LOG);
     if (!canViewAuditLog) {
-      return Rx.Observable.from([
-        {
-          executor: {id: null},
-          reason: 'ERROR: Unable to view audit log.',
-        },
-      ]);
+      let error = new Error(`Unable to view audit log. I need the 'View Audit Log' permission in '${guild.name}'`);
+      error.name = "AuditLogReadError";
+      return Rx.Observable.throw(error);
     }
 
     return Rx.Observable
