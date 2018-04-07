@@ -41,9 +41,25 @@ class ModLogService {
     this.nix.streams
       .guildBanAdd$
       .flatMap(([guild, user]) =>
-        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_ADD })
+        this.findReasonAuditLog(guild, user, { type: AuditLogActions.MEMBER_BAN_ADD })
           // Filter out bans by Jasmine, they have already been logged
           .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          .catch((error) => {
+            switch (error.name) {
+              case "TargetMatchError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: Unable to find matching log entry`
+                });
+              case "AuditLogReadError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: ${error.message}`
+                });
+              default:
+                return Rx.Observable.throw(error);
+            }
+          })
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
@@ -59,11 +75,26 @@ class ModLogService {
     this.nix.streams
       .guildBanRemove$
       .flatMap(([guild, user]) =>
-        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_REMOVE })
+        this.findReasonAuditLog(guild, user, {type: AuditLogActions.MEMBER_BAN_REMOVE })
           // Filter out bans by Jasmine, they have already been logged
           .filter((log) => log.executor.id !== this.nix.discord.user.id)
-          // Add the log to the returned data
-          .map((log) => [guild, user, log])
+          .catch((error) => {
+            switch (error.name) {
+              case "TargetMatchError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: Unable to find matching log entry`
+                });
+              case "AuditLogReadError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: ${error.message}`
+                });
+              default:
+                return Rx.Observable.throw(error);
+            }
+          })
+          .map(() => [guild, user])
       )
       .do(([guild, user]) => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
       .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
