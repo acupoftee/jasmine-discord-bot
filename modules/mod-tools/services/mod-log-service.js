@@ -198,11 +198,6 @@ class ModLogService {
 
   findReasonAuditLog(guild, target, options) {
     return Rx.Observable.of('')
-      .flatMap(() => {
-        let error = new Error("Test error");
-        error.name = "TargetMatchError";
-        return Rx.Observable.throw(error);
-      })
       .flatMap(() => this.getLatestAuditLogs(guild, {...options, limit: 1}))
       .map((auditEntry) => {
         if (auditEntry.target.id !== target.id) {
