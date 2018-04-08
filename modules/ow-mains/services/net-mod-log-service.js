@@ -17,16 +17,38 @@ class NetModLogService {
     this.nix.logger.debug('Adding listener for netModLog guildBanAdd$ events');
     this.nix.streams
       .guildBanAdd$
-      .flatMap(([guild, user]) =>
-        this.getLatestAuditLogs(guild, {type: AuditLogActions.MEMBER_BAN_ADD})
-          // Add the log to the returned data
-          .map((log) => [guild, user, log])
-      )
-      .do(([guild, user, log]) => {
+      .flatMap(([guild, user]) => {
+        let modLogService = this.nix.getService('modTools', 'ModLogService');
+
+        return modLogService
+          .findReasonAuditLog(guild, user, {type: AuditLogActions.MEMBER_BAN_ADD})
+          .catch((error) => {
+            switch (error.name) {
+              case "TargetMatchError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: Unable to find matching log entry`
+                });
+              case "AuditLogReadError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: ${error.message}`
+                });
+              default:
+                return Rx.Observable.throw(error);
+            }
+          })
+          .map((log) => [guild, user, log]);
+      })
+      .map(([guild, user, log]) => {
         if (log.executor.id === this.nix.discord.user.id) {
           //if the ban was by Jasmine, strip the moderator from the reason
-          log.reason = log.reason.replace(/\| Banned.*$/, '');
+          log = {
+            ...log,
+            reason: log.reason.replace(/\| Banned.*$/, '')
+          };
         }
+        return [guild, user, log];
       })
       .do(([guild, user, log]) => this.nix.logger.debug(`NetModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
       .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason))
@@ -102,26 +124,6 @@ class NetModLogService {
       })
       .map(true)
       .defaultIfEmpty(true);
-  }
-
-  getLatestAuditLogs(guild, options) {
-    let filter = Object.assign({
-      limit: 1,
-    }, options);
-
-    let canViewAuditLog = guild.member(this.nix.discord.user).hasPermission(Discord.Permissions.FLAGS.VIEW_AUDIT_LOG);
-    if (!canViewAuditLog) {
-      return Rx.Observable.from([
-        {
-          executor: { id: null },
-          reason: 'ERROR: Unable to view audit log.',
-        },
-      ]);
-    }
-
-    return Rx.Observable
-      .fromPromise(guild.fetchAuditLogs(filter))
-      .flatMap((logs) => Rx.Observable.from(logs.entries.array()));
   }
 }
 

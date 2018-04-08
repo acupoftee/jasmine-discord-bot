@@ -41,9 +41,25 @@ class ModLogService {
     this.nix.streams
       .guildBanAdd$
       .flatMap(([guild, user]) =>
-        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_ADD })
+        this.findReasonAuditLog(guild, user, { type: AuditLogActions.MEMBER_BAN_ADD })
           // Filter out bans by Jasmine, they have already been logged
           .filter((log) => log.executor.id !== this.nix.discord.user.id)
+          .catch((error) => {
+            switch (error.name) {
+              case "TargetMatchError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: Unable to find matching log entry`
+                });
+              case "AuditLogReadError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: ${error.message}`
+                });
+              default:
+                return Rx.Observable.throw(error);
+            }
+          })
           // Add the log to the returned data
           .map((log) => [guild, user, log])
       )
@@ -59,11 +75,26 @@ class ModLogService {
     this.nix.streams
       .guildBanRemove$
       .flatMap(([guild, user]) =>
-        this.getLatestAuditLogs(guild, { type: AuditLogActions.MEMBER_BAN_REMOVE })
+        this.findReasonAuditLog(guild, user, {type: AuditLogActions.MEMBER_BAN_REMOVE })
           // Filter out bans by Jasmine, they have already been logged
           .filter((log) => log.executor.id !== this.nix.discord.user.id)
-          // Add the log to the returned data
-          .map((log) => [guild, user, log])
+          .catch((error) => {
+            switch (error.name) {
+              case "TargetMatchError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: Unable to find matching log entry`
+                });
+              case "AuditLogReadError":
+                return Rx.Observable.of({
+                  executor: {id: null},
+                  reason: `ERROR: ${error.message}`
+                });
+              default:
+                return Rx.Observable.throw(error);
+            }
+          })
+          .map(() => [guild, user])
       )
       .do(([guild, user]) => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
       .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))
@@ -165,19 +196,48 @@ class ModLogService {
     return LOG_TYPES.find((type) => type.name.toLowerCase() === name.toLowerCase());
   }
 
-  getLatestAuditLogs(guild, options) {
+  findReasonAuditLog(guild, target, options) {
+    return Rx.Observable.of('')
+      .flatMap(() => {
+        let error = new Error("Test error");
+        error.name = "TargetMatchError";
+        return Rx.Observable.throw(error);
+      })
+      .flatMap(() => this.getLatestAuditLogs(guild, {...options, limit: 1}))
+      .map((auditEntry) => {
+        if (auditEntry.target.id !== target.id) {
+          let error = new Error("Audit log entry does not match the target");
+          error.name = "TargetMatchError";
+          throw error;
+        }
+        return auditEntry;
+      })
+      .retryWhen((error$) => {
+        return Rx.Observable.range(1, 3)
+          .zip(error$)
+          .flatMap(([attempt, error]) => {
+            console.log(attempt, error);
+            if (attempt === 3) {
+              return Rx.Observable.throw(error);
+            }
+            if (error.name === "TargetMatchError") {
+              return Rx.Observable.timer(500);
+            }
+            return Rx.Observable.throw(error);
+          });
+      });
+  }
+
+  getLatestAuditLogs(guild, options = {}) {
     let filter = Object.assign({
       limit: 1,
     }, options);
 
     let canViewAuditLog = guild.member(this.nix.discord.user).hasPermission(Discord.Permissions.FLAGS.VIEW_AUDIT_LOG);
     if (!canViewAuditLog) {
-      return Rx.Observable.from([
-        {
-          executor: {id: null},
-          reason: 'ERROR: Unable to view audit log.',
-        },
-      ]);
+      let error = new Error(`Unable to view audit log. I need the 'View Audit Log' permission in '${guild.name}'`);
+      error.name = "AuditLogReadError";
+      return Rx.Observable.throw(error);
     }
 
     return Rx.Observable
