@@ -634,11 +634,20 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
 
-"nix-core@github:nix-core/nix-core#v0.7.1":
-  version "0.7.1"
-  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/347a9e1b5a528e8e8c03027fa1c2a729ba428235"
+"nix-core@github:nix-core/nix-core#release/v1.0.0":
+  version "1.0.0-rc.0"
+  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/9c4f8bbfe5c9484903e64cd01c2f918b3c227d6b"
   dependencies:
+    nix-data-memory "github:nix-core/nix-data-memory#master"
     winston "^3.0.0-rc1"
+
+"nix-data-disk@github:nix-core/nix-data-disk#master":
+  version "0.0.0"
+  resolved "https://codeload.github.com/nix-core/nix-data-disk/tar.gz/b44ab7815e65e4d2a65816c0c6f029e599880a71"
+
+"nix-data-memory@github:nix-core/nix-data-memory#master":
+  version "0.0.0"
+  resolved "https://codeload.github.com/nix-core/nix-data-memory/tar.gz/8ef7e3aff8f21bfe8ee1aaff9a49ab8655ad26f6"
 
 object-assign@^4.0.1:
   version "4.1.1"
