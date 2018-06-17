@@ -64,7 +64,6 @@ module.exports = {
 
     return Rx.Observable
       .fromPromise(topicChannel.setParent(openCategory))
-      .flatMap((topicChannel) => topicChannel.setPosition(0).then(() => topicChannel))
       .flatMap((topicChannel) => topicChannel.send('===== Reopened =====').then(() => topicChannel))
       .flatMap((topicChannel) => {
         if (topicChannel.id !== context.channel.id) {
