@@ -22,7 +22,7 @@ module.exports = {
 
   run(context, response) {
     let guild = context.guild;
-    let channelName = context.args.channelName.replace(/\W/g, ' ').trim().replace(/\s+/g, '-');
+    let channelName = this.TopicService.channelNameSafeString(context.args.channelName);
 
     context.nix.logger.debug(`attempting to open topic channel: ${channelName}`);
 

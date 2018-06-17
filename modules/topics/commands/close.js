@@ -5,11 +5,18 @@ module.exports = {
   description: 'Close the current topic, or specify a topic to close.',
   scope: 'text',
 
+  services: {
+    topics: [
+      'TopicService',
+    ]
+  },
+
   args: [
     {
       name: 'channelName',
       description: 'The name of the channel to close',
       required: false,
+      greedy: true,
     },
   ],
 
@@ -37,10 +44,7 @@ module.exports = {
     }
 
     if (channelName) {
-      topicChannel =
-        guild.channels
-          .filter((channel) => channel.type === 'text')
-          .find((channel) => channel.name.toLowerCase() === channelName.toLowerCase());
+      topicChannel = this.TopicService.findChannel(guild, channelName);
     }
     else {
       topicChannel = context.channel;
@@ -48,8 +52,7 @@ module.exports = {
 
     if (!topicChannel) {
       response.type = 'message';
-      response.content =
-        "My apologies, I was not able to find that topic.";
+      response.content = `My apologies, I was not able to find the topic "${channelName}".`;
       return response.send();
     }
 

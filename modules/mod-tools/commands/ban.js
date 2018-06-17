@@ -47,7 +47,7 @@ module.exports = {
     let reason = context.args.reason;
     let days = context.flags.days;
 
-    return this.userService
+    return this.UserService
       .findUser(userString)
       .map((user) => {
         if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }

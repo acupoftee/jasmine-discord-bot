@@ -5,11 +5,18 @@ module.exports = {
   description: 'reopen the current topic, or specify a topic to reopen.',
   scope: 'text',
 
+  services: {
+    topics: [
+      'TopicService',
+    ]
+  },
+
   args: [
     {
       name: 'channelName',
       description: 'The name of the channel to reopen',
       required: false,
+      greedy: true,
     },
   ],
 
@@ -37,10 +44,7 @@ module.exports = {
     }
 
     if (channelName) {
-      topicChannel =
-        guild.channels
-          .filter((channel) => channel.type === 'text')
-          .find((channel) => channel.name.toLowerCase() === channelName.toLowerCase());
+      topicChannel = this.TopicService.findChannel(guild, channelName);
     }
     else {
       topicChannel = context.channel;

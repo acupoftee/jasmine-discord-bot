@@ -30,16 +30,43 @@ class TopicService extends Service {
     this.watchedChannels[channel.id] = true;
   }
 
+  findChannel(guild, channelName) {
+    let textChannels = guild.channels.filter((channel) => channel.type === 'text');
+    let foundChannel = null;
+
+    let channelIdMatches = channelName.match(/<#!?(\d+)>|^(\d+)$/);
+    if (channelIdMatches) {
+      let channelId = channelIdMatches[1] || channelIdMatches[2];
+      foundChannel = textChannels.find((channel) => channel.id === channelId);
+    }
+    else {
+      let searchName = this.channelNameSafeString(channelName).toLowerCase();
+      foundChannel = textChannels.find((channel) => channel.name.toLowerCase() === searchName);
+    }
+
+    return foundChannel;
+  }
+
   getOpenTopicsCategory(guild) {
     return guild.channels
-      .filter((c) => c.type === null)
+      .filter((c) => c.type === "category")
       .find((c) => c.name.toLowerCase().includes('!topic'));
   }
 
   getClosedTopicsCategory(guild) {
     return guild.channels
-      .filter((c) => c.type === null)
+      .filter((c) => c.type === "category")
       .find((c) => c.name.toLowerCase().includes('!close'));
+  }
+
+  /**
+   * Turns a string into a channel name safe string by replacing invalid charaters with dashes
+   *
+   * @param string {string} The string to turn into a channel name
+   * @returns {string} A channel name safe string
+   */
+  channelNameSafeString(string) {
+    return string.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-')
   }
 }
 
