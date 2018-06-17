@@ -1,5 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
+const Service = require('nix-core').Service;
 
 const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
@@ -8,9 +9,10 @@ const {
   NET_MOD_LOG_TOKEN,
 } = require('../utility');
 
-class NetModLogService {
-  constructor(nix) {
-    this.nix = nix;
+class NetModLogService extends Service {
+  configureService() {
+    this.dataService = this.nix.getService('core', 'dataService');
+    this.modLogService = this.nix.getService('modTools', 'ModLogService');
   }
 
   onNixListen() {
@@ -18,9 +20,7 @@ class NetModLogService {
     this.nix.streams
       .guildBanAdd$
       .flatMap(([guild, user]) => {
-        let modLogService = this.nix.getService('modTools', 'ModLogService');
-
-        return modLogService
+        return this.modLogService
           .findReasonAuditLog(guild, user, {type: AuditLogActions.MEMBER_BAN_ADD})
           .catch((error) => {
             switch (error.name) {
@@ -99,13 +99,13 @@ class NetModLogService {
 
     return Rx.Observable.from(this.nix.discord.guilds.array())
       .flatMap((netGuild) =>
-        this.nix.dataService
+        this.dataService
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG_TOKEN)
           .filter((token) => token === NET_MOD_LOG_TOKEN)
           .map(netGuild)
       )
       .flatMap((netGuild) =>
-        this.nix.dataService
+        this.dataService
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG)
           .map((channelId) => netGuild.channels.find("id", channelId))
       )

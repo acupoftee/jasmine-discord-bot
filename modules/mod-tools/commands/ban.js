@@ -7,6 +7,17 @@ module.exports = {
   name: 'ban',
   description: 'Ban a user from the server',
   permissions: ['admin', 'mod'],
+
+  services: {
+    core: [
+      'UserService',
+      'CommandService',
+    ],
+    modTools: [
+      'modLogService',
+    ],
+  },
+
   flags: [
     {
       name: 'days',
@@ -31,16 +42,12 @@ module.exports = {
   ],
 
   run(context, response) {
-    let modLogService = context.nix.getService('modTools', 'ModLogService');
-    let userService = context.nix.getService('core', 'UserService');
-    let commandService = context.nix.getService('core', 'CommandService');
-
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
     let days = context.flags.days;
 
-    return userService
+    return this.userService
       .findUser(userString)
       .map((user) => {
         if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }
@@ -61,7 +68,7 @@ module.exports = {
           )
           .map(user)
       )
-      .flatMap((user) => modLogService.addBanEntry(guild, user, reason, context.member.user).map(user))
+      .flatMap((user) => this.modLogService.addBanEntry(guild, user, reason, context.member.user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
@@ -79,7 +86,7 @@ module.exports = {
               response.content = `Err... Discord returned an unexpected error when I tried to ban that user.`;
               context.nix.messageOwner(
                 "I got this error when I tried to ban a user:",
-                {embed: context.nix.createErrorEmbed(context, error)}
+                {embed: context.nix.createEmbedForError(error)}
               );
           }
 

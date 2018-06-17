@@ -1,8 +1,10 @@
 const Rx = require('rx');
+const Service = require("nix-core").Service;
 
-class TopicService {
+class TopicService extends Service {
   constructor(nix) {
-    this.nix = nix;
+    super(nix);
+
     this.watchedChannels = {};
   }
 

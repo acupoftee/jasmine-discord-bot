@@ -5,6 +5,12 @@ module.exports = {
   description: 'Open a new discussion channel',
   scope: 'text',
 
+  services: {
+    topics: [
+      'topicService',
+    ],
+  },
+
   args: [
     {
       name: 'channelName',
@@ -15,14 +21,12 @@ module.exports = {
   ],
 
   run(context, response) {
-    let topicService = context.nix.getService('topics', 'TopicService');
-
     let guild = context.guild;
     let channelName = context.args.channelName.replace(/\W/g, ' ').trim().replace(/\s+/g, '-');
 
     context.nix.logger.debug(`attempting to open topic channel: ${channelName}`);
 
-    let openCategory = topicService.getOpenTopicsCategory(guild);
+    let openCategory = this.topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -34,7 +38,7 @@ module.exports = {
       .fromPromise(context.guild.createChannel(channelName))
       .flatMap((channel) => channel.setParent(openCategory).then(() => channel))
       .flatMap((channel) => channel.setPosition(1).then(() => channel))
-      .do((channel) => topicService.watchChannel(channel))
+      .do((channel) => this.topicService.watchChannel(channel))
       .flatMap((channel) => {
         response.type = 'reply';
         response.content = 'I have opened the channel ' + channel.toString() + '.';

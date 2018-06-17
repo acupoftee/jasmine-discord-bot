@@ -5,6 +5,13 @@ const VALID_LOG_TYPES_NAMES = LOG_TYPES.map((t) => t.name);
 module.exports = {
   name: 'enableLog',
   description: 'Enable a log in a channel, such as the ModLog or the JoinLog',
+
+  services: {
+    core: [
+      'dataService',
+    ],
+  },
+
   inputs: [
     {
       name: 'type',
@@ -38,26 +45,22 @@ module.exports = {
       });
     }
 
-    return context.nix.dataService
+    return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
       .flatMap(() => response.send({content: `I have enabled the ${logType.name} in the channel ${channel}`}))
       .catch((error) => {
-        if (error.name === 'DiscordAPIError') {
-          if (error.message === "Missing Access") {
-            return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
-          }
-
-          response.content = `Err... Discord returned an unexpected error when I tried to talk in that channel.`;
-          context.nix.messageOwner(
-            "I got this error when I tried to post the mod log in a channel",
-            {embed: context.nix.createErrorEmbed(context, error)}
-          );
-
-          return response.send();
+        switch (error.name) {
+          case 'DiscordAPIError':
+            if (error.message === "Missing Access") {
+              return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
+            }
+            else {
+              return Rx.Observable.throw(error);
+            }
+          default:
+            return Rx.Observable.throw(error);
         }
-
-        return Rx.Observable.throw(error);
       });
   },
 };

@@ -3,6 +3,13 @@ const {BROADCAST_TYPES} = require('../utility');
 module.exports = {
   name: 'unsubBroadcast',
   description: `Unsubscribe from a type of broadcast. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+
+  services: {
+    core: [
+      'dataService',
+    ]
+  },
+
   inputs: [
     {
       name: 'type',
@@ -21,7 +28,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return context.nix.dataService
+    return this.dataService
       .setGuildData(guild.id, datakey, null)
       .flatMap(() => response.send({content: `I have disabled ${broadcastType} broadcasts`}));
   },

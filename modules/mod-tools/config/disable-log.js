@@ -5,6 +5,13 @@ const VALID_LOG_TYPES_NAMES = LOG_TYPES.map((t) => t.name);
 module.exports = {
   name: 'disableLog',
   description: 'disable a log, such as the ModLog or the JoinLog',
+
+  services: {
+    core: [
+      'dataService',
+    ],
+  },
+
   inputs: [
     {
       name: 'type',
@@ -26,7 +33,7 @@ module.exports = {
       });
     }
 
-    return context.nix.dataService
+    return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, null)
       .flatMap(() => response.send({content: `I have disabled the ${logType.name}.`}));
   },
