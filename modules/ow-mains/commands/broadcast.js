@@ -74,7 +74,13 @@ module.exports = {
           case ERRORS.TOKEN_INVALID:
             return response.send({content: `I'm sorry, but sending ${broadcastType} broadcasts from this server is not allowed.`});
           default:
-            return nix.handleError(context, error);
+            return nix.handleError(error, [
+              {name: "command", value: "broadcast"},
+              {name: "guild", value: context.guild.name},
+              {name: "channel", value: context.channel.name},
+              {name: "args", value: JSON.stringify(context.args)},
+              {name: "flags", value: JSON.stringify(context.flags)},
+            ]);
         }
       });
   },

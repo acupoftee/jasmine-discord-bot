@@ -55,12 +55,24 @@ module.exports = {
           }
           else {
             response.content = `I'm sorry, Discord returned an unexpected error when I tried to create the channel.`;
-            context.nix.handleError(context, error, false);
+            context.nix.handleError(error, [
+              {name: "command", value: "topic"},
+              {name: "guild", value: context.guild.name},
+              {name: "channel", value: context.channel.name},
+              {name: "args", value: JSON.stringify(context.args)},
+              {name: "flags", value: JSON.stringify(context.flags)},
+            ]);
           }
         }
         else {
           response.content = `I'm sorry, I ran into an unexpected problem.`;
-          context.nix.handleError(context, error, false);
+          context.nix.handleError(error, [
+            {name: "command", value: "topic"},
+            {name: "guild", value: context.guild.name},
+            {name: "channel", value: context.channel.name},
+            {name: "args", value: JSON.stringify(context.args)},
+            {name: "flags", value: JSON.stringify(context.flags)},
+          ]);
         }
 
         return response.send();
