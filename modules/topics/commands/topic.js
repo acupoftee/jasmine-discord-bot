@@ -7,7 +7,7 @@ module.exports = {
 
   services: {
     topics: [
-      'topicService',
+      'TopicService',
     ],
   },
 
@@ -26,7 +26,7 @@ module.exports = {
 
     context.nix.logger.debug(`attempting to open topic channel: ${channelName}`);
 
-    let openCategory = this.topicService.getOpenTopicsCategory(guild);
+    let openCategory = this.TopicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -37,8 +37,7 @@ module.exports = {
     return Rx.Observable
       .fromPromise(context.guild.createChannel(channelName))
       .flatMap((channel) => channel.setParent(openCategory).then(() => channel))
-      .flatMap((channel) => channel.setPosition(1).then(() => channel))
-      .do((channel) => this.topicService.watchChannel(channel))
+      .do((channel) => this.TopicService.watchChannel(channel))
       .flatMap((channel) => {
         response.type = 'reply';
         response.content = 'I have opened the channel ' + channel.toString() + '.';

@@ -21,13 +21,11 @@ module.exports = {
   ],
 
   run(context, response) {
-    let topicService = context.nix.getService('topics', 'TopicService');
-
     let topicChannel = null;
     let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = topicService.getOpenTopicsCategory(guild);
+    let openCategory = this.TopicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -35,7 +33,7 @@ module.exports = {
       return response.send();
     }
 
-    let closedCategory = topicService.getClosedTopicsCategory(guild);
+    let closedCategory = this.TopicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
