@@ -21,13 +21,11 @@ module.exports = {
   ],
 
   run(context, response) {
-    let topicService = context.nix.getService('topics', 'TopicService');
-
     let topicChannel = null;
     let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = topicService.getOpenTopicsCategory(guild);
+    let openCategory = this.TopicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -35,7 +33,7 @@ module.exports = {
       return response.send();
     }
 
-    let closedCategory = topicService.getClosedTopicsCategory(guild);
+    let closedCategory = this.TopicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
@@ -66,7 +64,6 @@ module.exports = {
 
     return Rx.Observable
       .fromPromise(topicChannel.setParent(openCategory))
-      .flatMap((topicChannel) => topicChannel.setPosition(0).then(() => topicChannel))
       .flatMap((topicChannel) => topicChannel.send('===== Reopened =====').then(() => topicChannel))
       .flatMap((topicChannel) => {
         if (topicChannel.id !== context.channel.id) {
@@ -85,12 +82,24 @@ module.exports = {
           }
           else {
             response.content = `I'm sorry, Discord returned an unexpected error when I tried to move the channel.`;
-            context.nix.handleError(context, error, false);
+            context.nix.handleError(error, [
+              {name: "command", value: "reopen"},
+              {name: "guild", value: context.guild.name},
+              {name: "channel", value: context.channel.name},
+              {name: "args", value: JSON.stringify(context.args)},
+              {name: "flags", value: JSON.stringify(context.flags)},
+            ]);
           }
         }
         else {
           response.content = `I'm sorry, I ran into an unexpected problem.`;
-          context.nix.handleError(context, error, false);
+          context.nix.handleError(error, [
+            {name: "command", value: "reopen"},
+            {name: "guild", value: context.guild.name},
+            {name: "channel", value: context.channel.name},
+            {name: "args", value: JSON.stringify(context.args)},
+            {name: "flags", value: JSON.stringify(context.flags)},
+          ]);
         }
 
         return response.send();
