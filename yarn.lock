@@ -649,9 +649,9 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
 
-"nix-core@github:nix-core/nix-core#v1.0.0":
-  version "1.0.0"
-  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/85690bc2e9795bf5d5029e7de6b6f6b17a0a838c"
+"nix-core@github:nix-core/nix-core#v1.0.1":
+  version "1.0.1"
+  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/4bdff0ff24ecc0d5d246f106e971e0642be383ff"
   dependencies:
     nix-data-memory "github:nix-core/nix-data-memory#master"
     winston "^3.0.0-rc1"
