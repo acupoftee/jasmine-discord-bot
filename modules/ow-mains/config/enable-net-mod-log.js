@@ -6,6 +6,13 @@ const {
 module.exports = {
   name: 'enableNetModLog',
   description: `Enable network mod log reporting to this server.`,
+
+  services: {
+    core: [
+      'dataService',
+    ]
+  },
+
   inputs: [
     {
       name: 'token',
@@ -17,9 +24,7 @@ module.exports = {
     },
   ],
 
-  run: (context, response) => {
-    let dataService = context.nix.dataService;
-
+  run(context, response) {
     let guild = context.guild;
     let token = context.args.input1;
     let channelString = context.args.input2;
@@ -34,26 +39,22 @@ module.exports = {
       return response.send();
     }
 
-    return dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG_TOKEN, token)
-      .flatMap(() => dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
+    return this.dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG_TOKEN, token)
+      .flatMap(() => this.dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
       .flatMap(() => channel.send('I will post the network moderation log here now.'))
       .flatMap(() => response.send({content: `This server will now receive the network moderation log.`}))
       .catch((error) => {
-        if (error.name === 'DiscordAPIError') {
-          if (error.message === "Missing Access") {
-            return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
-          }
-
-          response.content = `Err... Discord returned an unexpected error when I tried to talk in that channel.`;
-          context.nix.messageOwner(
-            "I got this error when I tried to post the mod log in a channel",
-            {embed: context.nix.createErrorEmbed(context, error)}
-          );
-
-          return response.send();
+        switch (error.name) {
+          case 'DiscordAPIError':
+            if (error.message === "Missing Access") {
+              return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
+            }
+            else {
+              return Rx.Observable.throw(error);
+            }
+          default:
+            return Rx.Observable.throw(error);
         }
-
-        return Rx.Observable.throw(error);
       });
   },
 };

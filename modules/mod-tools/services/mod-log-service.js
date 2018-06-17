@@ -1,5 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
+const Service = require('nix-core').Service;
 
 const AuditLogActions = Discord.GuildAuditLogs.Actions;
 
@@ -8,9 +9,9 @@ const {
   LOG_TYPES,
 } = require('../utility');
 
-class ModLogService {
-  constructor(nix) {
-    this.nix = nix;
+class ModLogService extends Service {
+  configureService() {
+    this.dataService = this.nix.getService('core', 'dataService');
   }
 
   onNixListen() {
@@ -171,7 +172,7 @@ class ModLogService {
     let logType = this.getLogType(logTypeName);
     if (!logType) { throw new Error(ERRORS.INVALID_LOG_TYPE); }
 
-    return this.nix.dataService
+    return this.dataService
       .getGuildData(guild.id, logType.channelDatakey)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find("id", channelId))

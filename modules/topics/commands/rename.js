@@ -5,6 +5,12 @@ module.exports = {
   description: 'rename the current topic',
   scope: 'text',
 
+  services: {
+    topics: [
+      'TopicService',
+    ]
+  },
+
   args: [
     {
       name: 'channelName',
@@ -19,7 +25,7 @@ module.exports = {
 
     let topicChannel = context.channel;
     let guild = context.guild;
-    let channelName = context.args.channelName.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-');
+    let channelName = this.TopicService.channelNameSafeString(context.args.channelName);
 
     context.nix.logger.debug(`renaming channel: ${topicChannel.name} => ${channelName}`);
 

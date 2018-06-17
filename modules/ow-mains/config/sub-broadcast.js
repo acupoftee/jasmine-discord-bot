@@ -3,6 +3,13 @@ const {BROADCAST_TYPES} = require('../utility');
 module.exports = {
   name: 'subBroadcast',
   description: `Subscribe to a type of broadcast in a channel. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
+
+  services: {
+    core: [
+      'dataService',
+    ]
+  },
+
   inputs: [
     {
       name: 'type',
@@ -32,26 +39,22 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return context.nix.dataService
+    return this.dataService
       .setGuildData(guild.id, datakey, channel.id)
       .flatMap(() => channel.send(`I will send ${broadcastType} broadcasts here.`))
       .flatMap(() => response.send({content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`}))
       .catch((error) => {
-        if (error.name === 'DiscordAPIError') {
-          if (error.message === "Missing Access" || error.message === "Missing Permissions") {
-            return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
-          }
-
-          response.content = `Err... Discord returned an unexpected error when I tried to talk in that channel.`;
-          context.nix.messageOwner(
-            "I got this error when I tried to talk in a channel",
-            {embed: context.nix.createErrorEmbed(context, error)}
-          );
-
-          return response.send();
+        switch (error.name) {
+          case 'DiscordAPIError':
+            if (error.message === "Missing Access") {
+              return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
+            }
+            else {
+              return Rx.Observable.throw(error);
+            }
+          default:
+            return Rx.Observable.throw(error);
         }
-
-        return Rx.Observable.throw(error);
       });
   },
 };

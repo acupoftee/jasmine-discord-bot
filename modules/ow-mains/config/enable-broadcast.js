@@ -7,6 +7,13 @@ const {
 module.exports = {
   name: 'enableBroadcast',
   description: `Enable broadcasting from this server.`,
+
+  services: {
+    core: [
+      'dataService',
+    ],
+  },
+
   inputs: [
     {
       name: 'type',
@@ -34,9 +41,9 @@ module.exports = {
       return response.send({content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`});
     }
 
-    return nix.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
+    return this.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .do((savedData) => savedData[broadcastType] = token)
-      .flatMap((savedData) => nix.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
+      .flatMap((savedData) => this.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
       .flatMap(() => response.send({content: `This server is now allowed to send ${broadcastType} broadcasts.`}));
   },
 };

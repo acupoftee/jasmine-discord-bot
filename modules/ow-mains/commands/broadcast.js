@@ -7,6 +7,13 @@ module.exports = {
   name: 'broadcast',
   description: 'broadcast a message to all connected servers',
   permissions: ['broadcaster'],
+
+  services: {
+    core: [
+      'dataService',
+    ],
+  },
+
   args: [
     {
       name: 'type',
@@ -45,7 +52,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return nix.dataService
+    return this.dataService
       .getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .map((allowedTokens) => {
         if (allowedTokens[broadcastType] !== BROADCAST_TOKENS[broadcastType]) { throw new Error(ERRORS.TOKEN_INVALID); }
@@ -53,7 +60,7 @@ module.exports = {
       })
       .flatMap(() => Rx.Observable.from(nix.discord.guilds.values()))
       .flatMap((guild) =>
-        nix.dataService
+        this.dataService
           .getGuildData(guild.id, datakey)
           .filter((channel) => channel !== null)
           .map((channelId) => guild.channels.get(channelId))

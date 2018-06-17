@@ -7,6 +7,13 @@ module.exports = {
   name: 'fools',
   description: 'April fools for Sombra Mains',
   permissions: ['admin'],
+
+  services: {
+    core: [
+      'dataService',
+    ]
+  },
+
   flags: [
     {
       name: 'restore',
@@ -20,12 +27,11 @@ module.exports = {
 
   run(context, response) {
     let guild = context.guild;
-    let dataService = context.nix.dataService;
     let restoreNames = context.flags.restore;
     let guildMembers = guild.members.array();
 
     return Rx.Observable.of('')
-      .flatMap(() => dataService.getGuildData(guild.id, DATAKEYS.PREV_NAMES))
+      .flatMap(() => this.dataService.getGuildData(guild.id, DATAKEYS.PREV_NAMES))
       .flatMap((prevNames) =>
         response
           .send({ content: `${restoreNames ? `Restoring` : `Changing`} ${guildMembers.length} names` })
