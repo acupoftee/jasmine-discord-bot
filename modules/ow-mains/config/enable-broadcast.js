@@ -25,24 +25,29 @@ module.exports = {
     },
   ],
 
-  run: (context, response) => {
+  run: (context) => {
     let guild = context.guild;
     let typeString = context.args.input1;
     let token = context.args.input2;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
-      response.content = `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`;
-      return response.send();
+      return {
+        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
+      };
     }
 
     if (token !== BROADCAST_TOKENS[broadcastType]) {
-      return response.send({content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`});
+      return {
+        content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`
+      };
     }
 
     return this.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .do((savedData) => savedData[broadcastType] = token)
       .flatMap((savedData) => this.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
-      .flatMap(() => response.send({content: `This server is now allowed to send ${broadcastType} broadcasts.`}));
+      .flatMap(() => ({
+        content: `This server is now allowed to send ${broadcastType} broadcasts.`
+      }));
   },
 };

@@ -20,7 +20,7 @@ module.exports = {
     },
   ],
 
-  run(context, response) {
+  run(context) {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
 
     let guild = context.guild;
@@ -28,13 +28,15 @@ module.exports = {
 
     let logType = modLogService.getLogType(logTypeName);
     if (!logType) {
-      return response.send({
+      return {
         content: `${logTypeName} is not a valid log type. Valid types: ${VALID_LOG_TYPES_NAMES.join(',')}`,
-      });
+      };
     }
 
     return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, null)
-      .flatMap(() => response.send({content: `I have disabled the ${logType.name}.`}));
+      .flatMap(() => ({
+        content: `I have disabled the ${logType.name}.`
+      }));
   },
 };

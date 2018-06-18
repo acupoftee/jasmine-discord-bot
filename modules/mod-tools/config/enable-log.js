@@ -26,7 +26,7 @@ module.exports = {
     },
   ],
 
-  run(context, response) {
+  run(context) {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
 
     let guild = context.guild;
@@ -35,26 +35,31 @@ module.exports = {
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
-      response.content = "I was not able to find that channel";
-      return response.send();
+      return {
+        content: "I was not able to find that channel"
+      };
     }
 
     let logType = modLogService.getLogType(logTypeName);
     if (!logType) {
-      return response.send({
+      return {
         content: `${logTypeName} is not a valid log type. Valid types: ${VALID_LOG_TYPES_NAMES.join(',')}`,
-      });
+      };
     }
 
     return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
-      .flatMap(() => response.send({content: `I have enabled the ${logType.name} in the channel ${channel}`}))
+      .flatMap(() => ({
+        content: `I have enabled the ${logType.name} in the channel ${channel}`
+      }))
       .catch((error) => {
         switch (error.name) {
           case 'DiscordAPIError':
             if (error.message === "Missing Access") {
-              return response.send({content: `Whoops, I do not have permission to talk in that channel.`});
+              return {
+                content: `Whoops, I do not have permission to talk in that channel.`
+              };
             }
             else {
               return Rx.Observable.throw(error);
