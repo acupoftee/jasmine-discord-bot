@@ -1,5 +1,4 @@
 const Rx = require('rx');
-const Discord = require('discord.js');
 
 const {ERRORS} = require('../utility');
 

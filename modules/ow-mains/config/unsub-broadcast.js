@@ -17,19 +17,24 @@ module.exports = {
     },
   ],
 
-  run(context, response) {
+  run(context) {
     let guild = context.guild;
     let typeString = context.args.input1;
+
+    let response = { content: null };
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
       response.content = `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`;
-      return response.send();
+      return response;
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
     return this.dataService
       .setGuildData(guild.id, datakey, null)
-      .flatMap(() => response.send({content: `I have disabled ${broadcastType} broadcasts`}));
+      .map(() => {
+        response.content = `I have disabled ${broadcastType} broadcasts`;
+        return response
+      });
   },
 };
