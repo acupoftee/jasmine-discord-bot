@@ -54,9 +54,9 @@ module.exports = {
         switch (error.name) {
           case 'DiscordAPIError':
             if (error.message === "Missing Permissions") {
-              return {
+              return Rx.Observable.return({
                 content: `Whoops, I do not have permission to talk in that channel.`
-              };
+              });
             }
             else {
               return Rx.Observable.throw(error);
