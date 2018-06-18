@@ -53,7 +53,7 @@ module.exports = {
       .catch((error) => {
         switch (error.name) {
           case 'DiscordAPIError':
-            if (error.message === "Missing Access") {
+            if (error.message === "Missing Permissions") {
               return {
                 content: `Whoops, I do not have permission to talk in that channel.`
               };
