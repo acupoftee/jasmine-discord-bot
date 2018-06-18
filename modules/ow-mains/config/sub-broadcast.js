@@ -1,3 +1,5 @@
+const Rx = require('rx');
+
 const {BROADCAST_TYPES} = require('../utility');
 
 module.exports = {

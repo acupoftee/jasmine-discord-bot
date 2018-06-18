@@ -26,7 +26,6 @@ module.exports = {
   ],
 
   run: (context, response) => {
-    let nix = context.nix;
     let guild = context.guild;
     let typeString = context.args.input1;
     let token = context.args.input2;

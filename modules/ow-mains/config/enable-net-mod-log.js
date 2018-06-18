@@ -1,3 +1,5 @@
+const Rx = require('rx');
+
 const {
   DATAKEYS,
   NET_MOD_LOG_TOKEN,

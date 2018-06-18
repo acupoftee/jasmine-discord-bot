@@ -1,3 +1,4 @@
+const Rx = require('rx');
 const { LOG_TYPES } = require('../utility');
 
 const VALID_LOG_TYPES_NAMES = LOG_TYPES.map((t) => t.name);
