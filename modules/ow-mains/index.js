@@ -18,7 +18,7 @@ module.exports = {
   configActions: [
     require('./config/sub-broadcast'),
     require('./config/unsub-broadcast'),
-    require('./config/enable-broadcast'),
+    require('./config/allow-broadcasting'),
     require('./config/enable-net-mod-log'),
   ],
   commands: [

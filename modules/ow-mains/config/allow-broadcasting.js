@@ -5,7 +5,7 @@ const {
 } = require('../utility');
 
 module.exports = {
-  name: 'enableBroadcast',
+  name: 'allowBroadcasting',
   description: `Enable broadcasting from this server.`,
 
   services: {
@@ -46,7 +46,7 @@ module.exports = {
     return this.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .do((savedData) => savedData[broadcastType] = token)
       .flatMap((savedData) => this.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
-      .flatMap(() => ({
+      .map(() => ({
         content: `This server is now allowed to send ${broadcastType} broadcasts.`
       }));
   },
