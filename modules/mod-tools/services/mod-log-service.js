@@ -175,7 +175,7 @@ class ModLogService extends Service {
     return this.dataService
       .getGuildData(guild.id, logType.channelDatakey)
       .filter((channelId) => typeof channelId !== 'undefined')
-      .map((channelId) => guild.channels.find("id", channelId))
+      .map((channelId) => guild.channels.find((c) => c.id === channelId))
       .filter((channel) => channel !== null)
       .flatMap((channel) => channel.send({embed}))
       .catch((error) => {

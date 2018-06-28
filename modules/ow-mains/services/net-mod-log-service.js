@@ -107,7 +107,7 @@ class NetModLogService extends Service {
       .flatMap((netGuild) =>
         this.dataService
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG)
-          .map((channelId) => netGuild.channels.find("id", channelId))
+          .map((channelId) => netGuild.channels.find((c) => c.id === channelId))
       )
       .filter((channel) => channel !== null)
       .flatMap((channel) => channel.send({embed}))
