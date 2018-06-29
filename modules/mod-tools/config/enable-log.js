@@ -50,7 +50,7 @@ module.exports = {
     return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
-      .flatMap(() => ({
+      .map(() => ({
         content: `I have enabled the ${logType.name} in the channel ${channel}`
       }))
       .catch((error) => {

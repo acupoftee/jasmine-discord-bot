@@ -35,7 +35,7 @@ module.exports = {
 
     return this.dataService
       .setGuildData(guild.id, logType.channelDatakey, null)
-      .flatMap(() => ({
+      .map(() => ({
         content: `I have disabled the ${logType.name}.`
       }));
   },
