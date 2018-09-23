@@ -7,7 +7,7 @@ module.exports = {
   loginToken: privateConfig.loginToken,
 
   logger: {
-    level: 'debug',
+    level: 'silly',
   },
 
   dataSource: {
