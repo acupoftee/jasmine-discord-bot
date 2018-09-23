@@ -12,8 +12,8 @@ const {
   BROADCAST_TOKENS,
 } = require('../utility');
 
-const CONFIRM_YES_EMOJI_NAME = "VoteYea";
-const CONFIRM_NO_EMOJI_NAME = "VoteNay";
+const CONFIRM_YES_EMOJI_NAME = "voteyea";
+const CONFIRM_NO_EMOJI_NAME = "votenay";
 
 const FALLBACK_YES = "👍";
 const FALLBACK_NO = "👎";
@@ -51,8 +51,8 @@ class BroadcastService extends Service {
 
   getConfirmEmoji(guild) {
     return {
-      yes: guild.emojis.find((e) => e.name === CONFIRM_YES_EMOJI_NAME) || FALLBACK_YES,
-      no: guild.emojis.find((e) => e.name === CONFIRM_NO_EMOJI_NAME) || FALLBACK_NO,
+      yes: guild.emojis.find((e) => e.name.toLowerCase() === CONFIRM_YES_EMOJI_NAME) || FALLBACK_YES,
+      no: guild.emojis.find((e) => e.name.toLowerCase() === CONFIRM_NO_EMOJI_NAME) || FALLBACK_NO,
     }
   }
 
@@ -83,7 +83,7 @@ class BroadcastService extends Service {
           .fromPromise(
             confirmMessage.awaitReactions(
               (reaction, user) =>
-                allowedEmojiNames.includes(reaction.emoji.name) &&
+                allowedEmojiNames.includes(reaction.emoji.name.toLowerCase()) &&
                 user.id === context.message.author.id,
               { max: 1 }
             )
@@ -93,7 +93,7 @@ class BroadcastService extends Service {
       .flatMap(({confirmMessage, reactions}) => {
         let yesEmojiNames = [CONFIRM_YES_EMOJI_NAME, FALLBACK_YES];
 
-        if (reactions.find((r) => yesEmojiNames.includes(r.emoji.name))) {
+        if (reactions.find((r) => yesEmojiNames.includes(r.emoji.name.toLowerCase()))) {
           return Rx.Observable.of({confirmMessage, result: true});
         }
         else {
