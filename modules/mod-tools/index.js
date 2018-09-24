@@ -12,9 +12,18 @@ module.exports = {
       keyword: DATAKEYS.JOIN_LOG_CHANNEL,
       data: null,
     },
+    {
+      keyword: DATAKEYS.AUTO_BAN_ENABLED,
+      data: false,
+    },
+    {
+      keyword: DATAKEYS.AUTO_BAN_USERNAME_HAS_LINK,
+      data: true,
+    }
   ],
   services: [
     require('./services/mod-log-service'),
+    require('./services/auto-ban-service'),
   ],
   configActions: [
     require('./config/enable-log'),
