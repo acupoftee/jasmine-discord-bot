@@ -63,10 +63,11 @@ module.exports = {
     return Rx.Observable
       .of('')
       .flatMap(() => this.broadcastService.broadcastAllowed(guild, broadcastType).filter(Boolean))
-      .flatMap(() => this.broadcastService.confirmBroadcast(context, broadcastBody).filter(Boolean))
+      .flatMap(() => this.broadcastService.confirmBroadcast(context, broadcastType, broadcastBody).filter(Boolean))
+      .flatMap(() => response.send({content: `Ok, let me broadcast that then.`}))
       .flatMap(() => this.broadcastService.broadcastMessage(broadcastType, broadcastBody))
       .count(() => true)
-      .flatMap((sentMessages) => response.send({content: `Sent ${sentMessages} messages`}))
+      .flatMap((sentMessages) => response.send({content: `Done. Broadcasted to ${sentMessages} servers`}))
       .catch((error) => {
         if (error instanceof BroadcastingNotAllowedError) {
           return response.send({content: `I'm sorry, but sending ${broadcastType} broadcasts from this server is not allowed.`});

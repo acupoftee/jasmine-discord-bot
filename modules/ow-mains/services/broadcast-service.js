@@ -59,12 +59,12 @@ class BroadcastService extends Service {
   /**
    * @returns {Rx.Observable<any>}
    */
-  confirmBroadcast(context, broadcastBody) {
+  confirmBroadcast(context, broadcastType, broadcastBody) {
     return Rx.Observable
-      .of(broadcastBody)
-      .map((broadcastBody) => (new Discord.RichEmbed()).setDescription(broadcastBody))
+      .of('')
+      .map(() => (new Discord.RichEmbed()).setDescription(broadcastBody))
       .flatMap((broadcastEmbed) => context.message.channel.send(
-        "Broadcast the following message?",
+        `Broadcast this to "${broadcastType}"?`,
         { embed: broadcastEmbed }
       ))
       .flatMap((confirmMessage) =>
