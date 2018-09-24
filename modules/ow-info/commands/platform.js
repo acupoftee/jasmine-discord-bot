@@ -43,11 +43,24 @@ module.exports = {
               `or your permissions outrank mine.`;
             return response.send();
           }
+          else if (error.message.includes("Invalid Form Body")) {
+            return response.send({
+              content: "I'm sorry, but I can't append the platform tag to your name as it would exceed discord's " +
+                "character limit for nicknames."
+            });
+          }
 
           response.content = `Err... Discord returned an unexpected error when I tried to update your nickname.`;
           context.nix.messageOwner(
-            "I got this error when I tried to update someone's platform:",
-            {embed: this.createErrorEmbed(context, error)}
+            `I got this error when I tried to update ${context.author.tag}'s platform:`,
+            {
+              embed: context.nix.createEmbedForError(error, [
+                {name: "guild", inline: true, value: context.guild.name},
+                {name: "channel", inline: true, value: context.channel.name},
+                {name: "command", inline: true, value: "platform"},
+                {name: "user", inline: true, value: context.author.tag},
+              ])
+            }
           );
 
           return response.send();
@@ -85,4 +98,3 @@ function setPlatformTag(member, newPlatform) {
   return Rx.Observable.fromPromise(member.setNickname(newNickname))
     .map(() => newPlatform);
 }
-

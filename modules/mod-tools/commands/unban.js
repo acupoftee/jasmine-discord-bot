@@ -50,7 +50,15 @@ module.exports = {
               response.content = `Err... Discord returned an unexpected error when I tried to unban that user.`;
               context.nix.messageOwner(
                 "I got this error when I tried to unban a user:",
-                {embed: context.nix.createErrorEmbed(context, error)}
+                {
+                  embed: context.nix.createEmbedForError(error, [
+                    {name: "guild", inline: true, value: context.guild.name},
+                    {name: "channel", inline: true, value: context.channel.name},
+                    {name: "command", inline: true, value: "unban"},
+                    {name: "user to unban", inline: true, value: user.tag},
+                    {name: "user unbanning", inline: true, value: context.author.tag},
+                  ])
+                }
               );
           }
 

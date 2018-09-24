@@ -29,7 +29,6 @@ module.exports = {
     let userString = context.args.user;
     let reason = context.args.reason;
 
-
     let warningEmbed = new Discord.RichEmbed();
     warningEmbed
       .setThumbnail(guild.iconURL)
@@ -70,7 +69,15 @@ module.exports = {
               response.content = `Err... Discord returned an unexpected error when I tried to ban that user.`;
               context.nix.messageOwner(
                 "I got this error when I tried to ban a user:",
-                {embed: context.nix.createErrorEmbed(context, error)}
+                {
+                  embed: context.nix.createEmbedForError(error, [
+                    {name: "guild", inline: true, value: context.guild.name},
+                    {name: "channel", inline: true, value: context.channel.name},
+                    {name: "command", inline: true, value: "ban"},
+                    {name: "user to ban", inline: true, value: user.tag},
+                    {name: "user banning", inline: true, value: context.author.tag},
+                  ])
+                }
               );
           }
 
