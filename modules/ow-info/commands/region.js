@@ -61,8 +61,15 @@ module.exports = {
           response.type = 'message';
           response.content = `Err... Discord returned an unexpected error when I tried to update your nickname.`;
           context.nix.messageOwner(
-            "I got this error when I tried to update someone's platform:",
-            {embed: this.createErrorEmbed(context, error)}
+            `I got this error when I tried to update ${context.author.tag}'s platform:`,
+            {
+              embed: context.nix.createEmbedForError(error, [
+                {name: "guild", inline: true, value: context.guild.name},
+                {name: "channel", inline: true, value: context.channel.name},
+                {name: "command", inline: true, value: "region"},
+                {name: "user", inline: true, value: context.author.tag},
+              ])
+            }
           );
 
           return response.send();
