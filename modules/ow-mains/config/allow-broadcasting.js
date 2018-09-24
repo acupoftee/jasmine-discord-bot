@@ -25,7 +25,7 @@ module.exports = {
     },
   ],
 
-  run: (context) => {
+  run(context) {
     let guild = context.guild;
     let typeString = context.args.input1;
     let token = context.args.input2;

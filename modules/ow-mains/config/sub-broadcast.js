@@ -30,16 +30,16 @@ module.exports = {
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
-      return {
+      return Rx.Observable.of({
         content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
-      };
+      });
     }
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
-      return {
+      return Rx.Observable.of({
         content: "I was not able to find that channel"
-      };
+      });
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
