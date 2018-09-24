@@ -18,7 +18,7 @@ class TopicService extends Service {
       .flatMap((message) => message.pin())
       .catch((error) => {
         this.nix.logger.error(error);
-        return Rx.Observable.of();
+        return Rx.Observable.of('');
       })
       .subscribe();
 
