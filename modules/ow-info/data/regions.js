@@ -5,6 +5,7 @@ module.exports = [
     alias: [
       'NA',
       'US',
+      'USA',
       'Canada',
     ],
   },
@@ -21,6 +22,15 @@ module.exports = [
     role: 'Asia',
     alias: [
       'Asia',
+    ],
+  },
+  {
+    name: 'Oceania',
+    role: 'Oceania',
+    alias: [
+      'OCE',
+      'AUS',
+      'Australia'
     ],
   },
 ];
