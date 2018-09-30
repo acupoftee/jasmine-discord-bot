@@ -2,7 +2,7 @@ const Rx = require('rx');
 
 module.exports = {
   name: 'viewRegions',
-  description: 'view all configured regions, and their aliases',
+  description: 'Displays a list of all configured regions, and their aliases',
 
   services: {
     'ow-info': [

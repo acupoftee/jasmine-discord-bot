@@ -4,7 +4,7 @@ const {RegionNotFoundError} = require('../errors');
 
 module.exports = {
   name: 'addRegion',
-  description: 'Add an Overwatch region, and map it to a role',
+  description: 'Adds an Overwatch region, and map it to a role',
 
   services: {
     'ow-info': [
@@ -14,13 +14,13 @@ module.exports = {
 
   inputs: [
     {
-      name: 'region',
-      description: 'the name of alias',
+      name: 'regionName',
+      description: 'The name of region to add',
       required: true,
     },
     {
       name: 'role',
-      description: 'the name the the role to map the region to',
+      description: 'The name the the role to map the region to',
       required: true,
     },
   ],

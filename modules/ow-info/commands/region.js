@@ -16,7 +16,7 @@ module.exports = {
   args: [
     {
       name: 'region',
-      description: 'The Overwatch region you play in',
+      description: 'The Overwatch region you most often play in',
       required: true,
     },
   ],

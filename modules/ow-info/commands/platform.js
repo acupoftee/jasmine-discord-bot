@@ -8,7 +8,7 @@ module.exports = {
   args: [
     {
       name: 'platform',
-      description: 'The platform server/system you play on',
+      description: 'The platform server you most often play on',
       required: true,
     },
   ],

@@ -4,7 +4,7 @@ const {RegionNotFoundError} = require('../errors');
 
 module.exports = {
   name: 'addRegionAlias',
-  description: 'Add an alias for a region',
+  description: 'Adds an alias for a region',
 
   services: {
     'ow-info': [
@@ -14,13 +14,13 @@ module.exports = {
 
   inputs: [
     {
-      name: 'alias',
-      description: 'the name of alias',
+      name: 'aliasName',
+      description: 'The name of alias',
       required: true,
     },
     {
-      name: 'region',
-      description: 'the name of the region the alias is for',
+      name: 'regionName',
+      description: 'The name of the region the alias is for',
       required: true,
     },
   ],

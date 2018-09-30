@@ -4,7 +4,7 @@ const {RegionNotFoundError} = require('../errors');
 
 module.exports = {
   name: 'rmRegion',
-  description: 'removes an Overwatch region',
+  description: 'Removes an Overwatch region',
 
   services: {
     'ow-info': [
@@ -14,8 +14,8 @@ module.exports = {
 
   inputs: [
     {
-      name: 'region',
-      description: 'the name of the region to remove',
+      name: 'regionName',
+      description: 'The name of the region to remove',
       required: true,
     },
   ],

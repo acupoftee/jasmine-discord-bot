@@ -17,7 +17,7 @@ module.exports = {
   inputs: [
     {
       name: 'alias',
-      description: 'the name of the alias to remove',
+      description: 'The name of the alias to remove',
       required: true,
     },
   ],
