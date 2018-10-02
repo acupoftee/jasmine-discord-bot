@@ -37,3 +37,17 @@ The following Modules are available for Jasmine:
 - [Topics](./modules/topics.md) *(disabled by default)*: Provides command to create Topic Channels
 
 \* Core Module; can't be disabled
+
+## All Commands
+- [Core](./modules/core.md)
+    - [config](./modules/core.md#config)
+    - [help](./modules/core.md#help)
+    - [owner:listGuilds](./modules/core.md#owner:listGuilds)
+    - [owner:shutdown](./modules/core.md#owner:shutdown)
+
+## All Config Actions
+- [Command](./modules/command.md):
+    - [disable](./modules/command.md#disable)
+    - [enable](./modules/command.md#enable)
+    - [enabled](./modules/command.md#enabled)
+    - [setPrefix](./modules/command.md#setPrefix)
