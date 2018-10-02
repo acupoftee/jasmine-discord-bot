@@ -23,7 +23,7 @@ run:
 ### Command list
 - [Core](docs/modules/core.md)
     - [config](docs/modules/core.md#config)
-        - Run a [config action](#config-action)
+        - Run a [config action](#config-actions)
     - [help](docs/modules/core.md#help)
         - display currently avaliable commands
 
