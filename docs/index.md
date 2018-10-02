@@ -21,7 +21,7 @@ Inversely, modules can be disabled by running:
 !config module disable {module}
 ```
 
-_(Note: The core modules can not be disabled)_
+*(Note: The core modules can not be disabled)*
 
 ## Available Modules
 
@@ -32,8 +32,8 @@ The following Modules are available for Jasmine:
 - [Command*](./modules/command.md): Manages commands, and allows for enabling and disabling specific commands. 
 - [Module*](./modules/module.md): Manages modules, and allows for enabling and disabling modules.
 - [Mod Tools](./modules/mod-tools.md): Provides moderation commands such as `!ban`, and `!warn`, and `!kick`.
-- [Overwatch Info](./modules/ow-info.md) _(disabled by default)_: Provides commands to help users find others to play with.
-- [OWMN](./modules/ow-mains.md) _(disabled by default)_: Provides OWMN specific tools and commands
-- [Topics](./modules/topics.md) _(disabled by default)_: Provides command to create Topic Channels
+- [Overwatch Info](./modules/ow-info.md) *(disabled by default)*: Provides commands to help users find others to play with.
+- [OWMN](./modules/ow-mains.md) *(disabled by default)*: Provides OWMN specific tools and commands
+- [Topics](./modules/topics.md) *(disabled by default)*: Provides command to create Topic Channels
 
 \* Core Module; can't be disabled
