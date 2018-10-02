@@ -3,6 +3,10 @@ The core module contains core Jasmine commands.
 
 *This is a core module, and can not be disabled*
 
+- Permission Levels:
+    - Admin
+
+
 - Commands:
     - [config](#config)
     - [help](#help)
@@ -17,14 +21,14 @@ The core module contains core Jasmine commands.
 ```
 Displays a overview list of available config actions
 
-* *Requires permissions: Admin*
+* *Requires permission: Admin*
 
 ```
 !config {module} --list
 ```
 Displays a detailed list of available config actions for a module
 
-* *Requires permissions: Admin*
+* *Requires permission: Admin*
 * `module`: The name of the module to get config actions for
 
 ```
@@ -33,7 +37,7 @@ Displays a detailed list of available config actions for a module
 Run a config action for this server. See the documentation of other modules for 
 available config actions.
 
-* *Requires permissions: Admin*
+* *Requires permission: Admin*
 * `module`: The name of the module that the config action belongs to
 * `action`: The name of the action to run
 
