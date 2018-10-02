@@ -1,5 +1,7 @@
 # Core
-The core module contains core commands that can not be disabled
+The core module contains core Jasmine commands.
+
+*This is a core module, and can not be disabled*
 
 - Commands:
     - [config](#config)
