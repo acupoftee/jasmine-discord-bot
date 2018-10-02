@@ -10,8 +10,6 @@ The core module contains core Jasmine commands.
 - Commands:
     - [config](#config)
     - [help](#help)
-    - [owner:listGuilds](#owner:listGuilds)
-    - [owner:shutdown](#owner:shutdown)
 
 ## Commands
 
@@ -47,19 +45,3 @@ available config actions.
 ```
 
 Displays all available commands from all modules that the user can use.
-
-### owner:listGuilds
-```
-!owner:listGuilds
-```
-Displays a list of all server that the bot is connected to, and their guildIds
-
-* **Owner only command**
-
-### owner:shutdown
-```
-!owner:shutdown
-```
-Gracefully shuts down the bot.
-
-* **Owner only command**
