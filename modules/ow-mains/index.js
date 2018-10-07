@@ -1,4 +1,4 @@
-const {DATAKEYS} = require('./utility');
+const DATAKEYS = require('./datakeys');
 
 module.exports = {
   name: 'owMains',

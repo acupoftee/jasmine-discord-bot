@@ -1,11 +1,5 @@
 const config = require('../../config/config.js');
-
-const DATAKEYS = {
-  BROADCAST: (type) => `owMains.broadcast.${type}`,
-  BROADCAST_TOKENS: 'owMains.broadcast.tokens',
-  NET_MOD_LOG: 'owMains.netModLog.channel',
-  NET_MOD_LOG_TOKEN: 'owMains.netModLog.token',
-};
+const DATAKEYS = require('./datakeys');
 
 const BROADCAST_TYPES = {
   'blizzard': DATAKEYS.BROADCAST('blizzard'),
@@ -23,7 +17,6 @@ const ERRORS = {
 
 module.exports = {
   ERRORS,
-  DATAKEYS,
   BROADCAST_TYPES,
   BROADCAST_TOKENS,
   NET_MOD_LOG_TOKEN,
