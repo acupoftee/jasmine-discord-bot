@@ -116,9 +116,16 @@ class ServerListService extends Service {
         this._getAllServerListChannels(),
         this._buildInviteMessages()
       )
-      .flatMap(([channel, messages]) => this._updateInviteList(channel, messages))
+      .flatMap(([channel, messages]) => this._updateServerList(channel, messages))
   }
 
+  /**
+   * Returns a list of channels in all guilds that are configured to display the list of servers.
+   *
+   * @private
+   *
+   * @returns {Rx.Observable<Channel>} An observable of channels
+   */
   _getAllServerListChannels() {
     return Rx.Observable
       .from(this.nix.discord.guilds.values())
@@ -128,6 +135,10 @@ class ServerListService extends Service {
 
   /**
    * Builds a list of messages that can replace the list in the list channel
+   *
+   * @private
+   * @return {Rx.Observable<Array<String>>} an observable that will emit a single array of messages that contain the
+   *   server list.
    */
   _buildInviteMessages() {
     return this._getServerList()
@@ -143,43 +154,43 @@ class ServerListService extends Service {
       .toArray();
   }
 
-  /**
-   * Deletes and recreates the list of guilds and their invites in a guild
-   *
-   * @param guild {Guild} the guild to update the server list in
-   */
-  _updateInviteList(channel, messages) {
-    return this._removeListMessages(channel)
-      .flatMap(() => this._addListMessages(channel, messages))
-  }
-
-  _removeListMessages(channel) {
+  _updateServerList(channel, messages) {
     return Rx.Observable
       .of('')
       .flatMap(() => channel.fetchMessages())
-      .flatMap((messages) => Rx.Observable.from(messages.values()))
-      .filter((message) => message.author.id === this.nix.discord.user.id)
-      .flatMap((message) => message.delete())
+      .flatMap((oldMessages) => Rx.Observable.from(oldMessages.values()))
+      .filter((oldMessages) => oldMessages.author.id === this.nix.discord.user.id)
+      .flatMap((oldMessages) => oldMessages.delete())
       .defaultIfEmpty('')
       .last()
-      .map(() => '')
-  }
-
-  _addListMessages(channel, messages) {
-    return Rx.Observable
-      .from(serverListMessages)
+      .flatMap(() => Rx.Observable.from(messages))
       .concatMap((newMessage) => channel.send(newMessage))
       .defaultIfEmpty('')
       .last()
       .map(() => '')
   }
 
+  /**
+   * Gets a list of all added server invites
+   *
+   * @private
+   *
+   * @return {Object} The data structure for the list of Servers
+   */
   _getServerList() {
     return this.dataService
       ._getData('module', 'owMains', DataKeys.FULL_SERVER_LIST)
       .map((data) => data === null ? {} : data);
   }
 
+  /**
+   * Gets the data for a single server
+   *
+   * @private
+   *
+   * @param guildName {String} the name of the server to retrieve (case insensitive),
+   * @return {Object} The data structure for the saved server.
+   */
   _getServerData(guildName) {
     guildName = guildName.toLowerCase();
 
@@ -194,6 +205,16 @@ class ServerListService extends Service {
       });
   }
 
+  /**
+   * Updates the settings for a saved server invite
+   *
+   * @private
+   *
+   * @param guildName {String} the name of the server to update
+   * @param guildData {Object} the data to save for that server
+   *
+   * @return {Object} The saved data for the server invite
+   */
   _setServerData(guildName, guildData) {
     guildName = guildName.toLowerCase();
 
@@ -203,16 +224,13 @@ class ServerListService extends Service {
         list[guildName] = guildData;
         return list;
       })
-      .flatMap((list) => this._setServerList(list));
+      .flatMap((list) => this._setServerList(list))
+      .map((list) => list[guildName]);
   }
 
   _setServerList(list) {
     return this.dataService
       ._setData('module', 'owMains', DataKeys.FULL_SERVER_LIST, list);
-  }
-
-  _checkChannelEmpty(channel) {
-
   }
 }
 
