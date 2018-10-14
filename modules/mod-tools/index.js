@@ -14,7 +14,7 @@ module.exports = {
     },
     {
       keyword: DATAKEYS.AUTO_BAN_ENABLED,
-      data: false,
+      data: true,
     },
     {
       keyword: DATAKEYS.AUTO_BAN_USERNAME_HAS_LINK,
