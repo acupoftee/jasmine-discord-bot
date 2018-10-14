@@ -23,7 +23,7 @@ const LOG_TYPES = [
 ];
 
 const AUTO_BAN_RULES = {
-  LINKS_IN_USERNAME: 'linksInUsername',
+  USERNAME_IS_INVITE: 'usernameIsInvite',
 };
 
 module.exports = {

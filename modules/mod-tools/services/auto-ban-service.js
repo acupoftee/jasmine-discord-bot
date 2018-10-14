@@ -68,7 +68,7 @@ class AutoBanService extends Service {
         Rx.Observable
           .merge([
             Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.LINKS_IN_USERNAME).filter(Boolean))
+              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.USERNAME_IS_INVITE).filter(Boolean))
               .flatMap(() => this.memberHasUsernameWithLink(member).filter(Boolean))
               .map(() => "Username contains a link"),
           ])
