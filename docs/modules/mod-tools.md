@@ -7,12 +7,12 @@ Provides commands to assist with server moderation.
     - [!warn](#warn)
 
 - Config Actions:
-    - [disableAutoBan](#disableAutoBan)
-    - [disableLog](#disableLog)
-    - [enableAutoBan](#enableAutoBan)
-    - [enableLog](#enableLog)
-    - [listAutoBanRules](#listAutoBanRules)
-    - [setAutoBanRule](#setAutoBanRule)
+    - [disableAutoBan](#disableautoban)
+    - [disableLog](#disablelog)
+    - [enableAutoBan](#enableautoban)
+    - [enableLog](#enablelog)
+    - [listAutoBanRules](#listautobanrules)
+    - [setAutoBanRule](#setautobanrule)
 
 ## Autoban
 
