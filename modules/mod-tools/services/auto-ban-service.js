@@ -1,8 +1,13 @@
 const Rx = require('rx');
-
 const Service = require('nix-core').Service;
 
-const {DATAKEYS} = require('../utility');
+const {
+  RuleNotFoundError,
+} = require("../errors");
+const {
+  DATAKEYS,
+  AUTO_BAN_RULES,
+} = require('../utility');
 
 class AutoBanService extends Service {
   configureService() {
@@ -32,6 +37,27 @@ class AutoBanService extends Service {
       })
       .subscribe();
   }
+
+  getAutoBanRule(rule) {
+    let foundRule = Object.values(AUTO_BAN_RULES).find((r) => r.toLowerCase() === rule.toLowerCase())
+    if (!foundRule) {
+      return new RuleNotFoundError(rule);
+    }
+    return foundRule;
+  }
+
+  setAutoBansEnabled(guild, newValue) {
+    return this.dataService
+      .setGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED, newValue)
+  }
+
+  setAutoBanRule(guild, rule, newValue) {
+    rule = this.getAutoBanRule(rule);
+
+    return this.dataService
+      .setGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule), newValue)
+      .map((enabled) => ([rule, enabled]))
+  }
   
   doAutoBans(member) {
     return Rx.Observable
@@ -42,7 +68,7 @@ class AutoBanService extends Service {
         Rx.Observable
           .merge([
             Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanUsernameWithLinksEnabled(member.guild).filter(Boolean))
+              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.LINKS_IN_USERNAME).filter(Boolean))
               .flatMap(() => this.memberHasUsernameWithLink(member).filter(Boolean))
               .map(() => "Username contains a link"),
           ])
@@ -63,9 +89,21 @@ class AutoBanService extends Service {
       .getGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED)
   }
 
-  isAutoBanUsernameWithLinksEnabled(guild) {
+  isAutoBanRuleEnabled(guild, rule) {
+    rule = this.getAutoBanRule(rule);
+
     return this.dataService
-      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_USERNAME_HAS_LINK)
+      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule))
+  }
+
+  getRules(guild) {
+    return Rx.Observable
+      .from(Object.values(AUTO_BAN_RULES))
+      .flatMap((rule) => this.isAutoBanRuleEnabled(guild, rule).map((enabled) => [rule, enabled]))
+      .reduce((rules, [rule, enabled]) => {
+        rules[rule] = enabled;
+        return rules;
+      }, {})
   }
 
   memberHasUsernameWithLink(member) {

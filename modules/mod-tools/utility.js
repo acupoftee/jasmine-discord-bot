@@ -2,7 +2,7 @@ const DATAKEYS = {
   MOD_LOG_CHANNEL: 'modTools.modLogChannel',
   JOIN_LOG_CHANNEL: 'modTools.joinLogChannel',
   AUTO_BAN_ENABLED: 'modTools.autoBan.enabled',
-  AUTO_BAN_USERNAME_HAS_LINK: 'modTools.autoBan.usernameHasLink',
+  AUTO_BAN_RULE: (rule) => `modTools.autoBan.rule.${rule}`,
 };
 
 const ERRORS = {
@@ -22,8 +22,13 @@ const LOG_TYPES = [
   },
 ];
 
+const AUTO_BAN_RULES = {
+  LINKS_IN_USERNAME: 'linksInUsername',
+};
+
 module.exports = {
   DATAKEYS,
   ERRORS,
   LOG_TYPES,
+  AUTO_BAN_RULES,
 };

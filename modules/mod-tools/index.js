@@ -1,5 +1,10 @@
 const glob = require('glob');
 
+const {
+  DATAKEYS,
+  AUTO_BAN_RULES,
+} = require('./utility');
+
 module.exports = {
   name: 'modTools',
   permissions: ['mod'],
@@ -17,7 +22,7 @@ module.exports = {
       data: true,
     },
     {
-      keyword: DATAKEYS.AUTO_BAN_USERNAME_HAS_LINK,
+      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.LINKS_IN_USERNAME),
       data: true,
     }
   ],
