@@ -8,5 +8,6 @@ module.exports = {
   SERVER_LIST_CHANNEL: 'owMains.serverList.channel',
 
   // Module Data
-  FULL_SERVER_LIST: 'serverList',
+  SERVER_LIST: 'serverList',
+  CATEGORY_LIST: 'categoryList',
 };

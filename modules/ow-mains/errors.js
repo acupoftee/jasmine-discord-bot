@@ -17,16 +17,28 @@ class BroadcastCanceledError extends BroadcastError {
   }
 }
 
-class ServerListError extends Error {
+class InviteListError extends Error {
   constructor(message) {
     super(message);
-    this.name = "ServerListError";
+    this.name = "InviteListError";
   }
 }
 
-class ServerNotFoundError extends ServerListError {
+class InviteNotFoundError extends InviteListError {
   constructor(guildName) {
-    super(`The guild ${guildName} could not be found`);
+    super(`The invite for guild ${guildName} could not be found`);
+  }
+}
+
+class CategoryNotFoundError extends InviteListError {
+  constructor(categoryName) {
+    super(`The category ${categoryName} could not be found`);
+  }
+}
+
+class UnauthorizedServerError extends InviteListError {
+  constructor(guild) {
+    super(`${guild.name} is not authorized to manage guild invites.`)
   }
 }
 
@@ -35,6 +47,8 @@ module.exports = {
   BroadcastingNotAllowedError,
   BroadcastCanceledError,
 
-  ServerListError,
-  ServerNotFoundError,
+  InviteListError,
+  ServerNotFoundError: InviteNotFoundError,
+  CategoryNotFoundError,
+  UnauthorizedServerError,
 };

@@ -1,3 +1,5 @@
+const glob = require('glob');
+
 const DATAKEYS = require('./datakeys');
 
 module.exports = {
@@ -13,18 +15,13 @@ module.exports = {
     { keyword: DATAKEYS.NET_MOD_LOG, data: null },
     { keyword: DATAKEYS.NET_MOD_LOG_TOKEN, data: null },
   ],
-  services: [
-    require('./services/net-mod-log-service'),
-    require('./services/broadcast-service'),
-    require('./services/server-list-service'),
-  ],
-  configActions: [
-    require('./config/sub-broadcast'),
-    require('./config/unsub-broadcast'),
-    require('./config/allow-broadcasting'),
-    require('./config/enable-net-mod-log'),
-  ],
-  commands: [
-    require('./commands/broadcast'),
-  ],
+  services: glob
+    .sync(`${__dirname}/services/**/*.js`)
+    .map((filename) => require(filename)),
+  configActions: glob
+    .sync(`${__dirname}/config/**/*.js`)
+    .map((filename) => require(filename)),
+  commands: glob
+    .sync(`${__dirname}/commands/**/*.js`)
+    .map((filename) => require(filename)),
 };
