@@ -13,6 +13,8 @@ The core module contains core Jasmine commands.
 
 ## Commands
 
+This module has no commands
+
 ### config
 ```
 !config --list
