@@ -3,6 +3,18 @@
 The Overwatch Info module provides commands to allow users to specify what Region and Platform 
 they play on to help users find others to play with.
 
+*Note: This module is disabled by default. Use `!config module enable ow-info` to enable this module*
+
+- Commands
+    - [platform](#platform)
+    - [region](#region)
+- Config Actions
+    - [addRegion](#addRegion)
+    - [addRegionAlias](#addRegionAlias)
+    - [rmRegion](#rmRegion)
+    - [rmRegionAlias](#rmRegionAlias)
+    - [viewRegions](#viewRegions)
+
 ## Commands
 
 ### platform
@@ -21,7 +33,7 @@ Sets the Overwatch region that you most often play on, and assigns you the Disco
 
 - `region`: The Overwatch region you most often play in
 
-_Admins: the mapped role can be changed via the `addRegion` config action._
+*Admins: the mapped role can be changed via the [addRegion](#addregion) config action.*
 
 ## Config Actions
 
@@ -49,7 +61,7 @@ Adds an alias to an existing region
 ```
 Removes an Overwatch region.
 
-_Note: Also removes any of the mapped aliases for that region_
+*Note: Also removes any of the mapped aliases for that region*
 
 - `regionName`: The name of the region to remove.
 
