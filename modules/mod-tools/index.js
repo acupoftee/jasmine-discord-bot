@@ -1,4 +1,4 @@
-const {DATAKEYS} = require('./utility');
+const glob = require('glob');
 
 module.exports = {
   name: 'modTools',
@@ -21,17 +21,13 @@ module.exports = {
       data: true,
     }
   ],
-  services: [
-    require('./services/mod-log-service'),
-    require('./services/auto-ban-service'),
-  ],
-  configActions: [
-    require('./config/enable-log'),
-    require('./config/disable-log'),
-  ],
-  commands: [
-    require('./commands/warn.js'),
-    require('./commands/ban.js'),
-    require('./commands/unban.js'),
-  ],
+  services: glob
+    .sync(`${__dirname}/services/**/*.js`)
+    .map((filename) => require(filename)),
+  configActions: glob
+    .sync(`${__dirname}/config/**/*.js`)
+    .map((filename) => require(filename)),
+  commands: glob
+    .sync(`${__dirname}/commands/**/*.js`)
+    .map((filename) => require(filename)),
 };
