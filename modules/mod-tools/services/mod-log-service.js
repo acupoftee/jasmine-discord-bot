@@ -95,7 +95,8 @@ class ModLogService extends Service {
                 return Rx.Observable.throw(error);
             }
           })
-          .map(() => [guild, user])
+          // Add the log to the returned data
+          .map((log) => [guild, user, log])
       )
       .do(([guild, user]) => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
       .flatMap(([guild, user, log]) => this.addUnbanEntry(guild, user, log.executor))

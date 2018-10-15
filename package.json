@@ -29,6 +29,7 @@
     "git-rev": "^0.2.1",
     "nix-core": "github:nix-core/nix-core#v1.2.0",
     "nix-data-disk": "github:nix-core/nix-data-disk#master",
+    "node-glob": "^1.2.0",
     "rx": "^4.1.0"
   }
 }
