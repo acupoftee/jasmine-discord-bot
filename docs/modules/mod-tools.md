@@ -1,12 +1,13 @@
 # Mod Tools
 Provides commands to assist with server moderation.
 
-- Commands:
+- [AutoBan](#autoban):
+    - [Rules](#rules)
+- [Commands](#commands):
     - [!ban](#ban)
     - [!unban](#unban)
     - [!warn](#warn)
-
-- Config Actions:
+- [Config Actions](#config-actions):
     - [disableAutoBan](#disableautoban)
     - [disableLog](#disablelog)
     - [enableAutoBan](#enableautoban)
@@ -35,7 +36,6 @@ The following rules are available:
 * `usernameIsInvite`: 
     * Auto ban the user if there is a discord invite in the user's name.
     * enabled by default
-
 
 ## Commands
 
@@ -140,3 +140,5 @@ Lists the currently configured rules for auto banning users.
 
 * `rule`: The name of the rule to enable or disable
 * `enabled`: "true" or "false" to enable or disable the rule
+
+See [AutoBan rules](#rules) for a list of available rules.
