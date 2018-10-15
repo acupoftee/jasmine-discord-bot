@@ -35,16 +35,16 @@ module.exports = {
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
-      return {
+      return Rx.Observable.of({
         content: "I was not able to find that channel"
-      };
+      });
     }
 
     let logType = modLogService.getLogType(logTypeName);
     if (!logType) {
-      return {
-        content: `${logTypeName} is not a valid log type. Valid types: ${VALID_LOG_TYPES_NAMES.join(',')}`,
-      };
+      return Rx.Observable.of({
+        content: `${logTypeName} is not a valid log type. Valid types: ${VALID_LOG_TYPES_NAMES.join(', ')}`,
+      });
     }
 
     return this.dataService
@@ -57,9 +57,9 @@ module.exports = {
         switch (error.name) {
           case 'DiscordAPIError':
             if (error.message === "Missing Access") {
-              return {
+              return Rx.Observable.of({
                 content: `Whoops, I do not have permission to talk in that channel.`
-              };
+              });
             }
             else {
               return Rx.Observable.throw(error);

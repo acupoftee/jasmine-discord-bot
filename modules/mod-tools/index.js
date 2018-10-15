@@ -1,4 +1,9 @@
-const {DATAKEYS} = require('./utility');
+const glob = require('glob');
+
+const {
+  DATAKEYS,
+  AUTO_BAN_RULES,
+} = require('./utility');
 
 module.exports = {
   name: 'modTools',
@@ -12,17 +17,22 @@ module.exports = {
       keyword: DATAKEYS.JOIN_LOG_CHANNEL,
       data: null,
     },
+    {
+      keyword: DATAKEYS.AUTO_BAN_ENABLED,
+      data: true,
+    },
+    {
+      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.USERNAME_IS_INVITE),
+      data: true,
+    }
   ],
-  services: [
-    require('./services/mod-log-service'),
-  ],
-  configActions: [
-    require('./config/enable-log'),
-    require('./config/disable-log'),
-  ],
-  commands: [
-    require('./commands/warn.js'),
-    require('./commands/ban.js'),
-    require('./commands/unban.js'),
-  ],
+  services: glob
+    .sync(`${__dirname}/services/**/*.js`)
+    .map((filename) => require(filename)),
+  configActions: glob
+    .sync(`${__dirname}/config/**/*.js`)
+    .map((filename) => require(filename)),
+  commands: glob
+    .sync(`${__dirname}/commands/**/*.js`)
+    .map((filename) => require(filename)),
 };
