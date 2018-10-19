@@ -85,11 +85,11 @@ class AutoBanService extends Service {
           .merge([
             Rx.Observable.of('')
               .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_DISCORD_INVITE).filter(Boolean))
-              .flatMap(() => this.memberHasDiscordInvite(member).filter(Boolean))
+              .filter(() => this.memberHasDiscordInvite(member))
               .map(() => "Username contains or was changed to a Discord invite"),
             Rx.Observable.of('')
               .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_TWITCH_LINK).filter(Boolean))
-              .flatMap(() => this.memberHasTwitchLink(member).filter(Boolean))
+              .filter(() => this.memberHasTwitchLink(member))
               .map(() => "Username contains or was changed to a Twitch link"),
           ])
       )
@@ -127,49 +127,24 @@ class AutoBanService extends Service {
   }
 
   memberHasDiscordInvite(member) {
-    let usernameWithLinkRegex = /discord\.gg[\/\\]/;
-
-    return Rx.Observable
-      .of('')
-      .map(() => {
-        this.nix.logger.debug(`${member.user.tag} has username: ${member.user.username}`);
-
-        let usernameHasLink = !!member.user.username.match(usernameWithLinkRegex);
-        let nicknameHasLink = false;
-
-        if (member.nickname) {
-          this.nix.logger.debug(`${member.user.tag} has nickname: ${member.nickname}`);
-          nicknameHasLink = !!member.nickname.match(usernameWithLinkRegex);
-        }
-
-        let hasLink = usernameHasLink || nicknameHasLink;
-        this.nix.logger.info(`${member.user.tag} has Discord invite in username: ${hasLink}`);
-
-        return hasLink
-      })
+    return this.memberNameMatches(member, /discord\.gg[\/\\]/);
   }
 
   memberHasTwitchLink(member) {
-    let usernameWithLinkRegex = /twitch\.tv[\/\\]/;
+    return this.memberNameMatches(member, /twitch\.tv[\/\\]/);
+  }
 
-    return Rx.Observable
-      .of('')
-      .map(() => {
-        this.nix.logger.debug(`${member.user.tag} has username: ${member.user.username}`);
+  memberNameMatches(member, regex) {
+    // check username
+    let usernameHasLink = !!member.user.username.match(regex);
 
-        let usernameHasLink = !!member.user.username.match(usernameWithLinkRegex);
-        let nicknameHasLink = false;
+    // check nickname if there is one
+    let nicknameHasLink = false;
+    if (member.nickname) {
+      nicknameHasLink = !!member.nickname.match(regex);
+    }
 
-        if (member.nickname) {
-          this.nix.logger.debug(`${member.user.tag} has nickname: ${member.nickname}`);
-          nicknameHasLink = !!member.nickname.match(usernameWithLinkRegex);
-        }
-
-        let hasLink = usernameHasLink || nicknameHasLink;
-        this.nix.logger.info(`${member.user.tag} has Twitch link in username: ${hasLink}`);
-
-        return hasLink
-      })
+    return usernameHasLink || nicknameHasLink;
   }
 }
 
