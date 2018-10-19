@@ -10,6 +10,31 @@ const {
 } = require('../utility');
 
 class AutoBanService extends Service {
+  constructor(props) {
+    super(props);
+
+    this.rules = [
+      {
+        name: AUTO_BAN_RULES.BAN_DISCORD_INVITE,
+        test: (member) => {
+          let hasLink = this.memberNameMatches(member, /discord\.gg[\/\\]/);
+          this.nix.logger.debug(`${member.user.tag} has Discord invite in name: ${hasLink}`);
+          return hasLink;
+        },
+        reason: "Username contains or was changed to a Discord invite",
+      },
+      {
+        name: AUTO_BAN_RULES.BAN_TWITCH_LINK,
+        test: (member) => {
+          let hasLink = this.memberNameMatches(member, /twitch\.tv[\/\\]/);
+          this.nix.logger.debug(`${member.user.tag} has Twitch link in name: ${hasLink}`);
+          return hasLink;
+        },
+        reason: "Username contains or was changed to a Twitch link",
+      },
+    ];
+  }
+
   configureService() {
     this.dataService = this.nix.getService('core', 'dataService');
   }
@@ -80,19 +105,8 @@ class AutoBanService extends Service {
       .of('')
       .flatMap(() => this.isAutoBanEnabled(member.guild).filter(Boolean))
       .do(() => this.nix.logger.info(`Checking if ${member.user.tag} should be auto banned...`))
-      .flatMap(() =>
-        Rx.Observable
-          .merge([
-            Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_DISCORD_INVITE).filter(Boolean))
-              .filter(() => this.memberHasDiscordInvite(member))
-              .map(() => "Username contains or was changed to a Discord invite"),
-            Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_TWITCH_LINK).filter(Boolean))
-              .filter(() => this.memberHasTwitchLink(member))
-              .map(() => "Username contains or was changed to a Twitch link"),
-          ])
-      )
+      .flatMap(() => Rx.Observable.from(this.rules))
+      .flatMap((rule) => this.runRule(rule, member))
       .filter((reason) => reason)
       .take(1)
       .do((reason) => this.nix.logger.info(`Auto banning ${member.user.tag}; reason: ${reason}`))
@@ -102,6 +116,15 @@ class AutoBanService extends Service {
           reason: `Jasmine AutoBan: ${reason}`,
         })
       )
+  }
+
+  runRule(rule, member) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.isAutoBanRuleEnabled(member.guild, rule.name))
+      .filter(Boolean)
+      .filter(() => rule.test(member))
+      .map(() => rule.reason)
   }
 
   isAutoBanEnabled(guild) {
@@ -124,14 +147,6 @@ class AutoBanService extends Service {
         rules[rule] = enabled;
         return rules;
       }, {})
-  }
-
-  memberHasDiscordInvite(member) {
-    return this.memberNameMatches(member, /discord\.gg[\/\\]/);
-  }
-
-  memberHasTwitchLink(member) {
-    return this.memberNameMatches(member, /twitch\.tv[\/\\]/);
   }
 
   memberNameMatches(member, regex) {
