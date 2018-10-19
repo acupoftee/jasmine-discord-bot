@@ -34,7 +34,10 @@ To configure the rules around which users are autobanned:
 The following rules are available:
 
 * `banDiscordInvites`: 
-    * Auto ban the user if there is a discord invite in the user's name.
+    * Auto ban the user if there is a Discord invite in the user's name.
+    * enabled by default
+* `banTwitchLinks`: 
+    * Auto ban the user if there is a Twitch link in the user's name.
     * enabled by default
 
 ## Commands

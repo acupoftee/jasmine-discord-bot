@@ -84,9 +84,13 @@ class AutoBanService extends Service {
         Rx.Observable
           .merge([
             Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.USERNAME_IS_DISCORD_INVITE).filter(Boolean))
+              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_DISCORD_INVITE).filter(Boolean))
               .flatMap(() => this.memberHasDiscordInvite(member).filter(Boolean))
-              .map(() => "Username contains a link"),
+              .map(() => "Username contains or was changed to a Discord invite"),
+            Rx.Observable.of('')
+              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.BAN_TWITCH_LINK).filter(Boolean))
+              .flatMap(() => this.memberHasTwitchLink(member).filter(Boolean))
+              .map(() => "Username contains or was changed to a Twitch link"),
           ])
       )
       .filter((reason) => reason)
@@ -139,7 +143,30 @@ class AutoBanService extends Service {
         }
 
         let hasLink = usernameHasLink || nicknameHasLink;
-        this.nix.logger.info(`${member.user.tag} has link in username: ${hasLink}`);
+        this.nix.logger.info(`${member.user.tag} has Discord invite in username: ${hasLink}`);
+
+        return hasLink
+      })
+  }
+
+  memberHasTwitchLink(member) {
+    let usernameWithLinkRegex = /twitch\.tv[\/\\]/;
+
+    return Rx.Observable
+      .of('')
+      .map(() => {
+        this.nix.logger.debug(`${member.user.tag} has username: ${member.user.username}`);
+
+        let usernameHasLink = !!member.user.username.match(usernameWithLinkRegex);
+        let nicknameHasLink = false;
+
+        if (member.nickname) {
+          this.nix.logger.debug(`${member.user.tag} has nickname: ${member.nickname}`);
+          nicknameHasLink = !!member.nickname.match(usernameWithLinkRegex);
+        }
+
+        let hasLink = usernameHasLink || nicknameHasLink;
+        this.nix.logger.info(`${member.user.tag} has Twitch link in username: ${hasLink}`);
 
         return hasLink
       })
