@@ -26,7 +26,7 @@ By default, autobanning is enabled. To disable autobanning users:
 
 To configure the rules around which users are autobanned:
 ```text
-!config setAutoBanRule {rule} {enabled}
+!config modTools setAutoBanRule {rule} {enabled}
 ```
 
 ### Rules
