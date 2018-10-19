@@ -10,28 +10,69 @@ const {
 } = require('../utility');
 
 class AutoBanService extends Service {
+  constructor(props) {
+    super(props);
+
+    this.rules = [
+      {
+        name: AUTO_BAN_RULES.BAN_DISCORD_INVITE,
+        test: (member) => {
+          let hasLink = this.memberNameMatches(member, /discord\.gg[\/\\]/);
+          this.nix.logger.debug(`${member.user.tag} has Discord invite in name: ${hasLink}`);
+          return hasLink;
+        },
+        reason: "Username contains or was changed to a Discord invite",
+      },
+      {
+        name: AUTO_BAN_RULES.BAN_TWITCH_LINK,
+        test: (member) => {
+          let hasLink = this.memberNameMatches(member, /twitch\.tv[\/\\]/);
+          this.nix.logger.debug(`${member.user.tag} has Twitch link in name: ${hasLink}`);
+          return hasLink;
+        },
+        reason: "Username contains or was changed to a Twitch link",
+      },
+    ];
+  }
+
   configureService() {
     this.dataService = this.nix.getService('core', 'dataService');
   }
 
   onNixListen() {
     this.nix.streams.guildMemberAdd$
-      .flatMap((member) => this.doAutoBans(member))
+      .flatMap((member) =>
+        this.doAutoBans(member)
+          .catch((error) => {
+            error.member = member;
+            return Rx.Observable.throw(error);
+          })
+      )
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberAdd$"},
+          {name: "Member", value: error.member.toString()},
+          {name: "Guild", value: error.member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
       .subscribe();
 
     this.nix.streams.guildMemberUpdate$
-      .flatMap(([oldMember, newMember]) => this.doAutoBans(newMember))
+      .flatMap(([oldMember, newMember]) =>
+        this.doAutoBans(newMember)
+          .catch((error) => {
+            error.member = newMember;
+            return Rx.Observable.throw(error);
+          })
+      )
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberUpdate$"},
+          {name: "Member", value: error.member.toString()},
+          {name: "Guild", value: error.member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
@@ -39,7 +80,7 @@ class AutoBanService extends Service {
   }
 
   getAutoBanRule(rule) {
-    let foundRule = Object.values(AUTO_BAN_RULES).find((r) => r.toLowerCase() === rule.toLowerCase())
+    let foundRule = Object.values(AUTO_BAN_RULES).find((r) => r.toLowerCase() === rule.toLowerCase());
     if (!foundRule) {
       return new RuleNotFoundError(rule);
     }
@@ -64,15 +105,8 @@ class AutoBanService extends Service {
       .of('')
       .flatMap(() => this.isAutoBanEnabled(member.guild).filter(Boolean))
       .do(() => this.nix.logger.info(`Checking if ${member.user.tag} should be auto banned...`))
-      .flatMap(() =>
-        Rx.Observable
-          .merge([
-            Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.USERNAME_IS_INVITE).filter(Boolean))
-              .flatMap(() => this.memberHasUsernameWithLink(member).filter(Boolean))
-              .map(() => "Username contains a link"),
-          ])
-      )
+      .flatMap(() => Rx.Observable.from(this.rules))
+      .flatMap((rule) => this.runRule(rule, member))
       .filter((reason) => reason)
       .take(1)
       .do((reason) => this.nix.logger.info(`Auto banning ${member.user.tag}; reason: ${reason}`))
@@ -82,6 +116,15 @@ class AutoBanService extends Service {
           reason: `Jasmine AutoBan: ${reason}`,
         })
       )
+  }
+
+  runRule(rule, member) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.isAutoBanRuleEnabled(member.guild, rule.name))
+      .filter(Boolean)
+      .filter(() => rule.test(member))
+      .map(() => rule.reason)
   }
 
   isAutoBanEnabled(guild) {
@@ -106,29 +149,18 @@ class AutoBanService extends Service {
       }, {})
   }
 
-  memberHasUsernameWithLink(member) {
-    let usernameWithLinkRegex = /discord\.gg[\/\\]/;
+  memberNameMatches(member, regex) {
+    // check username
+    let usernameHasLink = !!member.user.username.match(regex);
 
-    return Rx.Observable
-      .of('')
-      .map(() => {
-        this.nix.logger.debug(`${member.user.tag} has username: ${member.user.username}`);
+    // check nickname if there is one
+    let nicknameHasLink = false;
+    if (member.nickname) {
+      nicknameHasLink = !!member.nickname.match(regex);
+    }
 
-        let usernameHasLink = !!member.user.username.match(usernameWithLinkRegex);
-        let nicknameHasLink = false;
-
-        if (member.nickname) {
-          this.nix.logger.debug(`${member.user.tag} has nickname: ${member.nickname}`);
-          nicknameHasLink = !!member.nickname.match(usernameWithLinkRegex);
-        }
-
-        let hasLink = usernameHasLink || nicknameHasLink;
-        this.nix.logger.info(`${member.user.tag} has link in username: ${hasLink}`);
-
-        return hasLink
-      })
+    return usernameHasLink || nicknameHasLink;
   }
-
 }
 
 module.exports = AutoBanService;
