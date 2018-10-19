@@ -22,9 +22,13 @@ module.exports = {
       data: true,
     },
     {
-      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.USERNAME_IS_INVITE),
+      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.BAN_DISCORD_INVITE),
       data: true,
-    }
+    },
+    {
+      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.BAN_TWITCH_LINK),
+      data: true,
+    },
   ],
   services: glob
     .sync(`${__dirname}/services/**/*.js`)
