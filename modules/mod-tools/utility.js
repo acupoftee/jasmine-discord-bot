@@ -2,7 +2,7 @@ const DATAKEYS = {
   MOD_LOG_CHANNEL: 'modTools.modLogChannel',
   JOIN_LOG_CHANNEL: 'modTools.joinLogChannel',
   AUTO_BAN_ENABLED: 'modTools.autoBan.enabled',
-  AUTO_BAN_RULE: (rule) => `modTools.autoBan.rule.${rule}`,
+  AUTO_BAN_RULE: (rule) => `modTools.autoBan.rule.${AUTO_BAN_MAP[rule]}`,
 };
 
 const ERRORS = {
@@ -22,8 +22,12 @@ const LOG_TYPES = [
   },
 ];
 
+const AUTO_BAN_MAP = {
+  banDiscordInvites: 'usernameIsInvite',
+};
+
 const AUTO_BAN_RULES = {
-  USERNAME_IS_INVITE: 'usernameIsInvite',
+  USERNAME_IS_DISCORD_INVITE: 'banDiscordInvites',
 };
 
 module.exports = {

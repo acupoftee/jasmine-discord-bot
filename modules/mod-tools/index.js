@@ -22,7 +22,7 @@ module.exports = {
       data: true,
     },
     {
-      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.USERNAME_IS_INVITE),
+      keyword: DATAKEYS.AUTO_BAN_RULE(AUTO_BAN_RULES.USERNAME_IS_DISCORD_INVITE),
       data: true,
     }
   ],

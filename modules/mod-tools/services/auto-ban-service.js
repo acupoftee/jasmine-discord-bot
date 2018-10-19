@@ -16,22 +16,38 @@ class AutoBanService extends Service {
 
   onNixListen() {
     this.nix.streams.guildMemberAdd$
-      .flatMap((member) => this.doAutoBans(member))
+      .flatMap((member) =>
+        this.doAutoBans(member)
+          .catch((error) => {
+            error.member = member;
+            return Rx.Observable.throw(error);
+          })
+      )
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberAdd$"},
+          {name: "Member", value: error.member.toString()},
+          {name: "Guild", value: error.member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
       .subscribe();
 
     this.nix.streams.guildMemberUpdate$
-      .flatMap(([oldMember, newMember]) => this.doAutoBans(newMember))
+      .flatMap(([oldMember, newMember]) =>
+        this.doAutoBans(newMember)
+          .catch((error) => {
+            error.member = newMember;
+            return Rx.Observable.throw(error);
+          })
+      )
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberUpdate$"},
+          {name: "Member", value: error.member.toString()},
+          {name: "Guild", value: error.member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
@@ -39,7 +55,7 @@ class AutoBanService extends Service {
   }
 
   getAutoBanRule(rule) {
-    let foundRule = Object.values(AUTO_BAN_RULES).find((r) => r.toLowerCase() === rule.toLowerCase())
+    let foundRule = Object.values(AUTO_BAN_RULES).find((r) => r.toLowerCase() === rule.toLowerCase());
     if (!foundRule) {
       return new RuleNotFoundError(rule);
     }
@@ -68,8 +84,8 @@ class AutoBanService extends Service {
         Rx.Observable
           .merge([
             Rx.Observable.of('')
-              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.USERNAME_IS_INVITE).filter(Boolean))
-              .flatMap(() => this.memberHasUsernameWithLink(member).filter(Boolean))
+              .flatMap(() => this.isAutoBanRuleEnabled(member.guild, AUTO_BAN_RULES.USERNAME_IS_DISCORD_INVITE).filter(Boolean))
+              .flatMap(() => this.memberHasDiscordInvite(member).filter(Boolean))
               .map(() => "Username contains a link"),
           ])
       )
@@ -106,7 +122,7 @@ class AutoBanService extends Service {
       }, {})
   }
 
-  memberHasUsernameWithLink(member) {
+  memberHasDiscordInvite(member) {
     let usernameWithLinkRegex = /discord\.gg[\/\\]/;
 
     return Rx.Observable
@@ -128,7 +144,6 @@ class AutoBanService extends Service {
         return hasLink
       })
   }
-
 }
 
 module.exports = AutoBanService;
