@@ -15,7 +15,6 @@ module.exports = {
   ],
 
   run(context, response) {
-    let modLogService = context.nix.getService('modTools', 'ModLogService');
     let userService = context.nix.getService('core', 'UserService');
 
     let guild = context.guild;
@@ -28,7 +27,6 @@ module.exports = {
         return member;
       })
       .flatMap((user) => guild.unban(user, `Unbanned by ${context.author.tag}`))
-      .flatMap((user) => modLogService.addUnbanEntry(guild, user, context.member.user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been unbanned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {

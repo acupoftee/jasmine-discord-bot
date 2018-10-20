@@ -7,16 +7,6 @@ module.exports = {
   description: 'Ban a user from the server',
   permissions: ['admin', 'mod'],
 
-  services: {
-    core: [
-      'UserService',
-      'CommandService',
-    ],
-    modTools: [
-      'modLogService',
-    ],
-  },
-
   flags: [
     {
       name: 'days',
@@ -41,13 +31,14 @@ module.exports = {
   ],
 
   run(context, response) {
+    let userService = context.nix.getService('core', 'UserService');
+
     let guild = context.guild;
     let userString = context.args.user;
     let reason = context.args.reason;
     let days = context.flags.days;
 
-    return this.UserService
-      .findUser(userString)
+    return userService.findUser(userString)
       .map((user) => {
         if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }
         return user;
@@ -67,7 +58,6 @@ module.exports = {
           )
           .map(user)
       )
-      .flatMap((user) => this.modLogService.addBanEntry(guild, user, reason, context.member.user).map(user))
       .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
