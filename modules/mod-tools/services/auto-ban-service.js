@@ -113,7 +113,7 @@ class AutoBanService extends Service {
       .flatMap((reason) =>
         member.guild.ban(member, {
           days: 1,
-          reason: `Jasmine AutoBan: ${reason}`,
+          reason: `[AutoBan] ${reason}`,
         })
       )
   }

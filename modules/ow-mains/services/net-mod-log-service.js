@@ -40,6 +40,7 @@ class NetModLogService extends Service {
           })
           .map((log) => [guild, user, log]);
       })
+      .filter(([guild, user, log]) => !log.reason.match(/\[AutoBan\]/i))
       .map(([guild, user, log]) => {
         if (log.executor.id === this.nix.discord.user.id) {
           //if the ban was by Jasmine, strip the moderator from the reason
