@@ -43,8 +43,6 @@ class ModLogService extends Service {
       .guildBanAdd$
       .flatMap(([guild, user]) =>
         this.findReasonAuditLog(guild, user, { type: AuditLogActions.MEMBER_BAN_ADD })
-          // Filter out bans by Jasmine, they have already been logged
-          .filter((log) => log.executor.id !== this.nix.discord.user.id)
           .catch((error) => {
             switch (error.name) {
               case "TargetMatchError":
