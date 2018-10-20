@@ -17,7 +17,7 @@ class AutoBanService extends Service {
       {
         name: AUTO_BAN_RULES.BAN_DISCORD_INVITE,
         test: (member) => {
-          let hasLink = this.memberNameMatches(member, /discord\.gg[\/\\]/);
+          let hasLink = this.memberNameMatches(member, /discord\.gg[\/\\]/i);
           this.nix.logger.debug(`${member.user.tag} has Discord invite in name: ${hasLink}`);
           return hasLink;
         },
@@ -26,7 +26,7 @@ class AutoBanService extends Service {
       {
         name: AUTO_BAN_RULES.BAN_TWITCH_LINK,
         test: (member) => {
-          let hasLink = this.memberNameMatches(member, /twitch\.tv[\/\\]/);
+          let hasLink = this.memberNameMatches(member, /twitch\.tv[\/\\]/i);
           this.nix.logger.debug(`${member.user.tag} has Twitch link in name: ${hasLink}`);
           return hasLink;
         },
