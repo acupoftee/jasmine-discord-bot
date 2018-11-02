@@ -790,8 +790,9 @@ natural-compare@^1.4.0:
     winston "^3.0.0-rc1"
 
 "nix-data-disk@github:nix-core/nix-data-disk#master":
-  version "0.0.0"
-  resolved "https://codeload.github.com/nix-core/nix-data-disk/tar.gz/b44ab7815e65e4d2a65816c0c6f029e599880a71"
+  version "1.0.0"
+  uid "0370bb576fe05486523eed54a8ce8f8b69038e58"
+  resolved "https://github.com/nix-core/nix-data-disk#0370bb576fe05486523eed54a8ce8f8b69038e58"
 
 "nix-data-memory@github:nix-core/nix-data-memory#master":
   version "1.0.0"
