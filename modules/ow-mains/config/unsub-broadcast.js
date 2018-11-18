@@ -4,12 +4,6 @@ module.exports = {
   name: 'unsubBroadcast',
   description: `Unsubscribe from a type of broadcast. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
 
-  services: {
-    core: [
-      'dataService',
-    ]
-  },
-
   inputs: [
     {
       name: 'type',
@@ -30,7 +24,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, datakey, null)
       .map(() => {
         response.content = `I have disabled ${broadcastType} broadcasts`;

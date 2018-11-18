@@ -10,10 +10,6 @@ const {
 } = require('../utility');
 
 class ModLogService extends Service {
-  configureService() {
-    this.dataService = this.nix.getService('core', 'dataService');
-  }
-
   onNixListen() {
     this.nix.logger.debug('Adding listener for guildMemberAdd$ events');
     this.nix.streams
@@ -171,7 +167,7 @@ class ModLogService extends Service {
     let logType = this.getLogType(logTypeName);
     if (!logType) { throw new Error(ERRORS.INVALID_LOG_TYPE); }
 
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, logType.channelDatakey)
       .filter((channelId) => typeof channelId !== 'undefined')
       .map((channelId) => guild.channels.find((c) => c.id === channelId))

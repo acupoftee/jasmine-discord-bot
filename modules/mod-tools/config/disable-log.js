@@ -6,12 +6,6 @@ module.exports = {
   name: 'disableLog',
   description: 'disable a log, such as the ModLog or the JoinLog',
 
-  services: {
-    core: [
-      'dataService',
-    ],
-  },
-
   inputs: [
     {
       name: 'type',
@@ -33,7 +27,7 @@ module.exports = {
       };
     }
 
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, logType.channelDatakey, null)
       .map(() => ({
         content: `I have disabled the ${logType.name}.`

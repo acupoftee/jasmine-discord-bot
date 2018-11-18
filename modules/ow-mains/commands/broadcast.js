@@ -13,15 +13,6 @@ module.exports = {
   description: 'broadcast a message to all connected servers',
   permissions: ['broadcaster'],
 
-  services: {
-    core: [
-      'dataService',
-    ],
-    owMains: [
-      'broadcastService',
-    ]
-  },
-
   args: [
     {
       name: 'type',

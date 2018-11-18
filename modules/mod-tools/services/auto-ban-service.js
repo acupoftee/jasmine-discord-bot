@@ -35,10 +35,6 @@ class AutoBanService extends Service {
     ];
   }
 
-  configureService() {
-    this.dataService = this.nix.getService('core', 'dataService');
-  }
-
   onNixListen() {
     this.nix.streams.guildMemberAdd$
       .flatMap((member) =>
@@ -88,14 +84,14 @@ class AutoBanService extends Service {
   }
 
   setAutoBansEnabled(guild, newValue) {
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED, newValue)
   }
 
   setAutoBanRule(guild, rule, newValue) {
     rule = this.getAutoBanRule(rule);
 
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule), newValue)
       .map((enabled) => ([rule, enabled]))
   }
@@ -128,14 +124,14 @@ class AutoBanService extends Service {
   }
 
   isAutoBanEnabled(guild) {
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED)
   }
 
   isAutoBanRuleEnabled(guild, rule) {
     rule = this.getAutoBanRule(rule);
 
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule))
   }
 

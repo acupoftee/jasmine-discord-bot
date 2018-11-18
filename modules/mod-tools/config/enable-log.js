@@ -7,12 +7,6 @@ module.exports = {
   name: 'enableLog',
   description: 'Enable a log in a channel, such as the ModLog or the JoinLog',
 
-  services: {
-    core: [
-      'dataService',
-    ],
-  },
-
   inputs: [
     {
       name: 'type',
@@ -47,7 +41,7 @@ module.exports = {
       });
     }
 
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
       .map(() => ({

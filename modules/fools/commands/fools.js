@@ -8,12 +8,6 @@ module.exports = {
   description: 'April fools for Sombra Mains',
   permissions: ['admin'],
 
-  services: {
-    core: [
-      'dataService',
-    ]
-  },
-
   flags: [
     {
       name: 'restore',
@@ -31,7 +25,7 @@ module.exports = {
     let guildMembers = guild.members.array();
 
     return Rx.Observable.of('')
-      .flatMap(() => this.dataService.getGuildData(guild.id, DATAKEYS.PREV_NAMES))
+      .flatMap(() => this.nix.getGuildData(guild.id, DATAKEYS.PREV_NAMES))
       .flatMap((prevNames) =>
         response
           .send({ content: `${restoreNames ? `Restoring` : `Changing`} ${guildMembers.length} names` })
@@ -50,7 +44,7 @@ module.exports = {
             }
           })
           .toArray()
-          .flatMap((changedUsers) => dataService.setGuildData(guild.id, DATAKEYS.PREV_NAMES, prevNames).map(() => changedUsers));
+          .flatMap((changedUsers) => this.nix.setGuildData(guild.id, DATAKEYS.PREV_NAMES, prevNames).map(() => changedUsers));
       })
       .flatMap((changedUsers) => {
         return response.send({

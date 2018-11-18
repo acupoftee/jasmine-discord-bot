@@ -11,7 +11,6 @@ const {
 
 class NetModLogService extends Service {
   configureService() {
-    this.dataService = this.nix.getService('core', 'dataService');
     this.modLogService = this.nix.getService('modTools', 'ModLogService');
   }
 
@@ -100,13 +99,13 @@ class NetModLogService extends Service {
 
     return Rx.Observable.from(this.nix.discord.guilds.array())
       .flatMap((netGuild) =>
-        this.dataService
+        this.nix
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG_TOKEN)
           .filter((token) => token === NET_MOD_LOG_TOKEN)
           .map(netGuild)
       )
       .flatMap((netGuild) =>
-        this.dataService
+        this.nix
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG)
           .map((channelId) => netGuild.channels.find((c) => c.id === channelId))
       )

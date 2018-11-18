@@ -13,10 +13,6 @@ const {
 const defaultRegions = require('../data/regions');
 
 class RegionService extends Service {
-  configureService() {
-    this.dataService = this.nix.getService('core', 'DataService');
-  }
-
   onNixJoinGuild(guild) {
     let mapRoles$ = this.getRegions(guild)
       .filter((roles) => roles === null)
@@ -59,19 +55,19 @@ class RegionService extends Service {
   }
 
   getRegions(guild) {
-    return this.dataService.getGuildData(guild.id, DATAKEYS.REGION_REGIONS);
+    return this.nix.getGuildData(guild.id, DATAKEYS.REGION_REGIONS);
   }
 
   setRegions(guild, roles) {
-    return this.dataService.setGuildData(guild.id, DATAKEYS.REGION_REGIONS, roles);
+    return this.nix.setGuildData(guild.id, DATAKEYS.REGION_REGIONS, roles);
   }
 
   getAliases(guild) {
-    return this.dataService.getGuildData(guild.id, DATAKEYS.REGION_ALIASES);
+    return this.nix.getGuildData(guild.id, DATAKEYS.REGION_ALIASES);
   }
 
   setAliases(guild, aliases) {
-    return this.dataService.setGuildData(guild.id, DATAKEYS.REGION_ALIASES, aliases);
+    return this.nix.setGuildData(guild.id, DATAKEYS.REGION_ALIASES, aliases);
   }
 
   mapRegion(guild, region, role) {

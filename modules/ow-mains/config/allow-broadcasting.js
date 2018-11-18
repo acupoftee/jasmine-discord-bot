@@ -8,12 +8,6 @@ module.exports = {
   name: 'allowBroadcasting',
   description: `Enable broadcasting from this server.`,
 
-  services: {
-    core: [
-      'dataService',
-    ],
-  },
-
   inputs: [
     {
       name: 'type',
@@ -43,9 +37,9 @@ module.exports = {
       };
     }
 
-    return this.dataService.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
+    return this.nix.getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .do((savedData) => savedData[broadcastType] = token)
-      .flatMap((savedData) => this.dataService.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
+      .flatMap((savedData) => this.nix.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
       .map(() => ({
         content: `This server is now allowed to send ${broadcastType} broadcasts.`
       }));

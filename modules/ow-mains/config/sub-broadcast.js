@@ -6,12 +6,6 @@ module.exports = {
   name: 'subBroadcast',
   description: `Subscribe to a type of broadcast in a channel. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
 
-  services: {
-    core: [
-      'dataService',
-    ]
-  },
-
   inputs: [
     {
       name: 'type',
@@ -43,7 +37,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, datakey, channel.id)
       .flatMap(() => channel.send(`I will send ${broadcastType} broadcasts here.`))
       .map(() => ({
