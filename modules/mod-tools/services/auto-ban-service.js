@@ -35,38 +35,35 @@ class AutoBanService extends Service {
     ];
   }
 
-  configureService() {
-    this.dataService = this.nix.getService('core', 'dataService');
-  }
-
   onNixListen() {
     this.nix.streams.guildMemberAdd$
-      .flatMap((member) =>
-        this.doAutoBans(member)
-          .catch((error) => {
-            error.member = member;
-            return Rx.Observable.throw(error);
-          })
-      )
+      .flatMap((member) => this.handleGuildMemberAdd(member))
+      .subscribe();
+
+    this.nix.streams.guildMemberUpdate$
+      .flatMap(([oldMember, newMember]) => this.handleGuildMemberUpdate(oldMember, newMember))
+      .subscribe();
+  }
+
+  handleGuildMemberAdd(member) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.doAutoBans(member))
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberAdd$"},
-          {name: "Member", value: error.member.toString()},
-          {name: "Guild", value: error.member.guild.toString()},
+          {name: "Member", value: member.toString()},
+          {name: "Guild", value: member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
-      .subscribe();
+  }
 
-    this.nix.streams.guildMemberUpdate$
-      .flatMap(([oldMember, newMember]) =>
-        this.doAutoBans(newMember)
-          .catch((error) => {
-            error.member = newMember;
-            return Rx.Observable.throw(error);
-          })
-      )
+  handleGuildMemberUpdate(oldMember, newMember) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.doAutoBans(newMember))
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
@@ -76,7 +73,6 @@ class AutoBanService extends Service {
         ]);
         return Rx.Observable.empty();
       })
-      .subscribe();
   }
 
   getAutoBanRule(rule) {
@@ -88,14 +84,14 @@ class AutoBanService extends Service {
   }
 
   setAutoBansEnabled(guild, newValue) {
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED, newValue)
   }
 
   setAutoBanRule(guild, rule, newValue) {
     rule = this.getAutoBanRule(rule);
 
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule), newValue)
       .map((enabled) => ([rule, enabled]))
   }
@@ -128,14 +124,14 @@ class AutoBanService extends Service {
   }
 
   isAutoBanEnabled(guild) {
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED)
   }
 
   isAutoBanRuleEnabled(guild, rule) {
     rule = this.getAutoBanRule(rule);
 
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule))
   }
 

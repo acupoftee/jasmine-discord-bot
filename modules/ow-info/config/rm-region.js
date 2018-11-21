@@ -6,12 +6,6 @@ module.exports = {
   name: 'rmRegion',
   description: 'Removes an Overwatch region',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
-  },
-
   inputs: [
     {
       name: 'regionName',
@@ -20,10 +14,14 @@ module.exports = {
     },
   ],
 
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
+  },
+
   run(context) {
     let guild = context.guild;
 
-    let regionName = context.args.input1;
+    let regionName = context.inputs.regionName;
 
     if (!regionName) {
       return Rx.Observable.of({

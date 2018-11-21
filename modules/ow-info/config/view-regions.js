@@ -4,13 +4,9 @@ module.exports = {
   name: 'viewRegions',
   description: 'Displays a list of all configured regions, and their aliases',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
   },
-
-  inputs: [],
 
   run(context) {
     let guild = context.guild;

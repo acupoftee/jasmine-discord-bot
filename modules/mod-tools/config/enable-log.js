@@ -7,12 +7,6 @@ module.exports = {
   name: 'enableLog',
   description: 'Enable a log in a channel, such as the ModLog or the JoinLog',
 
-  services: {
-    core: [
-      'dataService',
-    ],
-  },
-
   inputs: [
     {
       name: 'type',
@@ -30,8 +24,8 @@ module.exports = {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
 
     let guild = context.guild;
-    let logTypeName = context.args.input1;
-    let channelString = context.args.input2;
+    let logTypeName = context.inputs.type;
+    let channelString = context.inputs.channel;
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
@@ -47,7 +41,7 @@ module.exports = {
       });
     }
 
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
       .map(() => ({

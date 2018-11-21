@@ -13,6 +13,7 @@ const {
 module.exports = {
   name: 'region',
   description: 'Sets the Overwatch region that you most often play on.',
+
   args: [
     {
       name: 'region',
@@ -21,10 +22,8 @@ module.exports = {
     },
   ],
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
+  configureCommand() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
   },
 
   run(context, response) {

@@ -7,6 +7,7 @@ module.exports = {
   name: 'warn',
   description: 'Issue a warning to a user',
   permissions: ['admin', 'mod'],
+
   args: [
     {
       name: 'user',
