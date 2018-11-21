@@ -41,12 +41,12 @@ class NetModLogService extends Service {
               case "TargetMatchError":
                 return Rx.Observable.of({
                   executor: {id: null},
-                  reason: `ERROR: Unable to find matching log entry`
+                  reason: `ERROR: Unable to find matching log entry`,
                 });
               case "AuditLogReadError":
                 return Rx.Observable.of({
                   executor: {id: null},
-                  reason: `ERROR: ${error.message}`
+                  reason: `ERROR: ${error.message}`,
                 });
               default:
                 return Rx.Observable.throw(error);
@@ -62,18 +62,20 @@ class NetModLogService extends Service {
           reason = reason.replace(/\| Banned.*$/, '');
         }
 
-        return {...log, reason };
+        return {...log, reason};
       })
       .do((log) => this.nix.logger.debug(`NetModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
       .flatMap((log) => this.addBanEntry(guild, user, log.reason))
       .catch((error) => {
         this.nix.handleError(error, [
-          {name: 'Event', value: 'guildBanAdd'},
+          {name: 'Service', value: 'NetModLogService'},
+          {name: 'Hook', value: 'guildBanAdd$'},
           {name: 'Guild Name', value: guild.name},
           {name: 'Guild ID', value: guild.id},
           {name: 'Banned User', value: user.tag.toString()},
           {name: 'Banned Reason', value: log.reason},
         ]);
+        return Rx.Observable.empty();
       });
   }
 
@@ -84,11 +86,13 @@ class NetModLogService extends Service {
       .flatMap(() => this.addUnbanEntry(guild, user))
       .catch((error) => {
         this.nix.handleError(error, [
-          {name: 'Event', value: 'guildBanRemove'},
+          {name: 'Service', value: 'NetModLogService'},
+          {name: 'Hook', value: 'guildBanRemove$'},
           {name: 'Guild Name', value: guild.name},
           {name: 'Guild ID', value: guild.id},
           {name: 'Unbanned User', value: user.tag.toString()},
         ]);
+        return Rx.Observable.empty();
       });
   }
 
@@ -122,12 +126,12 @@ class NetModLogService extends Service {
         this.nix
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG_TOKEN)
           .filter((token) => token === NET_MOD_LOG_TOKEN)
-          .map(netGuild)
+          .map(netGuild),
       )
       .flatMap((netGuild) =>
         this.nix
           .getGuildData(netGuild.id, DATAKEYS.NET_MOD_LOG)
-          .map((channelId) => netGuild.channels.find((c) => c.id === channelId))
+          .map((channelId) => netGuild.channels.find((c) => c.id === channelId)),
       )
       .filter((channel) => channel !== null)
       .flatMap((channel) => channel.send({embed}))

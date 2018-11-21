@@ -67,13 +67,7 @@ module.exports = {
           return response.send({content: `Ok. Broadcast canceled`});
         }
         else {
-          return nix.handleError(error, [
-            {name: "command", value: "broadcast"},
-            {name: "guild", value: context.guild.name},
-            {name: "channel", value: context.channel.name},
-            {name: "args", value: JSON.stringify(context.args)},
-            {name: "flags", value: JSON.stringify(context.flags)},
-          ]);
+          return Rx.Observable.throw(error);
         }
       });
   },

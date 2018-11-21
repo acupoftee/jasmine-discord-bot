@@ -37,32 +37,33 @@ class AutoBanService extends Service {
 
   onNixListen() {
     this.nix.streams.guildMemberAdd$
-      .flatMap((member) =>
-        this.doAutoBans(member)
-          .catch((error) => {
-            error.member = member;
-            return Rx.Observable.throw(error);
-          })
-      )
+      .flatMap((member) => this.handleGuildMemberAdd(member))
+      .subscribe();
+
+    this.nix.streams.guildMemberUpdate$
+      .flatMap(([oldMember, newMember]) => this.handleGuildMemberUpdate(oldMember, newMember))
+      .subscribe();
+  }
+
+  handleGuildMemberAdd(member) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.doAutoBans(member))
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
           {name: "Hook", value: "guildMemberAdd$"},
-          {name: "Member", value: error.member.toString()},
-          {name: "Guild", value: error.member.guild.toString()},
+          {name: "Member", value: member.toString()},
+          {name: "Guild", value: member.guild.toString()},
         ]);
         return Rx.Observable.empty();
       })
-      .subscribe();
+  }
 
-    this.nix.streams.guildMemberUpdate$
-      .flatMap(([oldMember, newMember]) =>
-        this.doAutoBans(newMember)
-          .catch((error) => {
-            error.member = newMember;
-            return Rx.Observable.throw(error);
-          })
-      )
+  handleGuildMemberUpdate(oldMember, newMember) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => this.doAutoBans(newMember))
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "AutoBanService"},
@@ -72,7 +73,6 @@ class AutoBanService extends Service {
         ]);
         return Rx.Observable.empty();
       })
-      .subscribe();
   }
 
   getAutoBanRule(rule) {
