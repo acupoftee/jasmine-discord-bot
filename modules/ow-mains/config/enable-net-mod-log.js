@@ -42,6 +42,7 @@ module.exports = {
       .flatMap(() => this.nix.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
       .flatMap(() => channel.send('I will post the network moderation log here now.'))
       .flatMap(() => ({
+        status: 200,
         content: `This server will now receive the network moderation log.`
       }))
       .catch((error) => {
@@ -49,6 +50,7 @@ module.exports = {
           case 'DiscordAPIError':
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
+                status: 400,
                 content: `Whoops, I do not have permission to talk in that channel.`
               });
             }

@@ -48,6 +48,7 @@ module.exports = {
           case 'DiscordAPIError':
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
+                status: 400,
                 content: `Whoops, I do not have permission to talk in that channel.`
               });
             }

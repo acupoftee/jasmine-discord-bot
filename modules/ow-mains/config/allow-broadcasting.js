@@ -27,12 +27,14 @@ module.exports = {
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
       return {
+        status: 200,
         content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
       };
     }
 
     if (token !== BROADCAST_TOKENS[broadcastType]) {
       return {
+        status: 200,
         content: `I'm sorry, but that token is not valid for ${broadcastType} broadcasts`
       };
     }
@@ -41,6 +43,7 @@ module.exports = {
       .do((savedData) => savedData[broadcastType] = token)
       .flatMap((savedData) => this.nix.setGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS, savedData))
       .map(() => ({
+        status: 200,
         content: `This server is now allowed to send ${broadcastType} broadcasts.`
       }));
   },

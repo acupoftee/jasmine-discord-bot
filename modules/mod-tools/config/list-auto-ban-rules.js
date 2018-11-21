@@ -15,7 +15,7 @@ module.exports = {
         autoBanService.getRules(guild)
       )
       .map(([autoBanEnabled, rules]) => {
-        message = [
+        let message = [
           `**Autoban Rules:**`,
           `(Autoban enabled: ${autoBanEnabled})`
         ];
@@ -26,6 +26,9 @@ module.exports = {
 
         return message.join('\n');
       })
-      .map((content) => ({status: 200, content}));
+      .map((content) => ({
+        status: 200, 
+        content
+      }));
   }
 };

@@ -18,11 +18,12 @@ module.exports = {
     let modLogService = context.nix.getService('modTools', 'ModLogService');
 
     let guild = context.guild;
-    let logTypeName = context.args.input1;
+    let logTypeName = context.inputs.type;
 
     let logType = modLogService.getLogType(logTypeName);
     if (!logType) {
       return {
+        status: 400,
         content: `${logTypeName} is not a valid log type. Valid types: ${VALID_LOG_TYPES_NAMES.join(',')}`,
       };
     }
@@ -30,6 +31,7 @@ module.exports = {
     return this.nix
       .setGuildData(guild.id, logType.channelDatakey, null)
       .map(() => ({
+        status: 200,
         content: `I have disabled the ${logType.name}.`
       }));
   },
