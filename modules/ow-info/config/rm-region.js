@@ -6,12 +6,6 @@ module.exports = {
   name: 'rmRegion',
   description: 'Removes an Overwatch region',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
-  },
-
   inputs: [
     {
       name: 'regionName',
@@ -19,6 +13,10 @@ module.exports = {
       required: true,
     },
   ],
+
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
+  },
 
   run(context) {
     let guild = context.guild;

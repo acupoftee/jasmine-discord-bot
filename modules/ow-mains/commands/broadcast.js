@@ -27,6 +27,10 @@ module.exports = {
     },
   ],
 
+  configureCommand() {
+    this.broadcastService = this.nix.getService('owMains', 'broadcastService');
+  },
+
   run(context, response) {
     let nix = context.nix;
     let guild = context.guild;

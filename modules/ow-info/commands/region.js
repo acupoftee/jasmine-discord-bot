@@ -22,10 +22,8 @@ module.exports = {
     },
   ],
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
+  configureCommand() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
   },
 
   run(context, response) {

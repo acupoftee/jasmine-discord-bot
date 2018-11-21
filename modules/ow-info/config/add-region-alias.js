@@ -6,12 +6,6 @@ module.exports = {
   name: 'addRegionAlias',
   description: 'Adds an alias for a region',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
-  },
-
   inputs: [
     {
       name: 'aliasName',
@@ -24,6 +18,10 @@ module.exports = {
       required: true,
     },
   ],
+
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
+  },
 
   run(context) {
     let guild = context.guild;

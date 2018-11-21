@@ -6,12 +6,6 @@ module.exports = {
   name: 'addRegion',
   description: 'Adds an Overwatch region, and map it to a role',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
-  },
-
   inputs: [
     {
       name: 'regionName',
@@ -24,6 +18,10 @@ module.exports = {
       required: true,
     },
   ],
+
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
+  },
 
   run(context) {
     let guild = context.guild;
