@@ -19,8 +19,8 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let typeString = context.args.input1;
-    let channelString = context.args.input2;
+    let typeString = context.inputs.type;
+    let channelString = context.inputs.channel;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {

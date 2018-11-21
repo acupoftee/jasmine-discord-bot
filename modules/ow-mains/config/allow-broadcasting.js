@@ -21,8 +21,8 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let typeString = context.args.input1;
-    let token = context.args.input2;
+    let typeString = context.inputs.type;
+    let token = context.inputs.token;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {

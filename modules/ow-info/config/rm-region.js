@@ -23,7 +23,7 @@ module.exports = {
   run(context) {
     let guild = context.guild;
 
-    let regionName = context.args.input1;
+    let regionName = context.inputs.regionName;
 
     if (!regionName) {
       return Rx.Observable.of({

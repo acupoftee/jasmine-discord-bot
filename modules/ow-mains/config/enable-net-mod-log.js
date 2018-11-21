@@ -22,8 +22,8 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let token = context.args.input1;
-    let channelString = context.args.input2;
+    let token = context.inputs.token;
+    let channelString = context.inputs.channel;
 
     if (token !== NET_MOD_LOG_TOKEN) {
       return {

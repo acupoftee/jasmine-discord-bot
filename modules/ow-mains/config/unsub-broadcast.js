@@ -13,22 +13,22 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let typeString = context.args.input1;
-
-    let response = { content: null };
+    let typeString = context.inputs.type;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
-      response.content = `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`;
-      return response;
+      return {
+        status: 400,
+        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
+      };
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
     return this.nix
       .setGuildData(guild.id, datakey, null)
-      .map(() => {
-        response.content = `I have disabled ${broadcastType} broadcasts`;
-        return response
-      });
+      .map(() => ({
+        status: 200,
+        content: `I have disabled ${broadcastType} broadcasts`,
+      }));
   },
 };

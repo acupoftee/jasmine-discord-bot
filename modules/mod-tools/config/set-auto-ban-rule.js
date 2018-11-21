@@ -26,8 +26,8 @@ module.exports = {
     let autoBanService = context.nix.getService('modTools', 'autoBanService');
     let guild = context.guild;
 
-    let rule = context.args.input1;
-    let enabled = context.args.input2 === "true";
+    let rule = context.inputs.rule;
+    let enabled = context.inputs.enabled === "true";
 
     return autoBanService
       .setAutoBanRule(guild, rule, enabled)

@@ -28,8 +28,8 @@ module.exports = {
   run(context) {
     let guild = context.guild;
 
-    let regionName = context.args.input1;
-    let roleString = context.args.input2;
+    let regionName = context.inputs.regionName;
+    let roleString = context.inputs.role;
 
     if (!regionName) {
       return Rx.Observable.of({

@@ -10,8 +10,6 @@ module.exports = {
     ],
   },
 
-  inputs: [],
-
   run(context) {
     let guild = context.guild;
 
