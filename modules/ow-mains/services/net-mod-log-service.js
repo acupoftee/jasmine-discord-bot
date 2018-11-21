@@ -18,7 +18,22 @@ class NetModLogService extends Service {
     this.nix.logger.debug('Adding listener for netModLog guildBanAdd$ events');
     this.nix.streams
       .guildBanAdd$
-      .flatMap(([guild, user]) => {
+      .flatMap(([guild, user]) => this.handleGuildBanAdd(guild, user))
+      .subscribe();
+
+    this.nix.logger.debug('Adding listener for netModLog guildBanRemove$ events');
+    this.nix.streams
+      .guildBanRemove$
+      .flatMap(([guild, user]) => this.handleGuildBanRemove(guild, user))
+      .subscribe();
+
+    return Rx.Observable.of(true);
+  }
+
+  handleGuildBanAdd(guild, user) {
+    return Rx.Observable
+      .of('')
+      .flatMap(() => {
         return this.modLogService
           .findReasonAuditLog(guild, user, {type: AuditLogActions.MEMBER_BAN_ADD})
           .catch((error) => {
@@ -36,40 +51,45 @@ class NetModLogService extends Service {
               default:
                 return Rx.Observable.throw(error);
             }
-          })
-          .map((log) => [guild, user, log]);
+          });
       })
-      .filter(([guild, user, log]) => !log.reason.match(/\[AutoBan\]/i))
-      .map(([guild, user, log]) => {
+      .filter((log) => !log.reason.match(/\[AutoBan\]/i))
+      .map((log) => {
+        let reason = log.reason;
+
         if (log.executor.id === this.nix.discord.user.id) {
-          //if the ban was by Jasmine, strip the moderator from the reason
-          log = {
-            ...log,
-            reason: log.reason.replace(/\| Banned.*$/, '')
-          };
+          //the ban was made by Jasmine, strip the moderator from the reason
+          reason = reason.replace(/\| Banned.*$/, '');
         }
-        return [guild, user, log];
-      })
-      .do(([guild, user, log]) => this.nix.logger.debug(`NetModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
-      .flatMap(([guild, user, log]) => this.addBanEntry(guild, user, log.reason))
-      .catch((error) => {
-        this.nix.logger.error(error);
-        return Rx.Observable.throw(error);
-      })
-      .subscribe();
 
-    this.nix.logger.debug('Adding listener for netModLog guildBanRemove$ events');
-    this.nix.streams
-      .guildBanRemove$
-      .do(([guild, user]) => this.nix.logger.debug(`NetModLog: User ${user.tag} unbanned in ${guild.id}`))
-      .flatMap(([guild, user]) => this.addUnbanEntry(guild, user))
-      .catch((error) => {
-        this.nix.logger.error(error);
-        return Rx.Observable.throw(error);
+        return {...log, reason };
       })
-      .subscribe();
+      .do((log) => this.nix.logger.debug(`NetModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
+      .flatMap((log) => this.addBanEntry(guild, user, log.reason))
+      .catch((error) => {
+        this.nix.handleError(error, [
+          {name: 'Event', value: 'guildBanAdd'},
+          {name: 'Guild Name', value: guild.name},
+          {name: 'Guild ID', value: guild.id},
+          {name: 'Banned User', value: user.tag.toString()},
+          {name: 'Banned Reason', value: log.reason},
+        ]);
+      });
+  }
 
-    return Rx.Observable.of(true);
+  handleGuildBanRemove(guild, user) {
+    return Rx.Observable
+      .of('')
+      .do(() => this.nix.logger.debug(`NetModLog: User ${user.tag} unbanned in ${guild.id}`))
+      .flatMap(() => this.addUnbanEntry(guild, user))
+      .catch((error) => {
+        this.nix.handleError(error, [
+          {name: 'Event', value: 'guildBanRemove'},
+          {name: 'Guild Name', value: guild.name},
+          {name: 'Guild ID', value: guild.id},
+          {name: 'Unbanned User', value: user.tag.toString()},
+        ]);
+      });
   }
 
   addBanEntry(guild, user, reason) {
