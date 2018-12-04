@@ -13,7 +13,7 @@ describe('StreamingService', function () {
       getGuildData: (guildId, keyword) => this.dataSource.getData('guild', guildId, keyword),
       setGuildData: (guildId, keyword, data) => this.dataSource.setData('guild', guildId, keyword, data),
       streams: { presenceUpdate$: this.presenceUpdate$ },
-      handleError: (error, extraFields) => { throw error; }
+      handleError: (error, extraFields) => { throw error; },
     };
 
     this.streamingService = new StreamingService(this.nix);
@@ -37,16 +37,20 @@ describe('StreamingService', function () {
       this.oldMember = { name: "oldMember" };
       this.newMember = { name: "newMember" };
 
-      this.eventPayload = [this.oldMember, this.newMember];
+      this.eventPayload = [ this.oldMember, this.newMember ];
     });
 
     it('calls #handlePresenceUpdate', function (done) {
       sinon.stub(this.streamingService, 'handlePresenceUpdate').returns(Rx.Observable.of(''));
 
-      this.presenceUpdate$.subscribe(() => {}, (error) => done(error), () => {
-        expect(this.streamingService.handlePresenceUpdate).to.have.been.called;
-        done();
-      });
+      this.presenceUpdate$.subscribe(
+        () => {},
+        (error) => done(error),
+        () => {
+          expect(this.streamingService.handlePresenceUpdate).to.have.been.called;
+          done();
+        },
+      );
 
       this.presenceUpdate$.onNext(this.eventPayload);
       this.presenceUpdate$.onCompleted();
@@ -55,10 +59,14 @@ describe('StreamingService', function () {
     it('passes the new and old members to #handlePresenceUpdate', function (done) {
       sinon.stub(this.streamingService, 'handlePresenceUpdate').returns(Rx.Observable.of(''));
 
-      this.presenceUpdate$.subscribe(() => {}, (error) => done(error), () => {
-        expect(this.streamingService.handlePresenceUpdate).to.have.been.calledWith(this.oldMember, this.newMember);
-        done();
-      });
+      this.presenceUpdate$.subscribe(
+        () => {},
+        (error) => done(error),
+        () => {
+          expect(this.streamingService.handlePresenceUpdate).to.have.been.calledWith(this.oldMember, this.newMember);
+          done();
+        },
+      );
 
       this.presenceUpdate$.onNext(this.eventPayload);
       this.presenceUpdate$.onCompleted();
@@ -67,66 +75,136 @@ describe('StreamingService', function () {
 
   describe('#handlePresenceUpdate', function () {
     beforeEach(function () {
-      this.guild = {id: 'testGuild'};
+      this.guild = { id: 'testGuild' };
 
       this.oldMember = {
         name: "oldMember",
         guild: this.guild,
-        presence: {}
+        presence: {},
+        roles: new Map(),
       };
 
       this.newMember = {
         name: "newMember",
         guild: this.guild,
         presence: {},
+        roles: new Map(),
+
         addRole: sinon.fake.resolves(''),
+        removeRole: sinon.fake.resolves(''),
       };
     });
 
-    context('when the user goes live', function () {
-      beforeEach(function () {
-        this.newMember.presence.game = {
-          streaming: true,
-        };
+    context('when there no role to assign', function () {
+      beforeEach(function (done) {
+        this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, null)
+          .subscribe(() => {}, (error) => done(error), () => done());
       });
 
-      context('when there no role to assign', function () {
-        beforeEach(function (done) {
-          this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, null)
-            .subscribe(() => {
-            }, (error) => done(error), () => done());
+      it('does not raise an error', function (done) {
+        this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
+          .subscribe(
+            () => {},
+            (error) => done(error),
+            () => done(),
+          );
+      });
+    });
+
+    context('when there is a role to assign', function () {
+      beforeEach(function (done) {
+        this.role = { id: 'role-00001', name: 'test-role' };
+        this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, this.role.id)
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+
+      context('when the new user is live', function () {
+        beforeEach(function () {
+          this.newMember.presence.game = {
+            streaming: true,
+          };
         });
 
-        it('assigns the role to the member', function (done) {
-          this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
-            .subscribe(
-              () => {},
-              (error) => done(error),
-              () => {
-                expect(this.newMember.addRole).not.to.have.been.called;
-                done()
-              }
-            );
+        context('when the user is missing the role', function () {
+          beforeEach(function () {
+            delete this.newMember.roles[this.role.id];
+          });
+
+          it('assigns the role to the member', function (done) {
+            this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
+              .subscribe(
+                () => {
+                },
+                (error) => done(error),
+                () => {
+                  expect(this.newMember.addRole).to.have.been.calledWith(this.role.id);
+                  done();
+                },
+              );
+          });
+        });
+
+        context('when the user already has the role', function () {
+          beforeEach(function () {
+            this.newMember.roles.set(this.role.id, this.role);
+          });
+
+          it('does not assign the role to the member', function (done) {
+            this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
+              .subscribe(
+                () => {},
+                (error) => done(error),
+                () => {
+                  expect(this.newMember.addRole).not.to.have.been.called;
+                  done();
+                },
+              );
+          });
         });
       });
 
-      context('when there is a role to assign', function () {
-        beforeEach(function (done) {
-          this.role = {id: 'role-00001', name: 'test-role'};
-          this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, this.role.id)
-            .subscribe(() => {}, (error) => done(error), () => done());
+      context('when the new user is offline', function () {
+        beforeEach(function () {
+          this.newMember.presence.game = {
+            streaming: false,
+          };
         });
 
-        it('assigns the role to the member', function (done) {
-          this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
-            .subscribe(
-              () => {},
-              (error) => done(error),
-              () => {
-                expect(this.newMember.addRole).to.have.been.calledWith(this.role.id);
-                done()
-              }
-            );
+        context('when the user is missing the role', function () {
+          beforeEach(function () {
+            delete this.newMember.roles[this.role.id];
+          });
+
+          it('does not try to remove the role', function (done) {
+            this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
+              .subscribe(
+                () => {},
+                (error) => done(error),
+                () => {
+                  expect(this.newMember.removeRole).not.to.have.been.called;
+                  done();
+                },
+              );
+          });
+        });
+
+        context('when the user has the role', function () {
+          beforeEach(function () {
+            this.newMember.roles.set(this.role.id, this.role);
+          });
+
+          it('removes the role', function (done) {
+            this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember)
+              .subscribe(
+                () => {},
+                (error) => done(error),
+                () => {
+                  expect(this.newMember.removeRole).to.have.been.calledWith(this.role.id);
+                  done();
+                },
+              );
+          });
         });
       });
     });
@@ -138,10 +216,11 @@ describe('StreamingService', function () {
       this.guild = { id: 'guild-00001' };
     });
 
-    context('when there is a role set', function() {
+    context('when there is a role set', function () {
       beforeEach(function (done) {
         this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, this.role.id)
-          .subscribe(() => {}, (error) => done(error), () => done());
+          .subscribe(() => {
+          }, (error) => done(error), () => done());
       });
 
       it('returns the roleId to assign', function (done) {
@@ -152,7 +231,7 @@ describe('StreamingService', function () {
             () => {
               expect(this.returnedValue).to.eq(this.role.id);
               done();
-            }
+            },
           );
       });
     });
@@ -160,7 +239,8 @@ describe('StreamingService', function () {
     context('when there is no role set', function () {
       beforeEach(function (done) {
         this.nix.setGuildData(this.guild.id, DATAKEYS.LIVE_ROLE, null)
-          .subscribe(() => {}, (error) => done(error), () => done());
+          .subscribe(() => {
+          }, (error) => done(error), () => done());
       });
 
       it('returns null', function (done) {
@@ -171,8 +251,50 @@ describe('StreamingService', function () {
             () => {
               expect(this.returnedValue).to.be.null;
               done();
-            }
+            },
           );
+      });
+    });
+  });
+
+  describe('#memberIsStreaming', function () {
+    beforeEach(function () {
+      this.member = {
+        presence: {},
+      };
+    });
+
+    context('when the member is not playing a game', function () {
+      beforeEach(function () {
+        delete this.member.presence.game;
+      });
+
+      it('returns false', function () {
+        expect(this.streamingService.memberIsStreaming(this.member)).to.eq(false);
+      });
+    });
+
+    context('when the member is playing a game, but not streaming', function () {
+      beforeEach(function () {
+        this.member.presence.game = {
+          streaming: false,
+        };
+      });
+
+      it('returns false', function () {
+        expect(this.streamingService.memberIsStreaming(this.member)).to.eq(false);
+      });
+    });
+
+    context('when the member is streaming', function () {
+      beforeEach(function () {
+        this.member.presence.game = {
+          streaming: true,
+        };
+      });
+
+      it('returns true', function () {
+        expect(this.streamingService.memberIsStreaming(this.member)).to.eq(true);
       });
     });
   });

@@ -14,11 +14,21 @@ class StreamingService extends Service {
   handlePresenceUpdate(oldMember, newMember) {
     return Rx.Observable
       .of('')
-      .filter(() => newMember.presence.game)
-      .filter(() => newMember.presence.game.streaming)
       .flatMap(() => this.getLiveRoleId(newMember.guild))
       .filter((liveRoleId) => liveRoleId)
-      .flatMap((liveRoleId) => newMember.addRole(liveRoleId))
+      .flatMap((liveRoleId) => {
+        let isStreaming = this.memberIsStreaming(newMember);
+
+        if (isStreaming && !newMember.roles.has(liveRoleId)) {
+          return Rx.Observable.of('')
+            .flatMap(() => newMember.addRole(liveRoleId));
+        } else if (!isStreaming && newMember.roles.has(liveRoleId)) {
+          return Rx.Observable.of('')
+            .flatMap(() => newMember.removeRole(liveRoleId));
+        } else {
+          return Rx.Observable.empty();
+        }
+      })
       .catch((error) => {
         this.nix.handleError(error, [
           {name: "Service", value: "StreamingService"},
@@ -32,6 +42,22 @@ class StreamingService extends Service {
 
   getLiveRoleId(guild) {
     return this.nix.getGuildData(guild.id, DATAKEYS.LIVE_ROLE);
+  }
+
+  /**
+   * Checks if a member is streaming a game
+   *
+   * @param member {GuildMember}
+   * @return {Boolean} true, if the member is streaming
+   */
+  memberIsStreaming(member) {
+    let presence = member.presence;
+    if (!presence.game) {
+      return false;
+    }
+    else {
+      return presence.game.streaming;
+    }
   }
 }
 
