@@ -1,4 +1,4 @@
-const {DATAKEYS} = require('./datakeys');
+const DATAKEYS = require('./datakeys');
 
 module.exports = {
   name: 'streaming',

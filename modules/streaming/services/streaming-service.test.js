@@ -3,7 +3,6 @@ const NixDataMemory = require('nix-data-memory');
 
 const StreamingService = require('./streaming-service');
 const DATAKEYS = require('../datakeys');
-const errors = require('../errors');
 
 describe('StreamingService', function () {
   beforeEach(function () {
