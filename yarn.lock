@@ -928,9 +928,9 @@ nise@^1.4.5:
 
 "nix-core@github:nix-core/nix-core#release/v2.0.0":
   version "2.0.0-rc"
-  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/c8a6cf65580a319b649cc29f91b19a5031d5a218"
+  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/16cb76b3ab1d382dc8487eb7194a764629601cca"
   dependencies:
-    nix-data-memory "github:nix-core/nix-data-memory#master"
+    nix-data-memory "github:nix-core/nix-data-memory#v0.0.1"
     winston "^3.0.0"
 
 "nix-data-disk@github:nix-core/nix-data-disk#master":
