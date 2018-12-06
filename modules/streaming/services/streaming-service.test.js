@@ -9,12 +9,8 @@ describe('StreamingService', function () {
     this.dataSource = new NixDataMemory();
     this.presenceUpdate$ = new Rx.Subject();
 
-    this.nix = {
-      getGuildData: (guildId, keyword) => this.dataSource.getData('guild', guildId, keyword),
-      setGuildData: (guildId, keyword, data) => this.dataSource.setData('guild', guildId, keyword, data),
-      streams: { presenceUpdate$: this.presenceUpdate$ },
-      handleError: (error, extraFields) => { throw error; },
-    };
+    this.nix = createNixStub();
+    this.nix.streams = { presenceUpdate$: this.presenceUpdate$ };
 
     this.streamingService = new StreamingService(this.nix);
   });
