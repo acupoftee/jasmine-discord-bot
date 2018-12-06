@@ -6,11 +6,9 @@ const NOT_TEST_FILES_REGEX = /^(?!.*test\.js).*\.js$/;
 
 module.exports = {
   name: 'streaming',
+  enabledByDefault: false,
   defaultData: [
-    {keyword: DATAKEYS.WATCH_ROLE, data: null},
-    {keyword: DATAKEYS.RESTRICT_GAMES, data: false},
-    {keyword: DATAKEYS.ALLOWED_GAMES, data: null},
-    {keyword: DATAKEYS.LIVE_ROLE, data: null},
+    { keyword: DATAKEYS.LIVE_ROLE, data: null },
   ],
   services: glob
     .sync(`${__dirname}/services/**/*.js`)
