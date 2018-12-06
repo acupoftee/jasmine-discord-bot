@@ -1,0 +1,27 @@
+let Rx = require('rx');
+
+module.exports = function (chai) {
+  var Assertion = chai.Assertion;
+
+  Assertion.addProperty('observable', function () {
+    new Assertion(this._obj).to.be.an.instanceOf(Rx.Observable);
+  });
+
+  Assertion.addMethod('emitLength', function (length) {
+    new Assertion(this._obj).to.be.observable;
+    this._obj.count(() => true).subscribe((emittedLength) => new Assertion(emittedLength).to.eq(length));
+  });
+
+  Assertion.addMethod('emit', function (items) {
+    new Assertion(this._obj).to.be.observable;
+    this._obj.toArray().subscribe((emittedItems) => new Assertion(emittedItems).to.deep.equal(items));
+  });
+
+  Assertion.addMethod('complete', function (done, callback) {
+    new Assertion(this._obj).to.be.an.instanceOf(Rx.Observable);
+    this._obj.subscribe(() => {}, (error) => done(error), () => {
+      if (callback) { callback(); }
+      done();
+    });
+  });
+};
