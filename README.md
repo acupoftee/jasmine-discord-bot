@@ -66,6 +66,9 @@ The following Modules are available for Jasmine:
 - [OWMN](docs/modules/ow-mains.md):
     - *disabled by default* 
     - Provides OWMN specific tools and commands
+- [Streaming](docs/modules/streaming.md):
+    - *disabled by default* 
+    - Assign a role to a user when they go live
 - [Topics](docs/modules/topics.md):
     - *disabled by default* 
     - Provides command to create Topic Channels
@@ -98,4 +101,9 @@ These are always run through the [config](docs/modules/core.md#config) command:
         - Revoke a permission level from a role
     - [rmUser](docs/modules/permissions.md#rmUser)
         - Revoke a permission level from a user
+- [Streaming](docs/modules/streaming.md)
+    - [addLiveRole](docs/modules/streaming.md#addLiveRole)
+        - Set the role to assign when a user goes live
+    - [removeLiveRole](docs/modules/streaming.md#removeLiveRole)
+        - Disables assigning a role when a user goes live
 
