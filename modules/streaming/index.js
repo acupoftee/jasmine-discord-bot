@@ -9,6 +9,7 @@ module.exports = {
   enabledByDefault: false,
   defaultData: [
     { keyword: DATAKEYS.LIVE_ROLE, data: null },
+    { keyword: DATAKEYS.STREAMER_ROLE, data: null },
   ],
   services: glob
     .sync(`${__dirname}/services/**/*.js`)
