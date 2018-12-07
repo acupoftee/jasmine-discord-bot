@@ -2,7 +2,7 @@ const Rx = require('rx');
 const Service = require('nix-core').Service;
 const DiscordAPIError = require('discord.js').DiscordAPIError;
 
-const DATAKEYS = require('../datakeys');
+const DATAKEYS = require('../lib/datakeys');
 const { RoleNotFoundError } = require('../lib/errors');
 
 class StreamingService extends Service {

@@ -1,6 +1,6 @@
 const glob = require('glob');
 
-const DATAKEYS = require('./datakeys');
+const DATAKEYS = require('./lib/datakeys');
 
 const NOT_TEST_FILES_REGEX = /^(?!.*test\.js).*\.js$/;
 

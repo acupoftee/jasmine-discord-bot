@@ -2,7 +2,7 @@ const Rx = require('rx');
 const NixDataMemory = require('nix-data-memory');
 
 const StreamingService = require('./streaming-service');
-const DATAKEYS = require('../datakeys');
+const DATAKEYS = require('../lib/datakeys');
 const { RoleNotFoundError } = require('../lib/errors');
 
 describe('StreamingService', function () {
