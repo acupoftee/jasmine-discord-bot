@@ -31,6 +31,17 @@ module.exports = function (chai) {
     };
   });
 
+  Assertion.addMethod('close', function (done, callback) {
+    new Assertion(this._obj).to.be.an.instanceOf(Rx.Observable);
+
+    let onClose = () => {
+      if (callback) { callback(); }
+      done();
+    };
+
+    this._obj.subscribe(() => {}, onClose, onClose);
+  });
+
   Assertion.addMethod('complete', function (done, callback) {
     new Assertion(this._obj).to.be.an.instanceOf(Rx.Observable);
     this._obj.subscribe(() => {}, (error) => done(error), () => {
