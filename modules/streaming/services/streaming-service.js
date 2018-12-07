@@ -90,6 +90,21 @@ class StreamingService extends Service {
       return presence.game.streaming;
     }
   }
+
+  setStreamerRole(guild, role) {
+    return this.nix.setGuildData(guild.id, DATAKEYS.STREAMER_ROLE, role ? role.id : null)
+      .flatMap(() => this.getStreamerRole(guild));
+  }
+
+  getStreamerRole(guild) {
+    return this.nix.getGuildData(guild.id, DATAKEYS.STREAMER_ROLE)
+      .map((roleId) => guild.roles.get(roleId));
+  }
+
+  removeStreamerRole(guild) {
+    return this.getStreamerRole(guild)
+      .flatMap((oldRole) => this.setStreamerRole(guild, null).map(() => oldRole));
+  }
 }
 
 module.exports = StreamingService;

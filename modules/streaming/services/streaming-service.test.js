@@ -416,4 +416,152 @@ describe('StreamingService', function () {
       });
     });
   });
+
+  describe('#getStreamerRole', function () {
+    beforeEach(function () {
+      this.role = { id: 'role-00001', name: 'test-role' };
+
+      this.roles = new Map();
+      this.roles.set(this.role.id, this.role);
+
+      this.guild = {
+        id: 'guild-00001',
+        roles: this.roles,
+      };
+    });
+
+    context('when there is a role set', function () {
+      beforeEach(function (done) {
+        this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, this.role.id)
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('returns the role to assign', function (done) {
+        expect(this.streamingService.getStreamerRole(this.guild))
+          .to.emit([ this.role ])
+          .and.complete(done);
+      });
+    });
+
+    context('when there is no role set', function () {
+      beforeEach(function (done) {
+        this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, null)
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('returns undefined', function (done) {
+        expect(this.streamingService.getStreamerRole(this.guild))
+          .to.emitLength(1).and.emit([ undefined ])
+          .and.complete(done);
+      });
+    });
+  });
+
+  describe('#setStreamerRole', function () {
+    beforeEach(function () {
+      this.guild = {
+        id: 'guild-00001',
+        roles: new Map(),
+      };
+    });
+
+    context('when passed a role', function () {
+      beforeEach(function () {
+        this.role = { id: 'role-00001', name: 'test-role' };
+        this.guild.roles.set(this.role.id, this.role);
+      });
+
+      it('saves the role id', function (done) {
+        sinon.spy(this.nix, 'setGuildData');
+
+        expect(this.streamingService.setStreamerRole(this.guild, this.role))
+          .to.complete(done, () => {
+          expect(this.nix.setGuildData).to.have.been.calledWith(this.guild.id, DATAKEYS.STREAMER_ROLE, this.role.id);
+        });
+      });
+
+      it('returns the saved role', function (done) {
+        expect(this.streamingService.setStreamerRole(this.guild, this.role))
+          .to.emit([ this.role ])
+          .and.complete(done);
+      });
+    });
+
+    context('when passed null', function () {
+      it('saves null', function (done) {
+        sinon.spy(this.nix, 'setGuildData');
+
+        expect(this.streamingService.setStreamerRole(this.guild, null))
+          .to.complete(done, () => {
+          expect(this.nix.setGuildData).to.have.been.calledWith(this.guild.id, DATAKEYS.STREAMER_ROLE, null);
+        });
+      });
+
+      it('returns undefined', function (done) {
+        expect(this.streamingService.setStreamerRole(this.guild, null))
+          .to.emit([ undefined ])
+          .and.complete(done);
+      });
+    });
+  });
+
+  describe('#removeStreamerRole', function () {
+    beforeEach(function () {
+      this.guild = {
+        id: 'guild-00001',
+        roles: new Map(),
+      };
+    });
+
+    it('sets the live role to null', function (done) {
+      sinon.spy(this.nix, 'setGuildData');
+
+      expect(this.streamingService.removeStreamerRole(this.guild))
+        .to.complete(done, () => {
+        expect(this.nix.setGuildData).to.have.been.calledWith(this.guild.id, DATAKEYS.STREAMER_ROLE, null);
+      });
+    });
+
+    context('when a previous role was set', function () {
+      beforeEach(function (done) {
+        this.role = { id: 'role-00001', name: 'test-role' };
+        this.guild.roles.set(this.role.id, this.role);
+
+        this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, this.role.id)
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('returns the previously set role', function (done) {
+        expect(this.streamingService.removeStreamerRole(this.guild))
+          .to.emit([ this.role ])
+          .and.complete(done);
+      });
+    });
+
+    context('when a previous role was set, but no longer exists', function () {
+      beforeEach(function (done) {
+        this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, 'role-00001')
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('returns the previously set role', function (done) {
+        expect(this.streamingService.removeStreamerRole(this.guild))
+          .to.emit([ undefined ])
+          .and.complete(done);
+      });
+    });
+
+    context('when a previous role was not set', function () {
+      beforeEach(function (done) {
+        this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, null)
+          .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('returns undefined', function (done) {
+        expect(this.streamingService.removeStreamerRole(this.guild))
+          .to.emit([ undefined ])
+          .and.complete(done);
+      });
+    });
+  });
 });
