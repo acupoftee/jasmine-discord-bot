@@ -16,6 +16,7 @@ module.exports = {
   services: [
     require('./services/net-mod-log-service'),
     require('./services/broadcast-service'),
+    require('./services/owmn-service'),
   ],
   configActions: [
     require('./config/sub-broadcast'),
