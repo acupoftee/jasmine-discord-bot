@@ -1,8 +1,8 @@
-let Rx = require('rx');
-let Collection = require('discord.js').Collection;
-let ConfigAction = require('nix-core/lib/models/config-action');
+const Rx = require('rx');
+const Collection = require('discord.js').Collection;
+const ConfigAction = require('nix-core/lib/models/config-action');
 
-let StreamingService = require('../services/streaming-service');
+const StreamingService = require('../services/streaming-service');
 
 describe('!config streaming setLiveRole', function () {
   beforeEach(function () {
