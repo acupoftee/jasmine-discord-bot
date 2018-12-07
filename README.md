@@ -102,9 +102,13 @@ These are always run through the [config](docs/modules/core.md#config) command:
     - [rmUser](docs/modules/permissions.md#rmUser)
         - Revoke a permission level from a user
 - [Streaming](docs/modules/streaming.md)
-    - [addLiveRole](docs/modules/streaming.md#addLiveRole)
+    - [setLiveRole](docs/modules/streaming.md#setLiveRole)
         - Set the role to assign when a user goes live
+    - [setStreamerRole](docs/modules/streaming.md#setStreamerRole)
+        - Set a role to limit who can receive the live role
     - [removeLiveRole](docs/modules/streaming.md#removeLiveRole)
         - Disables assigning a role when a user goes live
+    - [removeStreamerRole](docs/modules/streaming.md#removeStreamerRole)
+        - Removes the limit on who can receive the live role
     - [viewSettings](docs/modules/streaming.md#viewSettings)
         - View the current settings for the streaming module

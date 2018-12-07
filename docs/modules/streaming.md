@@ -2,15 +2,23 @@
 Allows for adding a role to a user when they go live on twitch. 
 
 - Config Actions:
-    - [addLiveRole](#addLiveRole)
-    - [removeLiveRole](#removeLiveRole)
     - [viewSettings](#viewSettings)
+    - [setLiveRole](#setLiveRole)
+    - [removeLiveRole](#removeLiveRole)
+    - [setStreamerRole](#setStreamerRole)
+    - [removeStreamerRole](#removeStreamerRole)
 
 ## Config Actions
 
-### addLiveRole
+### viewSettings
 ```
-!config streaming addLiveRole {role}
+!config streaming viewSettings
+```
+View the current settings for the streaming module.
+
+### setLiveRole
+```
+!config streaming setLiveRole {role}
 ```
 Sets the role to assign when a user starts streaming. Will also be automagically removed when they go offline
 
@@ -23,8 +31,17 @@ Sets the role to assign when a user starts streaming. Will also be automagically
 ```
 Stops Jasmine from adding a role to users when they start streaming.
 
-### viewSettings
+### setStreamerRole
 ```
-!config streaming viewSettings
+!config streaming setStreamerRole {role}
 ```
-View the current settings for the streaming module.
+Sets a role to limit who can receive the live role
+
+- `role`: The role to grant a permission to. Can be a mention or the name of a 
+  role.
+
+### removeStreamerRole
+```
+!config streaming removeStreamerRole
+```
+Removes the limit on who can receive the live role

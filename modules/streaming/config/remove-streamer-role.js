@@ -4,7 +4,7 @@ const { RoleNotFoundError } = require('../lib/errors');
 
 module.exports = {
   name: 'removeStreamerRole',
-  description: `Stop assigning a role when a user goes live`,
+  description: `Removes the limit on who can receive the live role`,
 
   configureAction() {
     this.streamingService = this.nix.getService('streaming', 'streamingService');

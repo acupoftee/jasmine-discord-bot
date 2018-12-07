@@ -4,7 +4,7 @@ const { findRole } = require("../../../lib/role-utilities");
 
 module.exports = {
   name: 'setStreamerRole',
-  description: `Set role to assign when a user goes live`,
+  description: `Set a role to limit who can receive the live role`,
 
   inputs: [
     {
