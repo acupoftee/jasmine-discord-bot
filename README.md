@@ -106,4 +106,5 @@ These are always run through the [config](docs/modules/core.md#config) command:
         - Set the role to assign when a user goes live
     - [removeLiveRole](docs/modules/streaming.md#removeLiveRole)
         - Disables assigning a role when a user goes live
-
+    - [viewSettings](docs/modules/streaming.md#viewSettings)
+        - View the current settings for the streaming module
