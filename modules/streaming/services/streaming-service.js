@@ -3,6 +3,7 @@ const Service = require('nix-core').Service;
 const DiscordAPIError = require('discord.js').DiscordAPIError;
 
 const DATAKEYS = require('../datakeys');
+const { RoleNotFoundError } = require('../lib/errors');
 
 class StreamingService extends Service {
   configureService() {
@@ -103,6 +104,14 @@ class StreamingService extends Service {
 
   removeStreamerRole(guild) {
     return this.getStreamerRole(guild)
+      .map((oldRole) => {
+        if (oldRole) {
+          return oldRole;
+        }
+        else {
+          throw new RoleNotFoundError('No streamer role set.');
+        }
+      })
       .flatMap((oldRole) => this.setStreamerRole(guild, null).map(() => oldRole));
   }
 }

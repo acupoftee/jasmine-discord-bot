@@ -3,6 +3,7 @@ const NixDataMemory = require('nix-data-memory');
 
 const StreamingService = require('./streaming-service');
 const DATAKEYS = require('../datakeys');
+const { RoleNotFoundError } = require('../lib/errors');
 
 describe('StreamingService', function () {
   beforeEach(function () {
@@ -513,15 +514,6 @@ describe('StreamingService', function () {
       };
     });
 
-    it('sets the live role to null', function (done) {
-      sinon.spy(this.nix, 'setGuildData');
-
-      expect(this.streamingService.removeStreamerRole(this.guild))
-        .to.complete(done, () => {
-        expect(this.nix.setGuildData).to.have.been.calledWith(this.guild.id, DATAKEYS.STREAMER_ROLE, null);
-      });
-    });
-
     context('when a previous role was set', function () {
       beforeEach(function (done) {
         this.role = { id: 'role-00001', name: 'test-role' };
@@ -529,6 +521,15 @@ describe('StreamingService', function () {
 
         this.nix.setGuildData(this.guild.id, DATAKEYS.STREAMER_ROLE, this.role.id)
           .subscribe(() => {}, (error) => done(error), () => done());
+      });
+
+      it('sets the live role to null', function (done) {
+        sinon.spy(this.nix, 'setGuildData');
+
+        expect(this.streamingService.removeStreamerRole(this.guild))
+          .to.complete(done, () => {
+          expect(this.nix.setGuildData).to.have.been.calledWith(this.guild.id, DATAKEYS.STREAMER_ROLE, null);
+        });
       });
 
       it('returns the previously set role', function (done) {
@@ -544,10 +545,10 @@ describe('StreamingService', function () {
           .subscribe(() => {}, (error) => done(error), () => done());
       });
 
-      it('returns the previously set role', function (done) {
+      it('throws a RoleNotFoundError', function (done) {
         expect(this.streamingService.removeStreamerRole(this.guild))
-          .to.emit([ undefined ])
-          .and.complete(done);
+          .to.throw(RoleNotFoundError)
+          .and.close(done);
       });
     });
 
@@ -557,10 +558,10 @@ describe('StreamingService', function () {
           .subscribe(() => {}, (error) => done(error), () => done());
       });
 
-      it('returns undefined', function (done) {
+      it('throws a RoleNotFoundError', function (done) {
         expect(this.streamingService.removeStreamerRole(this.guild))
-          .to.emit([ undefined ])
-          .and.complete(done);
+          .to.throw(RoleNotFoundError)
+          .and.close(done);
       });
     });
   });
