@@ -19,6 +19,11 @@ global.createNixStub = () => {
     loginToken: 'example-token'
   });
 
+  nix.stubService = (moduleName, serviceName, service) => {
+    let serviceKey = `${moduleName}.${serviceName}`.toLowerCase();
+    nix.servicesManager._services[serviceKey] = service;
+  };
+
   sinon.stub(nix, 'handleError').callsFake((error) => { throw error });
 
   return nix;
