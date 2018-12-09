@@ -13,7 +13,7 @@ module.exports = {
     let guild = context.guild;
 
     return Rx.Observable
-      .combineLatest(
+      .zip(
         this.streamingService.getLiveRole(guild),
       )
       .map(([liveRole]) => {
