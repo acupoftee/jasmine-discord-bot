@@ -19,7 +19,7 @@ global.createNixStub = () => {
     loginToken: 'example-token'
   });
 
-  sinon.stub(nix, 'handleError').throws(new Error('nix.handleError was called'));
+  sinon.stub(nix, 'handleError').callsFake((error) => { throw error });
 
   return nix;
 };

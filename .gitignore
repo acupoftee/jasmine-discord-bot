@@ -10,3 +10,4 @@
 \.idea/
 
 pm2.sh
+\.nyc_output/
