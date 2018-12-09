@@ -7,11 +7,13 @@ const StreamingService = require('../services/streaming-service');
 describe('!config streaming removeLiveRole', function () {
   beforeEach(function () {
     this.role = { id: 'role-00001', name: 'testRole' };
+    this.nix = createNixStub();
 
-    this.streamingService = new StreamingService();
+    this.streamingService = sinon.createStubInstance(StreamingService);
+    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.removeLiveRole = new ConfigAction(require('./remove-live-role'));
-    this.removeLiveRole.streamingService = this.streamingService;
+    this.removeLiveRole.nix = this.nix
   });
 
   describe('properties', function () {
@@ -24,8 +26,17 @@ describe('!config streaming removeLiveRole', function () {
     });
   });
 
+  describe('#configureAction', function () {
+    it('gets ModuleService from Nix', function () {
+      this.removeLiveRole.configureAction();
+      expect(this.removeLiveRole.streamingService).to.eq(this.streamingService);
+    });
+  });
+
   describe('#run', function () {
     beforeEach(function () {
+      this.removeLiveRole.configureAction();
+
       this.guild = {
         id: 'guild-00001',
         roles: new Collection(),
@@ -36,14 +47,13 @@ describe('!config streaming removeLiveRole', function () {
         guild: this.guild,
       };
 
-      sinon.stub(this.streamingService, 'removeLiveRole').returns(Rx.Observable.of(this.role));
+      this.streamingService.removeLiveRole.returns(Rx.Observable.of(this.role));
     });
 
     it('removes the live role from the guild', function (done) {
       expect(this.removeLiveRole.run(this.context))
-        .and.complete(() => {
+        .and.complete(done, () => {
           expect(this.streamingService.removeLiveRole).to.have.been.calledWith(this.guild);
-          done();
         });
     });
 

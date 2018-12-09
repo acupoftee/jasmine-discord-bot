@@ -8,11 +8,13 @@ const { RoleNotFoundError } = require('../lib/errors');
 describe('!config streaming removeStreamerRole', function () {
   beforeEach(function () {
     this.role = { id: 'role-00001', name: 'testRole' };
+    this.nix = createNixStub();
 
     this.streamingService = sinon.createStubInstance(StreamingService);
+    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.removeStreamerRole = new ConfigAction(require('./remove-streamer-role'));
-    this.removeStreamerRole.streamingService = this.streamingService;
+    this.removeStreamerRole.nix = this.nix;
   });
 
   describe('properties', function () {
@@ -25,8 +27,17 @@ describe('!config streaming removeStreamerRole', function () {
     });
   });
 
+  describe('#configureAction', function () {
+    it('gets ModuleService from Nix', function () {
+      this.removeStreamerRole.configureAction();
+      expect(this.removeStreamerRole.streamingService).to.eq(this.streamingService);
+    });
+  });
+
   describe('#run', function () {
     beforeEach(function () {
+      this.removeStreamerRole.configureAction();
+
       this.guild = {
         id: 'guild-00001',
         roles: new Collection(),

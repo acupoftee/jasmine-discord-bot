@@ -6,10 +6,13 @@ const StreamingService = require('../services/streaming-service');
 
 describe('!config streaming setLiveRole', function () {
   beforeEach(function () {
-    this.streamingService = new StreamingService();
+    this.nix = createNixStub();
+
+    this.streamingService = sinon.createStubInstance(StreamingService);
+    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.setLiveRole = new ConfigAction(require('./set-live-role'));
-    this.setLiveRole.streamingService = this.streamingService;
+    this.setLiveRole.nix = this.nix;
   });
 
   describe('properties', function () {
@@ -22,8 +25,17 @@ describe('!config streaming setLiveRole', function () {
     });
   });
 
+  describe('#configureAction', function () {
+    it('gets ModuleService from Nix', function () {
+      this.setLiveRole.configureAction();
+      expect(this.setLiveRole.streamingService).to.eq(this.streamingService);
+    });
+  });
+
   describe('#run', function () {
     beforeEach(function () {
+      this.setLiveRole.configureAction();
+
       this.guild = {
         id: 'guild-00001',
         roles: new Collection(),
@@ -72,15 +84,15 @@ describe('!config streaming setLiveRole', function () {
       });
 
       Object.entries({
-        'a mention': `<@${roleId}>`,
-        'a mention (with &)': `<@&${roleId}>`,
-        'an id': roleId,
-        'a name': roleName,
-      }).forEach(([inputType, value]) => {
-        context(`when a role is given as ${inputType}`, function () {
+        'when a role is given as a mention': `<@${roleId}>`,
+        'when a role is given as a mention (with &)': `<@&${roleId}>`,
+        'when a role is given as an id': roleId,
+        'when a role is given as a name': roleName,
+      }).forEach(([contextMsg, value]) => {
+        context(contextMsg, function () {
           beforeEach(function () {
             this.context.inputs.role = value;
-            sinon.stub(this.streamingService, 'setLiveRole').returns(Rx.Observable.of(this.role));
+            this.streamingService.setLiveRole.returns(Rx.Observable.of(this.role));
           });
 
           it('sets the live role to the correct role', function (done) {

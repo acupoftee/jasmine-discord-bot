@@ -6,10 +6,13 @@ const StreamingService = require('../services/streaming-service');
 
 describe('!config streaming viewSettings', function () {
   beforeEach(function () {
+    this.nix = createNixStub();
+
     this.streamingService = sinon.createStubInstance(StreamingService);
+    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.viewSettings = new ConfigAction(require('./view-settings'));
-    this.viewSettings.streamingService = this.streamingService;
+    this.viewSettings.nix = this.nix;
   });
 
   describe('properties', function () {
@@ -22,8 +25,17 @@ describe('!config streaming viewSettings', function () {
     });
   });
 
+  describe('#configureAction', function () {
+    it('gets ModuleService from Nix', function () {
+      this.viewSettings.configureAction();
+      expect(this.viewSettings.streamingService).to.eq(this.streamingService);
+    });
+  });
+
   describe('#run', function () {
     beforeEach(function () {
+      this.viewSettings.configureAction();
+
       this.guild = {
         id: 'guild-00001',
         roles: new Collection(),

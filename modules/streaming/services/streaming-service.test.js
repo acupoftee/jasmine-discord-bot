@@ -27,21 +27,10 @@ describe('StreamingService', function () {
   describe('#configureService', function () {
     beforeEach(function () {
       this.moduleService = {};
-      sinon.stub(this.nix, 'getService').callsFake((moduleName, serviceName) => {
-        if (moduleName === 'core' && serviceName === "ModuleService") {
-          return this.moduleService;
-        } else {
-          return null;
-        }
-      });
+      this.nix.stubService('core', 'ModuleService', this.moduleService);
     });
 
     it('gets ModuleService from Nix', function () {
-      this.streamingService.configureService();
-      expect(this.nix.getService).to.have.been.calledWith('core', 'ModuleService')
-    });
-
-    it('assigns ModuleService to self', function () {
       this.streamingService.configureService();
       expect(this.streamingService.moduleService).to.eq(this.moduleService);
     });
