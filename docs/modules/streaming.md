@@ -1,12 +1,33 @@
 # Streaming
-Allows for adding a role to a user when they go live on twitch. 
+Allows for adding a role to a user when they go live on twitch.
 
-- Config Actions:
+**Note: This module is disabled by default. Use `!config module enable streaming` to enable it.**
+ 
+- [Usage](#usage)
+- [Config Actions](#config-actions):
     - [viewSettings](#viewSettings)
     - [setLiveRole](#setLiveRole)
     - [removeLiveRole](#removeLiveRole)
     - [setStreamerRole](#setStreamerRole)
     - [removeStreamerRole](#removeStreamerRole)
+
+## Usage
+
+To set or change the role given to users use the following command:
+```
+!config streaming setLiveRole {role}
+```
+
+By default, Jasmine will add the live role to any user who goes live. To change this, you use the following command to 
+restrict it to a user with a special Streamer role. The same command can be also be used to change the role.
+```
+!config streaming setStreamerRole {role}
+```
+
+If you no longer want to restrict who gets the live role:
+```
+!config streaming removeStreamerRole
+```
 
 ## Config Actions
 
