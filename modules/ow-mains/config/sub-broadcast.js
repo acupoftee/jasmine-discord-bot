@@ -6,12 +6,6 @@ module.exports = {
   name: 'subBroadcast',
   description: `Subscribe to a type of broadcast in a channel. Broadcast types are: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
 
-  services: {
-    core: [
-      'dataService',
-    ]
-  },
-
   inputs: [
     {
       name: 'type',
@@ -25,8 +19,8 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let typeString = context.args.input1;
-    let channelString = context.args.input2;
+    let typeString = context.inputs.type;
+    let channelString = context.inputs.channel;
 
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
@@ -43,7 +37,7 @@ module.exports = {
     }
 
     let datakey = BROADCAST_TYPES[broadcastType];
-    return this.dataService
+    return this.nix
       .setGuildData(guild.id, datakey, channel.id)
       .flatMap(() => channel.send(`I will send ${broadcastType} broadcasts here.`))
       .map(() => ({
@@ -54,6 +48,7 @@ module.exports = {
           case 'DiscordAPIError':
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
+                status: 400,
                 content: `Whoops, I do not have permission to talk in that channel.`
               });
             }

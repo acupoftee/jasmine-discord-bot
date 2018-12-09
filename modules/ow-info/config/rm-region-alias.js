@@ -8,12 +8,6 @@ module.exports = {
   name: 'rmRegionAlias',
   description: 'removes an Overwatch region alias',
 
-  services: {
-    'ow-info': [
-      'regionService',
-    ],
-  },
-
   inputs: [
     {
       name: 'alias',
@@ -22,10 +16,14 @@ module.exports = {
     },
   ],
 
+  configureAction() {
+    this.regionService = this.nix.getService('ow-info', 'regionService');
+  },
+
   run(context) {
     let guild = context.guild;
 
-    let regionName = context.args.input1;
+    let regionName = context.inputs.alias;
 
     if (!regionName) {
       return Rx.Observable.of({

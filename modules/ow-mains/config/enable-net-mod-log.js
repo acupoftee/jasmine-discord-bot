@@ -9,12 +9,6 @@ module.exports = {
   name: 'enableNetModLog',
   description: `Enable network mod log reporting to this server.`,
 
-  services: {
-    core: [
-      'dataService',
-    ]
-  },
-
   inputs: [
     {
       name: 'token',
@@ -28,8 +22,8 @@ module.exports = {
 
   run(context) {
     let guild = context.guild;
-    let token = context.args.input1;
-    let channelString = context.args.input2;
+    let token = context.inputs.token;
+    let channelString = context.inputs.channel;
 
     if (token !== NET_MOD_LOG_TOKEN) {
       return {
@@ -44,10 +38,11 @@ module.exports = {
       };
     }
 
-    return this.dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG_TOKEN, token)
-      .flatMap(() => this.dataService.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
+    return this.nix.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG_TOKEN, token)
+      .flatMap(() => this.nix.setGuildData(guild.id, DATAKEYS.NET_MOD_LOG, channel.id))
       .flatMap(() => channel.send('I will post the network moderation log here now.'))
       .flatMap(() => ({
+        status: 200,
         content: `This server will now receive the network moderation log.`
       }))
       .catch((error) => {
@@ -55,6 +50,7 @@ module.exports = {
           case 'DiscordAPIError':
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
+                status: 400,
                 content: `Whoops, I do not have permission to talk in that channel.`
               });
             }

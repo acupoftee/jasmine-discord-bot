@@ -19,12 +19,8 @@ const FALLBACK_YES = "👍";
 const FALLBACK_NO = "👎";
 
 class BroadcastService extends Service {
-  configureService() {
-    this.dataService = this.nix.getService('core', 'dataService');
-  }
-
   broadcastAllowed(guild, broadcastType) {
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, DATAKEYS.BROADCAST_TOKENS)
       .map((allowedTokens) => {
         if (allowedTokens[broadcastType] !== BROADCAST_TOKENS[broadcastType]) {
@@ -126,7 +122,7 @@ class BroadcastService extends Service {
   getBroadcastChannel(broadcastType, guild) {
     let broadcastChannelDatakey = BROADCAST_TYPES[broadcastType];
 
-    return this.dataService
+    return this.nix
       .getGuildData(guild.id, broadcastChannelDatakey)
       .filter((channelId) => channelId !== null)
       .map((channelId) => guild.channels.get(channelId))

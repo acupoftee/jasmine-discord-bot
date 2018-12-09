@@ -5,6 +5,7 @@ const platforms = require('../data/platforms');
 module.exports = {
   name: 'platform',
   description: 'Sets the platform that you most often play Overwatch on.',
+
   args: [
     {
       name: 'platform',

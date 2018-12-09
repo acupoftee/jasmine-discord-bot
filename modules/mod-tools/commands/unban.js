@@ -6,6 +6,7 @@ module.exports = {
   name: 'unban',
   description: 'unban a user from the server',
   permissions: ['admin', 'mod'],
+
   args: [
     {
       name: 'user',
