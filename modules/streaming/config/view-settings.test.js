@@ -8,7 +8,7 @@ describe('!config streaming viewSettings', function () {
   beforeEach(function () {
     this.nix = createNixStub();
 
-    this.streamingService = sinon.createStubInstance(StreamingService);
+    this.streamingService = new StreamingService(this.nix);
     this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.viewSettings = new ConfigAction(require('./view-settings'));
@@ -49,7 +49,7 @@ describe('!config streaming viewSettings', function () {
 
     context('when no live role is set', function () {
       beforeEach(function () {
-        this.streamingService.getLiveRole.returns(Rx.Observable.from([undefined]));
+        sinon.stub(this.streamingService, 'getLiveRole').returns(Rx.Observable.from([undefined]));
       });
 
       it('Says the live role is not set', function (done) {
@@ -67,8 +67,8 @@ describe('!config streaming viewSettings', function () {
 
     context('when a live role is set', function () {
       beforeEach(function () {
-        this.role = { id: 'role-00001', name: 'testRole' };
-        this.streamingService.getLiveRole.returns(Rx.Observable.from([ this.role ]));
+        this.role = { id: 'role-00001', name: 'liveRole' };
+        sinon.stub(this.streamingService, 'getLiveRole').returns(Rx.Observable.from([ this.role ]));
       });
 
       it('Says the live role is not set', function (done) {
@@ -77,7 +77,45 @@ describe('!config streaming viewSettings', function () {
           .map((response) => response.embed)
           .map((embed) => {
             expect(embed.fields).to.containSubset([
-              { name: "Live Role:", value: "testRole" }
+              { name: "Live Role:", value: "liveRole" }
+            ])
+          });
+
+        expect(stream).to.complete(done);
+      });
+    });
+
+    context('when no streamer role is set', function () {
+      beforeEach(function () {
+        sinon.stub(this.streamingService, 'getStreamerRole').returns(Rx.Observable.from([undefined]));
+      });
+
+      it('Says the live role is not set', function (done) {
+        let stream = this.viewSettings
+          .run(this.context)
+          .map((response) => {
+            expect(response.embed.fields).to.containSubset([
+              { name: "Streamer Role:", value: "[Not set]" }
+            ])
+          });
+
+        expect(stream).to.complete(done);
+      });
+    });
+
+    context('when a streamer role is set', function () {
+      beforeEach(function () {
+        this.role = { id: 'role-00001', name: 'streamerRole' };
+        sinon.stub(this.streamingService, 'getStreamerRole').returns(Rx.Observable.from([ this.role ]));
+      });
+
+      it('Says the live role is not set', function (done) {
+        let stream = this.viewSettings
+          .run(this.context)
+          .map((response) => response.embed)
+          .map((embed) => {
+            expect(embed.fields).to.containSubset([
+              { name: "Streamer Role:", value: "streamerRole" }
             ])
           });
 
