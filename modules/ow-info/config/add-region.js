@@ -1,6 +1,7 @@
 const Rx = require('rx');
 
-const {RegionNotFoundError} = require('../errors');
+const { RegionNotFoundError } = require('../errors');
+const { findRole } = require("../../../lib/role-utilities");
 
 module.exports = {
   name: 'addRegion',
@@ -47,7 +48,7 @@ module.exports = {
     if (!role) {
       return Rx.Observable.of({
         status: 400,
-        content: `The role '${roleString}' could not be found.`
+        content: `The role '${roleString}' could not be found.`,
       });
     }
 
@@ -55,7 +56,7 @@ module.exports = {
       .mapRegion(guild, regionName, role)
       .map((mappedAlias) => ({
         ...mappedAlias,
-        role: guild.roles.get(mappedAlias.roleId)
+        role: guild.roles.get(mappedAlias.roleId),
       }))
       .map((mappedAlias) => ({
         status: 200,
@@ -63,28 +64,10 @@ module.exports = {
       }))
       .catch((error) => {
         if (error instanceof RegionNotFoundError) {
-          return Rx.Observable.of({status: 400, content: error.message});
-        }
-        else {
+          return Rx.Observable.of({ status: 400, content: error.message });
+        } else {
           return Rx.Observable.throw(error);
         }
       });
   },
 };
-
-function findRole(guild, roleString) {
-  let idRegex = /^\d+$/;
-  if (roleString.match(idRegex)) {
-    // string is an role ID
-    return guild.roles.get(roleString);
-  }
-
-  let mentionRegex = /<@&?(\d+)>/;
-  if (matches = roleString.match(mentionRegex)) {
-    // string is an role mention
-    return guild.roles.get(matches[1]);
-  }
-
-  // string is a role name
-  return guild.roles.find((r) => r.name.toLowerCase() === roleString.toLowerCase());
-}
