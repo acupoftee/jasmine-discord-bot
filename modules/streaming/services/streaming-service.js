@@ -7,7 +7,7 @@ const { RoleNotFoundError } = require('../lib/errors');
 
 class StreamingService extends Service {
   configureService() {
-    this.moduleService = this.nix.getService('core', 'moduleService');
+    this.moduleService = this.nix.getService('core', 'ModuleService');
   }
 
   onNixListen() {

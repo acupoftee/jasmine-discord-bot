@@ -11,7 +11,9 @@ describe('StreamingService', function () {
     this.presenceUpdate$ = new Rx.Subject();
 
     this.nix = createNixStub();
-    this.nix.streams = { presenceUpdate$: this.presenceUpdate$ };
+    this.nix.streams = {
+      presenceUpdate$: this.presenceUpdate$
+    };
 
     this.streamingService = new StreamingService(this.nix);
   });
@@ -20,7 +22,30 @@ describe('StreamingService', function () {
     this.presenceUpdate$.onCompleted();
   });
 
-  describe('onNixListen', function () {
+  describe('#configureService', function () {
+    beforeEach(function () {
+      this.moduleService = {};
+      sinon.stub(this.nix, 'getService').callsFake((moduleName, serviceName) => {
+        if (moduleName === 'core' && serviceName === "ModuleService") {
+          return this.moduleService;
+        } else {
+          return null;
+        }
+      });
+    });
+
+    it('gets ModuleService from Nix', function () {
+      this.streamingService.configureService();
+      expect(this.nix.getService).to.have.been.calledWith('core', 'ModuleService')
+    });
+
+    it('assigns ModuleService to self', function () {
+      this.streamingService.configureService();
+      expect(this.streamingService.moduleService).to.eq(this.moduleService);
+    });
+  });
+
+  describe('#onNixListen', function () {
     it('subscribes to the presence update event stream', function () {
       this.streamingService.onNixListen();
       expect(this.presenceUpdate$.observers.length).to.eq(1);
