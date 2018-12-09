@@ -13,36 +13,20 @@ class StreamingService extends Service {
   onNixListen() {
     this.nix.streams
       .presenceUpdate$
-      .flatMap((eventData) => {
-        let [_, newMember] = eventData;
-        return this.moduleService
-          .filterModuleEnabled(newMember.guild.id, 'streaming')
-          .map(() => eventData)
-      })
-      .flatMap(([ oldMember, newMember ]) => this.handlePresenceUpdate(oldMember, newMember))
+      .flatMap(([oldMember, newMember]) => this.handlePresenceUpdate(oldMember, newMember))
       .subscribe();
   }
 
   handlePresenceUpdate(oldMember, newMember) {
     return Rx.Observable
-      .of('')
-      .flatMap(() => this.getLiveRole(newMember.guild))
-      .filter((liveRole) => liveRole)
-      .flatMap((liveRole) => {
-        let isStreaming = this.memberIsStreaming(newMember);
-
-        if (isStreaming && !newMember.roles.has(liveRole.id)) {
-          return Rx.Observable.of('')
-            .do(() => this.nix.logger.debug(`User has gone live, adding role ${liveRole.name}`))
-            .flatMap(() => newMember.addRole(liveRole));
-        } else if (!isStreaming && newMember.roles.has(liveRole.id)) {
-          return Rx.Observable.of('')
-            .do(() => this.nix.logger.debug(`User has gone offline, removing role ${liveRole.name}`))
-            .flatMap(() => newMember.removeRole(liveRole));
-        } else {
-          return Rx.Observable.empty();
-        }
-      })
+      .merge(
+        this.moduleService.filterModuleEnabled(newMember.guild.id, 'streaming'),
+        this.getLiveRole(newMember.guild),
+        this.memberIsStreamer(newMember)
+      )
+      .every((checkPassed) => checkPassed)
+      .filter(Boolean)
+      .flatMap(() => this.updateMemberRoles(newMember))
       .catch((error) => {
         if (error instanceof DiscordAPIError) {
           switch (error.message) {
@@ -60,6 +44,38 @@ class StreamingService extends Service {
           { name: "Member", value: newMember.toString() },
         ]).ignoreElements();
       });
+  }
+
+  memberIsStreamer(member) {
+    return this.getStreamerRole(member.guild)
+      .filter((streamerRole) => streamerRole)
+      .map((streamerRole) => member.roles.has(streamerRole.id))
+      .defaultIfEmpty(true); // If no streamerRole set, then the member is a streamer
+  }
+
+  updateMemberRoles(member) {
+    return Rx.Observable
+      .if(
+        () => this.memberIsStreaming(member),
+        this.addLiveRoleToMember(member),
+        this.removeLiveRoleFromMember(member)
+      )
+  }
+
+  addLiveRoleToMember(member) {
+    return Rx.Observable.of('')
+      .flatMap(() => this.getLiveRole(member.guild))
+      .filter((liveRole) => liveRole)
+      .filter((liveRole) => !member.roles.has(liveRole.id))
+      .flatMap((liveRole) => member.addRole(liveRole));
+  }
+
+  removeLiveRoleFromMember(member) {
+    return Rx.Observable.of('')
+      .flatMap(() => this.getLiveRole(member.guild))
+      .filter((liveRole) => liveRole)
+      .filter((liveRole) => member.roles.has(liveRole.id))
+      .flatMap((liveRole) => member.removeRole(liveRole));
   }
 
   setLiveRole(guild, role) {
