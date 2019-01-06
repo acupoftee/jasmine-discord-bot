@@ -5,12 +5,6 @@ module.exports = {
   description: 'reopen the current topic, or specify a topic to reopen.',
   scope: 'text',
 
-  services: {
-    topics: [
-      'TopicService',
-    ]
-  },
-
   args: [
     {
       name: 'channelName',
@@ -20,12 +14,16 @@ module.exports = {
     },
   ],
 
+  configureCommand() {
+    this.topicService = this.nix.getService('topics', 'topicService');
+  },
+
   run(context, response) {
     let topicChannel = null;
     let guild = context.guild;
     let channelName = context.args.channelName;
 
-    let openCategory = this.TopicService.getOpenTopicsCategory(guild);
+    let openCategory = this.topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -33,7 +31,7 @@ module.exports = {
       return response.send();
     }
 
-    let closedCategory = this.TopicService.getClosedTopicsCategory(guild);
+    let closedCategory = this.topicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
@@ -42,7 +40,7 @@ module.exports = {
     }
 
     if (channelName) {
-      topicChannel = this.TopicService.findChannel(guild, channelName);
+      topicChannel = this.topicService.findChannel(guild, channelName);
     }
     else {
       topicChannel = context.channel;

@@ -5,12 +5,6 @@ module.exports = {
   description: 'rename the current topic',
   scope: 'text',
 
-  services: {
-    topics: [
-      'TopicService',
-    ]
-  },
-
   args: [
     {
       name: 'channelName',
@@ -20,14 +14,18 @@ module.exports = {
     },
   ],
 
+  configureCommand() {
+    this.topicService = this.nix.getService('topics', 'topicService');
+  },
+
   run(context, response) {
     let topicChannel = context.channel;
     let guild = context.guild;
-    let channelName = this.TopicService.channelNameSafeString(context.args.channelName);
+    let channelName = this.topicService.channelNameSafeString(context.args.channelName);
 
     context.nix.logger.debug(`renaming channel: ${topicChannel.name} => ${channelName}`);
 
-    let openCategory = this.TopicService.getOpenTopicsCategory(guild);
+    let openCategory = this.topicService.getOpenTopicsCategory(guild);
     if (!openCategory) {
       response.type = 'message';
       response.content =
@@ -35,7 +33,7 @@ module.exports = {
       return response.send();
     }
 
-    let closedCategory = this.TopicService.getClosedTopicsCategory(guild);
+    let closedCategory = this.topicService.getClosedTopicsCategory(guild);
     if (!closedCategory) {
       response.type = 'message';
       response.content =
