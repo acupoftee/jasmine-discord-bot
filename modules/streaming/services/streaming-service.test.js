@@ -214,7 +214,10 @@ describe('StreamingService', function () {
 
   describe('#updateMemberRoles', function () {
     beforeEach(function () {
-      this.member = { user: { tag: "member#0001" } };
+      this.member = {
+        guild: { name: "testGuild" },
+        user: { tag: "member#0001" },
+      };
       sinon.stub(this.streamingService, 'memberIsStreaming').returns(false);
       sinon.stub(this.streamingService, 'addLiveRoleToMember').returns(Rx.Observable.of(''));
       sinon.stub(this.streamingService, 'removeLiveRoleFromMember').returns(Rx.Observable.of(''));
@@ -278,6 +281,7 @@ describe('StreamingService', function () {
   describe('#addLiveRoleToMember', function () {
     beforeEach(function () {
       this.member = {
+        guild: { name: "testGuild" },
         user: { tag: "member#0001" },
         roles: new Collection(),
         addRole: sinon.fake.returns(Rx.Observable.of(''))
@@ -320,6 +324,7 @@ describe('StreamingService', function () {
   describe('#removeLiveRoleFromMember', function () {
     beforeEach(function () {
       this.member = {
+        guild: { name: "testGuild" },
         user: { tag: "member#0001" },
         roles: new Collection(),
         removeRole: sinon.fake.returns(Rx.Observable.of(''))

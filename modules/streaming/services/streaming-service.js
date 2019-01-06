@@ -5,6 +5,10 @@ const DiscordAPIError = require('discord.js').DiscordAPIError;
 const DATAKEYS = require('../lib/datakeys');
 const { RoleNotFoundError } = require('../lib/errors');
 
+function logPrefix(member) {
+  return `[Streaming:${member.guild.name}:${member.user.tag}]`;
+}
+
 class StreamingService extends Service {
   configureService() {
     this.moduleService = this.nix.getService('core', 'ModuleService');
@@ -18,21 +22,21 @@ class StreamingService extends Service {
   }
 
   handlePresenceUpdate(oldMember, newMember) {
-    this.nix.logger.debug(`[Streaming] Handling presence update for ${newMember.user.tag} in ${newMember.guild.name}`)
+    this.nix.logger.debug(`${logPrefix(newMember)} Handling presence update for ${newMember.user.tag} in ${newMember.guild.name}`);
     return Rx.Observable.merge(
         this.moduleService.isModuleEnabled(newMember.guild.id, 'streaming')
-          .do((moduleEnabled) => this.nix.logger.debug(`[Streaming] Module is ${moduleEnabled ? "enabled" : "disabled"} in ${newMember.guild.name}`)),
+          .do((moduleEnabled) => this.nix.logger.debug(`${logPrefix(newMember)} Module is ${moduleEnabled ? "enabled" : "disabled"} in ${newMember.guild.name}`)),
         this.getLiveRole(newMember.guild)
-          .do((liveRole) => this.nix.logger.debug(`[Streaming] Live role in ${newMember.guild.name} is ${liveRole ? liveRole.name : "<none>"}`)),
+          .do((liveRole) => this.nix.logger.debug(`${logPrefix(newMember)} Live role in ${newMember.guild.name} is ${liveRole ? liveRole.name : "<none>"}`)),
         this.memberIsStreamer(newMember)
-          .do((isStreamer) => this.nix.logger.debug(`[Streaming] ${newMember.user.tag} ${isStreamer ? "is" : "is not"} a streamer.`)),
+          .do((isStreamer) => this.nix.logger.debug(`${logPrefix(newMember)} ${newMember.user.tag} ${isStreamer ? "is" : "is not"} a streamer.`)),
       )
       .every((checkPassed) => checkPassed)
       .filter(Boolean)
       .flatMap(() => this.updateMemberRoles(newMember))
       .catch((error) => {
         if (error instanceof DiscordAPIError) {
-          this.nix.logger.debug(`[Streaming] Ignored discord error: ${error.toString()}`);
+          this.nix.logger.debug(`${logPrefix(newMember)} Ignored discord error: ${error.toString()}`);
           return Rx.Observable.empty();
         }
 
@@ -53,10 +57,10 @@ class StreamingService extends Service {
   }
 
   updateMemberRoles(member) {
-    this.nix.logger.debug(`[Streaming] Will update roles for ${member.user.tag}`);
+    this.nix.logger.debug(`${logPrefix(member)} Will update roles for ${member.user.tag}`);
     return Rx.Observable.of('')
       .map(() => this.memberIsStreaming(member))
-      .do((isStreaming) => this.nix.logger.debug(`[Streaming] ${member.user.tag} ${isStreaming ? "is" : "is not"} Streaming`))
+      .do((isStreaming) => this.nix.logger.debug(`${logPrefix(member)} ${member.user.tag} ${isStreaming ? "is" : "is not"} Streaming`))
       .flatMap((isStreaming) =>
         Rx.Observable.if(
           () => isStreaming,
@@ -71,7 +75,7 @@ class StreamingService extends Service {
       .flatMap(() => this.getLiveRole(member.guild))
       .filter((liveRole) => liveRole)
       .filter((liveRole) => !member.roles.has(liveRole.id))
-      .do((liveRole) => this.nix.logger.debug(`[Streaming] Adding role ${liveRole.name} to ${member.user.tag}`))
+      .do((liveRole) => this.nix.logger.debug(`${logPrefix(member)} Adding role ${liveRole.name} to ${member.user.tag}`))
       .flatMap((liveRole) => member.addRole(liveRole));
   }
 
@@ -80,7 +84,7 @@ class StreamingService extends Service {
       .flatMap(() => this.getLiveRole(member.guild))
       .filter((liveRole) => liveRole)
       .filter((liveRole) => member.roles.has(liveRole.id))
-      .do((liveRole) => this.nix.logger.debug(`[Streaming] Removing role ${liveRole.name} from ${member.user.tag}`))
+      .do((liveRole) => this.nix.logger.debug(`${logPrefix(member)} Removing role ${liveRole.name} from ${member.user.tag}`))
       .flatMap((liveRole) => member.removeRole(liveRole));
   }
 
