@@ -41,7 +41,7 @@ class ModLogService extends Service {
   handleGuildMemberAdd(member) {
     return Rx.Observable
       .of('')
-      .do(() => this.nix.logger.debug(`User ${member.user.tag} joined ${member.guild.id}`))
+      .do(() => this.nix.logger.debug(`[ModLog:${member.guild.name}] User ${member.user.tag} joined`))
       .flatMap(() => this.addUserJoinedEntry(member))
       .catch((error) => {
         this.nix.handleError(error, [
@@ -57,7 +57,7 @@ class ModLogService extends Service {
   handleGuildMemberRemove(member) {
     return Rx.Observable
       .of('')
-      .do(() => this.nix.logger.debug(`User ${member.user.tag} left ${member.guild.id}`))
+      .do(() => this.nix.logger.debug(`[ModLog:${member.guild.name}] User ${member.user.tag} left`))
       .flatMap(() =>
         //filter out members who are banned
         Rx.Observable
@@ -82,7 +82,7 @@ class ModLogService extends Service {
   handleGuildBanAdd(guild, user) {
     return Rx.Observable
       .of('')
-      .do(() => this.nix.logger.debug(`ModLog: User ${user.tag} banned in ${guild.id} for reason: ${log.reason}`))
+      .do(() => this.nix.logger.debug(`[ModLog:${guild.name}] User ${user.tag} banned`))
       .flatMap(() => this.findReasonAuditLog(guild, user, {
         type: AuditLogActions.MEMBER_BAN_ADD
       }))
@@ -117,7 +117,7 @@ class ModLogService extends Service {
   handleGuildBanRemove(guild, user) {
     return Rx.Observable
       .of('')
-      .do(() => this.nix.logger.debug(`ModLog: User ${user.tag} unbanned in ${guild.id}`))
+      .do(() => this.nix.logger.debug(`[ModLog:${guild.name}] User ${user.tag} unbanned`))
       .flatMap(() => this.findReasonAuditLog(guild, user, {
         type: AuditLogActions.MEMBER_BAN_REMOVE
       }))
