@@ -1,4 +1,4 @@
-const config = require('../../config/config.js');
+const config = require('../../lib/config.js');
 
 const DATAKEYS = {
   BROADCAST: (type) => `owMains.broadcast.${type}`,

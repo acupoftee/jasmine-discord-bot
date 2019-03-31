@@ -88,6 +88,7 @@ describe('StreamingService', function () {
 
       this.newMember = {
         name: "newMember",
+        user: { tag: "newMember#0001" },
         guild: this.guild
       };
 
@@ -179,13 +180,6 @@ describe('StreamingService', function () {
               this.nix.handleError.returns(Rx.Observable.empty())
             });
 
-            it('lets nix handle the error', function (done) {
-              expect(this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember))
-                .to.complete(done, () => {
-                  expect(this.nix.handleError).to.have.been.calledWith(this.error);
-                })
-            });
-
             it('does not crash the stream', function (done) {
               expect(this.streamingService.handlePresenceUpdate(this.oldMember, this.newMember))
                 .to.emit([]).and.complete(done)
@@ -220,7 +214,10 @@ describe('StreamingService', function () {
 
   describe('#updateMemberRoles', function () {
     beforeEach(function () {
-      this.member = {};
+      this.member = {
+        guild: { name: "testGuild" },
+        user: { tag: "member#0001" },
+      };
       sinon.stub(this.streamingService, 'memberIsStreaming').returns(false);
       sinon.stub(this.streamingService, 'addLiveRoleToMember').returns(Rx.Observable.of(''));
       sinon.stub(this.streamingService, 'removeLiveRoleFromMember').returns(Rx.Observable.of(''));
@@ -284,6 +281,8 @@ describe('StreamingService', function () {
   describe('#addLiveRoleToMember', function () {
     beforeEach(function () {
       this.member = {
+        guild: { name: "testGuild" },
+        user: { tag: "member#0001" },
         roles: new Collection(),
         addRole: sinon.fake.returns(Rx.Observable.of(''))
       };
@@ -325,6 +324,8 @@ describe('StreamingService', function () {
   describe('#removeLiveRoleFromMember', function () {
     beforeEach(function () {
       this.member = {
+        guild: { name: "testGuild" },
+        user: { tag: "member#0001" },
         roles: new Collection(),
         removeRole: sinon.fake.returns(Rx.Observable.of(''))
       };

@@ -5,6 +5,10 @@ const DiscordAPIError = require('discord.js').DiscordAPIError;
 const DATAKEYS = require('../lib/datakeys');
 const { RoleNotFoundError } = require('../lib/errors');
 
+function logPrefix(member) {
+  return `[Streaming:${member.guild.name}:${member.user.tag}]`;
+}
+
 class StreamingService extends Service {
   configureService() {
     this.moduleService = this.nix.getService('core', 'ModuleService');
@@ -18,23 +22,22 @@ class StreamingService extends Service {
   }
 
   handlePresenceUpdate(oldMember, newMember) {
-    return Rx.Observable
-      .merge(
-        this.moduleService.filterModuleEnabled(newMember.guild.id, 'streaming'),
-        this.getLiveRole(newMember.guild),
+    this.nix.logger.debug(`${logPrefix(newMember)} Handling presence update for ${newMember.user.tag} in ${newMember.guild.name}`);
+    return Rx.Observable.merge(
+        this.moduleService.isModuleEnabled(newMember.guild.id, 'streaming')
+          .do((moduleEnabled) => this.nix.logger.debug(`${logPrefix(newMember)} Module is ${moduleEnabled ? "enabled" : "disabled"} in ${newMember.guild.name}`)),
+        this.getLiveRole(newMember.guild)
+          .do((liveRole) => this.nix.logger.debug(`${logPrefix(newMember)} Live role in ${newMember.guild.name} is ${liveRole ? liveRole.name : "<none>"}`)),
         this.memberIsStreamer(newMember)
+          .do((isStreamer) => this.nix.logger.debug(`${logPrefix(newMember)} ${newMember.user.tag} ${isStreamer ? "is" : "is not"} a streamer.`)),
       )
       .every((checkPassed) => checkPassed)
       .filter(Boolean)
       .flatMap(() => this.updateMemberRoles(newMember))
       .catch((error) => {
         if (error instanceof DiscordAPIError) {
-          switch (error.message) {
-            case 'Missing Permissions':
-              return Rx.Observable.empty();
-            default:
-              break;
-          }
+          this.nix.logger.debug(`${logPrefix(newMember)} Ignored discord error: ${error.toString()}`);
+          return Rx.Observable.empty();
         }
 
         return this.nix.handleError(error, [
@@ -54,11 +57,16 @@ class StreamingService extends Service {
   }
 
   updateMemberRoles(member) {
-    return Rx.Observable
-      .if(
-        () => this.memberIsStreaming(member),
-        this.addLiveRoleToMember(member),
-        this.removeLiveRoleFromMember(member)
+    this.nix.logger.debug(`${logPrefix(member)} Will update roles for ${member.user.tag}`);
+    return Rx.Observable.of('')
+      .map(() => this.memberIsStreaming(member))
+      .do((isStreaming) => this.nix.logger.debug(`${logPrefix(member)} ${member.user.tag} ${isStreaming ? "is" : "is not"} Streaming`))
+      .flatMap((isStreaming) =>
+        Rx.Observable.if(
+          () => isStreaming,
+          this.addLiveRoleToMember(member),
+          this.removeLiveRoleFromMember(member),
+        )
       )
   }
 
@@ -67,6 +75,7 @@ class StreamingService extends Service {
       .flatMap(() => this.getLiveRole(member.guild))
       .filter((liveRole) => liveRole)
       .filter((liveRole) => !member.roles.has(liveRole.id))
+      .do((liveRole) => this.nix.logger.debug(`${logPrefix(member)} Adding role ${liveRole.name} to ${member.user.tag}`))
       .flatMap((liveRole) => member.addRole(liveRole));
   }
 
@@ -75,6 +84,7 @@ class StreamingService extends Service {
       .flatMap(() => this.getLiveRole(member.guild))
       .filter((liveRole) => liveRole)
       .filter((liveRole) => member.roles.has(liveRole.id))
+      .do((liveRole) => this.nix.logger.debug(`${logPrefix(member)} Removing role ${liveRole.name} from ${member.user.tag}`))
       .flatMap((liveRole) => member.removeRole(liveRole));
   }
 
