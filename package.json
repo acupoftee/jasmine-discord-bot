@@ -1,6 +1,6 @@
 {
   "name": "jasmine-discord-bot",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "",
   "homepage": "",
   "author": {
@@ -34,7 +34,7 @@
   "dependencies": {
     "discord.js": "11.4.2",
     "git-rev": "^0.2.1",
-    "nix-core": "github:nix-core/nix-core#v2.1.1",
+    "nix-core": "github:nix-core/nix-core#v2.1.2",
     "nix-data-disk": "github:nix-core/nix-data-disk#master",
     "node-glob": "^1.2.0",
     "rx": "^4.1.0",

@@ -32,7 +32,6 @@ module.exports = {
   },
 
   run(context, response) {
-    let nix = context.nix;
     let guild = context.guild;
     let broadcastType = context.args.type.toLowerCase();
     let broadcastBody = context.args.message + `\n*- ${context.member.displayName}*`;
