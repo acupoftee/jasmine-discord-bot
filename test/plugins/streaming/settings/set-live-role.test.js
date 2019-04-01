@@ -2,39 +2,39 @@ const Rx = require('rx');
 const Collection = require('discord.js').Collection;
 const ConfigAction = require('nix-core/lib/models/config-action');
 
-const StreamingService = require('../services/streaming-service');
+const StreamingService = require('../../../../plugins/streaming/services/streaming-service');
 
-describe('!config streaming setStreamerRole', function () {
+describe('!config streaming setLiveRole', function () {
   beforeEach(function () {
     this.nix = createNixStub();
 
     this.streamingService = sinon.createStubInstance(StreamingService);
     this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
-    this.setStreamerRole = new ConfigAction(require('./set-streamer-role'));
-    this.setStreamerRole.nix = this.nix;
+    this.setLiveRole = new ConfigAction(require('../../../../plugins/streaming/config/set-live-role'));
+    this.setLiveRole.nix = this.nix;
   });
 
   describe('properties', function () {
     it('has the correct name', function () {
-      expect(this.setStreamerRole.name).to.eq('setStreamerRole');
+      expect(this.setLiveRole.name).to.eq('setLiveRole');
     });
 
     it('has a required rule input', function () {
-      expect(this.setStreamerRole.inputs).to.containSubset([ { name: 'role', required: true } ]);
+      expect(this.setLiveRole.inputs).to.containSubset([{ name: 'role', required: true }]);
     });
   });
 
   describe('#configureAction', function () {
     it('gets ModuleService from Nix', function () {
-      this.setStreamerRole.configureAction();
-      expect(this.setStreamerRole.streamingService).to.eq(this.streamingService);
+      this.setLiveRole.configureAction();
+      expect(this.setLiveRole.streamingService).to.eq(this.streamingService);
     });
   });
 
   describe('#run', function () {
     beforeEach(function () {
-      this.setStreamerRole.configureAction();
+      this.setLiveRole.configureAction();
 
       this.guild = {
         id: 'guild-00001',
@@ -53,8 +53,8 @@ describe('!config streaming setStreamerRole', function () {
       });
 
       it('returns a user readable error', function (done) {
-        expect(this.setStreamerRole.run(this.context))
-          .to.emit([ { status: 400, content: `A role to watch is required` } ])
+        expect(this.setLiveRole.run(this.context))
+          .to.emit([ { status: 400, content: `A role is to assign users is required` } ])
           .and.complete(done);
       });
     });
@@ -65,7 +65,7 @@ describe('!config streaming setStreamerRole', function () {
       });
 
       it('returns a user readable error', function (done) {
-        expect(this.setStreamerRole.run(this.context))
+        expect(this.setLiveRole.run(this.context))
           .to.emit([ { status: 400, content: `The role 'role-not-found' could not be found.` } ])
           .and.complete(done);
       });
@@ -84,31 +84,28 @@ describe('!config streaming setStreamerRole', function () {
       });
 
       Object.entries({
-        'a mention': `<@${roleId}>`,
-        'a mention (with &)': `<@&${roleId}>`,
-        'an id': roleId,
-        'a name': roleName,
-      }).forEach(([ inputType, value ]) => {
-        context(`when a role is given as ${inputType}`, function () {
+        'when a role is given as a mention': `<@${roleId}>`,
+        'when a role is given as a mention (with &)': `<@&${roleId}>`,
+        'when a role is given as an id': roleId,
+        'when a role is given as a name': roleName,
+      }).forEach(([contextMsg, value]) => {
+        context(contextMsg, function () {
           beforeEach(function () {
             this.context.inputs.role = value;
-            this.streamingService.setStreamerRole.returns(Rx.Observable.of(this.role));
+            this.streamingService.setLiveRole.returns(Rx.Observable.of(this.role));
           });
 
           it('sets the live role to the correct role', function (done) {
-            expect(this.setStreamerRole.run(this.context))
+            expect(this.setLiveRole.run(this.context))
               .and.complete(() => {
-                expect(this.streamingService.setStreamerRole).to.have.been.calledWith(this.guild, this.role);
+                expect(this.streamingService.setLiveRole).to.have.been.calledWith(this.guild, this.role);
                 done();
               });
           });
 
           it('returns a success message', function (done) {
-            expect(this.setStreamerRole.run(this.context))
-              .to.emit([ {
-                status: 200,
-                content: `I will now only give the live role to users with the ${this.role.name} role`,
-              } ])
+            expect(this.setLiveRole.run(this.context))
+              .to.emit([ { status: 200, content: `Live streamers will now be given the ${this.role.name} role.` } ])
               .and.complete(done);
           });
         });

@@ -16,7 +16,7 @@ global.expect = chai.expect;
 global.createNixStub = () => {
   let nix = new NixCore({
     ownerUserId: 'user-00001',
-    loginToken: 'example-token'
+    loginToken: 'example-token',
   });
 
   nix.stubService = (moduleName, serviceName, service) => {
@@ -24,7 +24,7 @@ global.createNixStub = () => {
     nix.servicesManager._services[serviceKey] = service;
   };
 
-  sinon.stub(nix, 'handleError').callsFake((error) => { throw error });
+  sinon.stub(nix, 'handleError').callsFake((error) => { throw error; });
 
   return nix;
 };

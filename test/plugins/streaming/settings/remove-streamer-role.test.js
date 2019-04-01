@@ -2,8 +2,8 @@ const Rx = require('rx');
 const Collection = require('discord.js').Collection;
 const ConfigAction = require('nix-core/lib/models/config-action');
 
-const StreamingService = require('../services/streaming-service');
-const { RoleNotFoundError } = require('../lib/errors');
+const StreamingService = require('../../../../plugins/streaming/services/streaming-service');
+const { RoleNotFoundError } = require('../../../../plugins/streaming/lib/errors');
 
 describe('!config streaming removeStreamerRole', function () {
   beforeEach(function () {
@@ -13,7 +13,7 @@ describe('!config streaming removeStreamerRole', function () {
     this.streamingService = sinon.createStubInstance(StreamingService);
     this.nix.stubService('streaming', 'StreamingService', this.streamingService);
 
-    this.removeStreamerRole = new ConfigAction(require('./remove-streamer-role'));
+    this.removeStreamerRole = new ConfigAction(require('../../../../plugins/streaming/config/remove-streamer-role'));
     this.removeStreamerRole.nix = this.nix;
   });
 

@@ -3,9 +3,9 @@ const NixDataMemory = require('nix-data-memory');
 const Collection = require('discord.js').Collection;
 const DiscordAPIError = require('discord.js').DiscordAPIError;
 
-const StreamingService = require('./streaming-service');
-const DATAKEYS = require('../lib/datakeys');
-const { RoleNotFoundError } = require('../lib/errors');
+const StreamingService = require('../../../../plugins/streaming/services/streaming-service');
+const DATAKEYS = require('../../../../plugins/streaming/lib/datakeys');
+const { RoleNotFoundError } = require('../../../../plugins/streaming/lib/errors');
 
 describe('StreamingService', function () {
   beforeEach(function () {
