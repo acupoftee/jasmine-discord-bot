@@ -18,14 +18,19 @@
   "scripts": {
     "start": "npm run bot",
     "bot": "node --preserve-symlinks ./index.js",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha",
+    "lint": "./node_modules/.bin/eslint **/*.js",
+    "lint-watch": "./node_modules/.bin/esw **/*.js -w",
+    "validate": "npm-run-all --parallel test lint"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-subset": "^1.6.0",
     "eslint": "^4.14.0",
+    "eslint-watch": "^4.0.2",
     "mocha": "^5.2.0",
     "nix-data-memory": "github:nix-core/nix-data-memory#v0.0.2",
+    "npm-run-all": "^4.1.5",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0"
   },
