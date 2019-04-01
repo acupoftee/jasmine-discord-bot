@@ -7,10 +7,10 @@ const packageJson = require('./package');
 
 let nix = new Nix(config);
 
-// Load every module in the modules folder
-fs.readdirSync('./modules')
+// Load every plugin in the plugins folder
+fs.readdirSync('./plugins')
   .forEach((file) => {
-    nix.addModule(require('./modules/' + file));
+    nix.addModule(require('./plugins/' + file));
   });
 
 nix.listen()
