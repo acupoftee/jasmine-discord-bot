@@ -6,14 +6,14 @@ const StreamingService = require('../../../../plugins/streaming/services/streami
 
 describe('!config streaming removeLiveRole', function () {
   beforeEach(function () {
-    this.role = { id: 'role-00001', name: 'testRole' };
-    this.nix = createNixStub();
+    this.role = {id: 'role-00001', name: 'testRole'};
+    this.jasmine = stubJasmine();
 
     this.streamingService = sinon.createStubInstance(StreamingService);
-    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
+    this.jasmine.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.removeLiveRole = new ConfigAction(require('../../../../plugins/streaming/config/remove-live-role'));
-    this.removeLiveRole.nix = this.nix
+    this.removeLiveRole.nix = this.jasmine;
   });
 
   describe('properties', function () {
@@ -53,13 +53,13 @@ describe('!config streaming removeLiveRole', function () {
     it('removes the live role from the guild', function (done) {
       expect(this.removeLiveRole.run(this.context))
         .and.complete(done, () => {
-          expect(this.streamingService.removeLiveRole).to.have.been.calledWith(this.guild);
-        });
+        expect(this.streamingService.removeLiveRole).to.have.been.calledWith(this.guild);
+      });
     });
 
     it('returns a success message', function (done) {
       expect(this.removeLiveRole.run(this.context))
-        .to.emit([ { status: 200, content: `Live streamers will no longer receive a role` } ])
+        .to.emit([{status: 200, content: `Live streamers will no longer receive a role`}])
         .and.complete(done);
     });
   });

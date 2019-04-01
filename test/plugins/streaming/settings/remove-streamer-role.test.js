@@ -3,18 +3,18 @@ const Collection = require('discord.js').Collection;
 const ConfigAction = require('nix-core/lib/models/config-action');
 
 const StreamingService = require('../../../../plugins/streaming/services/streaming-service');
-const { RoleNotFoundError } = require('../../../../plugins/streaming/lib/errors');
+const {RoleNotFoundError} = require('../../../../plugins/streaming/lib/errors');
 
 describe('!config streaming removeStreamerRole', function () {
   beforeEach(function () {
-    this.role = { id: 'role-00001', name: 'testRole' };
-    this.nix = createNixStub();
+    this.role = {id: 'role-00001', name: 'testRole'};
+    this.jasmine = stubJasmine();
 
     this.streamingService = sinon.createStubInstance(StreamingService);
-    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
+    this.jasmine.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.removeStreamerRole = new ConfigAction(require('../../../../plugins/streaming/config/remove-streamer-role'));
-    this.removeStreamerRole.nix = this.nix;
+    this.removeStreamerRole.nix = this.jasmine;
   });
 
   describe('properties', function () {
@@ -61,24 +61,24 @@ describe('!config streaming removeStreamerRole', function () {
 
     it('returns a success message', function (done) {
       expect(this.removeStreamerRole.run(this.context))
-        .to.emit([ {
-          status: 200,
-          content: `I will no longer limit adding the live role to users with the role ${this.role.name}`
-        } ])
+        .to.emit([{
+        status: 200,
+        content: `I will no longer limit adding the live role to users with the role ${this.role.name}`,
+      }])
         .and.complete(done);
     });
 
-    context('when there was no previous streamer role', function() {
+    context('when there was no previous streamer role', function () {
       beforeEach(function () {
         this.streamingService.removeStreamerRole.returns(Rx.Observable.throw(new RoleNotFoundError('The role could not be found')));
       });
 
       it('gives a user readable error', function (done) {
         expect(this.removeStreamerRole.run(this.context))
-          .to.emit([ {
-            status: 400,
-            content: `No streamer role was set.`
-          } ])
+          .to.emit([{
+          status: 400,
+          content: `No streamer role was set.`,
+        }])
           .and.complete(done);
       });
     });

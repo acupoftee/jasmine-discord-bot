@@ -6,13 +6,13 @@ const StreamingService = require('../../../../plugins/streaming/services/streami
 
 describe('!config streaming setLiveRole', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.jasmine = stubJasmine();
 
     this.streamingService = sinon.createStubInstance(StreamingService);
-    this.nix.stubService('streaming', 'StreamingService', this.streamingService);
+    this.jasmine.stubService('streaming', 'StreamingService', this.streamingService);
 
     this.setLiveRole = new ConfigAction(require('../../../../plugins/streaming/config/set-live-role'));
-    this.setLiveRole.nix = this.nix;
+    this.setLiveRole.nix = this.jasmine;
   });
 
   describe('properties', function () {
