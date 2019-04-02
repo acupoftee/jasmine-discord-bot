@@ -77,10 +77,10 @@ class RegionService extends Service {
           name: region,
           roleId: role.id,
         };
-        return regions
+        return regions;
       })
       .flatMap((regions) => this.setRegions(guild, regions))
-      .map((regions) => regions[region.toLowerCase()])
+      .map((regions) => regions[region.toLowerCase()]);
   }
 
   removeRegion(guild, regionName) {
@@ -89,7 +89,7 @@ class RegionService extends Service {
     return Rx.Observable
       .zip(
         this.getAliases(guild),
-        this.getRegions(guild)
+        this.getRegions(guild),
       )
       .map(([aliases, regions]) => {
         let regionData = regions[regionName.toLowerCase()];
@@ -111,18 +111,18 @@ class RegionService extends Service {
         Rx.Observable
           .merge(
             this.setAliases(guild, aliases),
-            this.setRegions(guild, regions)
+            this.setRegions(guild, regions),
           )
           .last()
-          .map(() => regionData.name)
-      )
+          .map(() => regionData.name),
+      );
   }
 
   mapAlias(guild, aliasName, regionName) {
     return Rx.Observable
       .zip(
         this.getAliases(guild),
-        this.getRegions(guild)
+        this.getRegions(guild),
       )
       .map(([aliases, regions]) => {
         let regionData = regions[regionName.toLowerCase()];
@@ -135,10 +135,10 @@ class RegionService extends Service {
           region: regionData.name,
         };
 
-        return aliases
+        return aliases;
       })
       .flatMap((aliases) => this.setAliases(guild, aliases))
-      .map((aliases) => aliases[aliasName.toLowerCase()])
+      .map((aliases) => aliases[aliasName.toLowerCase()]);
   }
 
   removeAlias(guild, aliasName) {
@@ -159,8 +159,8 @@ class RegionService extends Service {
       })
       .flatMap(([aliases, aliasData]) =>
         this.setAliases(guild, aliases)
-          .map(() => aliasData.name)
-      )
+          .map(() => aliasData.name),
+      );
   }
 
   getRegion(guild, regionOrAlias) {
@@ -169,12 +169,11 @@ class RegionService extends Service {
     return Rx.Observable
       .zip(
         this.getRegions(guild),
-        this.getAliases(guild)
+        this.getAliases(guild),
       )
       .map(([regions, alias]) => {
         if (regions[regionOrAlias]) {
-          let regionData = regions[regionOrAlias];
-          return regionData;
+          return regions[regionOrAlias];
         }
 
         if (alias[regionOrAlias]) {
@@ -185,11 +184,11 @@ class RegionService extends Service {
             throw new BrokenAliasError(aliasData.name, aliasData.region);
           }
 
-          return regionData
+          return regionData;
         }
 
         throw new RegionNotFoundError(regionOrAlias);
-      })
+      });
   }
 
   getRegionRole(guild, regionOrAlias) {
@@ -199,8 +198,8 @@ class RegionService extends Service {
         if (!regionRole) {
           throw new UnmappedRegionError(regionData.name);
         }
-        return regionRole
-      })
+        return regionRole;
+      });
   }
 
   setUserRegion(member, regionOrAlias) {
@@ -216,7 +215,7 @@ class RegionService extends Service {
     return this.getRegion(guild, regionOrAlias)
       .flatMap((region) => {
         if (member.roles.get(region.roleId)) {
-          throw new RegionAlreadyAssigned(member, region.name)
+          throw new RegionAlreadyAssigned(member, region.name);
         }
 
         let regionRole = guild.roles.get(region.roleId);
@@ -232,8 +231,8 @@ class RegionService extends Service {
           .of('')
           .flatMap(() => member.removeRoles(rolesToRemove))
           .flatMap(() => member.addRole(regionRole))
-          .map(() => region.name)
-      })
+          .map(() => region.name);
+      });
   }
 }
 

@@ -13,12 +13,13 @@ chai.use(observableMatchers);
 global.sinon = sinon;
 global.expect = chai.expect;
 
-function stubJasmine (config = {}) {
+function stubJasmine(config = {}) {
   let jasmine = new Jasmine({
     ownerUserId: 'user-00001',
     loginToken: 'example-token',
 
     logger: {silent: true},
+    dataSource: {type: 'memory'},
 
     ...config,
   });
