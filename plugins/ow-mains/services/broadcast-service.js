@@ -42,14 +42,14 @@ class BroadcastService extends Service {
   removeOwnReactions(message) {
     return Rx.Observable
       .from(message.reactions.values())
-      .filter((reaction) => reaction.remove(this.nix.discord.user))
+      .filter((reaction) => reaction.remove(this.nix.discord.user));
   }
 
   getConfirmEmoji(guild) {
     return {
       yes: guild.emojis.find((e) => e.name.toLowerCase() === CONFIRM_YES_EMOJI_NAME) || FALLBACK_YES,
       no: guild.emojis.find((e) => e.name.toLowerCase() === CONFIRM_NO_EMOJI_NAME) || FALLBACK_NO,
-    }
+    };
   }
 
   /**
@@ -61,11 +61,11 @@ class BroadcastService extends Service {
       .map(() => (new Discord.RichEmbed()).setDescription(broadcastBody))
       .flatMap((broadcastEmbed) => context.message.channel.send(
         `Broadcast this to "${broadcastType}"?`,
-        { embed: broadcastEmbed }
+        { embed: broadcastEmbed },
       ))
       .flatMap((confirmMessage) =>
         this.addConfirmReactions(confirmMessage)
-          .map(() => confirmMessage)
+          .map(() => confirmMessage),
       )
       .flatMap((confirmMessage) => {
         let allowedEmojiNames = [
@@ -81,10 +81,10 @@ class BroadcastService extends Service {
               (reaction, user) =>
                 allowedEmojiNames.includes(reaction.emoji.name.toLowerCase()) &&
                 user.id === context.message.author.id,
-              { max: 1 }
-            )
+              { max: 1 },
+            ),
           )
-          .map((reactions) => ({ confirmMessage, reactions }))
+          .map((reactions) => ({ confirmMessage, reactions }));
       })
       .flatMap(({confirmMessage, reactions}) => {
         let yesEmojiNames = [CONFIRM_YES_EMOJI_NAME, FALLBACK_YES];
@@ -100,14 +100,14 @@ class BroadcastService extends Service {
         this.removeOwnReactions(confirmMessage)
           .defaultIfEmpty('')
           .last()
-          .map(() => result)
+          .map(() => result),
       )
       .flatMap((result) => {
         if (!result) {
           return Rx.Observable.throw(new BroadcastCanceledError());
         }
         return Rx.Observable.of(result);
-      })
+      });
   }
 
   broadcastMessage(broadcastType, broadcastBody) {
@@ -115,8 +115,8 @@ class BroadcastService extends Service {
       .from(this.nix.discord.guilds.values())
       .flatMap((guild) =>
         this.getBroadcastChannel(broadcastType, guild)
-          .flatMap((channel) => channel.send(broadcastBody))
-      )
+          .flatMap((channel) => channel.send(broadcastBody)),
+      );
   }
 
   getBroadcastChannel(broadcastType, guild) {
@@ -126,7 +126,7 @@ class BroadcastService extends Service {
       .getGuildData(guild.id, broadcastChannelDatakey)
       .filter((channelId) => channelId !== null)
       .map((channelId) => guild.channels.get(channelId))
-      .filter((channel) => channel.permissionsFor(this.nix.discord.user).has(Discord.Permissions.FLAGS.SEND_MESSAGES))
+      .filter((channel) => channel.permissionsFor(this.nix.discord.user).has(Discord.Permissions.FLAGS.SEND_MESSAGES));
   }
 }
 

@@ -17,14 +17,14 @@ module.exports = {
       .removeStreamerRole(guild)
       .map((prevStreamingRole) => ({
         status: 200,
-        content: `I will no longer limit adding the live role to users with the role ${prevStreamingRole.name}`
+        content: `I will no longer limit adding the live role to users with the role ${prevStreamingRole.name}`,
       }))
       .catch((error) => {
         if (error instanceof RoleNotFoundError) {
           return Rx.Observable.of({
             status: 400,
-            content: `No streamer role was set.`
-          })
+            content: `No streamer role was set.`,
+          });
         }
       });
   },

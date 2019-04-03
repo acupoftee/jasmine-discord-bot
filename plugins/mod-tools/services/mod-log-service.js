@@ -65,7 +65,7 @@ class ModLogService extends Service {
           .map((bans) => bans.get(member.id))
           .filter((bannedUser) => !bannedUser)
           .map(member)
-          .catch(() => Rx.Observable.of(member)) //Error occurred while trying to fetch bans, just continue anyway.
+          .catch(() => Rx.Observable.of(member)), //Error occurred while trying to fetch bans, just continue anyway.
       )
       .flatMap(() => this.addUserLeftEntry(member))
       .catch((error) => {
@@ -84,19 +84,19 @@ class ModLogService extends Service {
       .of('')
       .do(() => this.nix.logger.debug(`[ModLog:${guild.name}] User ${user.tag} banned`))
       .flatMap(() => this.findReasonAuditLog(guild, user, {
-        type: AuditLogActions.MEMBER_BAN_ADD
+        type: AuditLogActions.MEMBER_BAN_ADD,
       }))
       .catch((error) => {
         switch (error.name) {
           case "TargetMatchError":
             return Rx.Observable.of({
               executor: {id: null},
-              reason: `ERROR: Unable to find matching log entry`
+              reason: `ERROR: Unable to find matching log entry`,
             });
           case "AuditLogReadError":
             return Rx.Observable.of({
               executor: {id: null},
-              reason: `ERROR: ${error.message}`
+              reason: `ERROR: ${error.message}`,
             });
           default:
             return Rx.Observable.throw(error);
@@ -119,19 +119,19 @@ class ModLogService extends Service {
       .of('')
       .do(() => this.nix.logger.debug(`[ModLog:${guild.name}] User ${user.tag} unbanned`))
       .flatMap(() => this.findReasonAuditLog(guild, user, {
-        type: AuditLogActions.MEMBER_BAN_REMOVE
+        type: AuditLogActions.MEMBER_BAN_REMOVE,
       }))
       .catch((error) => {
         switch (error.name) {
           case "TargetMatchError":
             return Rx.Observable.of({
               executor: {id: null},
-              reason: `ERROR: Unable to find matching log entry`
+              reason: `ERROR: Unable to find matching log entry`,
             });
           case "AuditLogReadError":
             return Rx.Observable.of({
               executor: {id: null},
-              reason: `ERROR: ${error.message}`
+              reason: `ERROR: ${error.message}`,
             });
           default:
             return Rx.Observable.throw(error);
@@ -253,7 +253,6 @@ class ModLogService extends Service {
         return Rx.Observable.range(1, 3)
           .zip(error$)
           .flatMap(([attempt, error]) => {
-            console.log(attempt, error);
             if (attempt === 3) {
               return Rx.Observable.throw(error);
             }

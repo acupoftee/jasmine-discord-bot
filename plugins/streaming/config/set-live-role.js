@@ -32,7 +32,7 @@ module.exports = {
     if (!role) {
       return Rx.Observable.of({
         status: 400,
-        content: `The role '${roleString}' could not be found.`
+        content: `The role '${roleString}' could not be found.`,
       });
     }
 
@@ -40,7 +40,7 @@ module.exports = {
       .setLiveRole(guild, role)
       .map((role) => ({
         status: 200,
-        content: `Live streamers will now be given the ${role.name} role.`
+        content: `Live streamers will now be given the ${role.name} role.`,
       }));
   },
 };

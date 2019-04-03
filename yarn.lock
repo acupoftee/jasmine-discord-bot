@@ -786,6 +786,11 @@ escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
+eslint-plugin-chai-expect@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-chai-expect/-/eslint-plugin-chai-expect-2.0.1.tgz#0f9267745feafa723b8ec1bb151c073df5558f60"
+  integrity sha512-HiFoh9F9grVdVQEIwADwPA7SlcGZcsm9gdzZGDoH2SeUoUmYrUuq1cQmfjyOfqRpFOL6qlhcz5nZW2ppTH9ZlQ==
+
 eslint-scope@^3.7.1:
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/eslint-scope/-/eslint-scope-3.7.1.tgz#3d63c3edfda02e06e01a452ad88caacc7cdcb6e8"
@@ -1906,8 +1911,8 @@ nise@^1.4.5:
   resolved "https://codeload.github.com/nix-core/nix-data-disk/tar.gz/b44ab7815e65e4d2a65816c0c6f029e599880a71"
 
 "nix-data-memory@github:nix-core/nix-data-memory#v0.0.3":
-  version "0.0.2"
-  resolved "https://codeload.github.com/nix-core/nix-data-memory/tar.gz/7a8d60a8085b3af9c7e267157f3450d19fb5afad"
+  version "0.0.3"
+  resolved "https://codeload.github.com/nix-core/nix-data-memory/tar.gz/72b6390f2d112581a0c4a13bde0a27f1d04a60b6"
 
 node-glob@^1.2.0:
   version "1.2.0"

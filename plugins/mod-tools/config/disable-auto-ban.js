@@ -1,5 +1,3 @@
-const Rx = require('rx');
-
 module.exports = {
   name: 'disableAutoBan',
   description: 'Disables autobanning of users',
@@ -13,7 +11,7 @@ module.exports = {
       .setAutoBansEnabled(guild, false)
       .map(() => ({
         status: 200,
-        content: `*puts away ban hammer*\nAutobanning is now disabled.`
+        content: `*puts away ban hammer*\nAutobanning is now disabled.`,
       }));
   },
 };

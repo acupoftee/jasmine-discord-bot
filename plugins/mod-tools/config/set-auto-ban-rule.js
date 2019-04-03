@@ -33,7 +33,7 @@ module.exports = {
       .setAutoBanRule(guild, rule, enabled)
       .map(([rule, enabled]) => ({
         status: 200,
-        content: `${rule} is now ${enabled ? "enabled" : "disabled"}`
+        content: `${rule} is now ${enabled ? "enabled" : "disabled"}`,
       }))
       .catch((error) => {
         if (error instanceof AutoBanError) {
@@ -42,15 +42,15 @@ module.exports = {
 
         return Rx.Observable.throw(error);
       });
-  }
+  },
 };
 
 function handleAutoBanError(error) {
   if (error instanceof RuleNotFoundError) {
     return Rx.Observable.of(({
       status: 404,
-      content: error.message
-    }))
+      content: error.message,
+    }));
   }
 
   return Rx.Observable.throw(error);

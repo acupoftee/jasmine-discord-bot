@@ -32,7 +32,7 @@ module.exports = {
       .setGuildData(guild.id, logType.channelDatakey, null)
       .map(() => ({
         status: 200,
-        content: `I have disabled the ${logType.name}.`
+        content: `I have disabled the ${logType.name}.`,
       }));
   },
 };

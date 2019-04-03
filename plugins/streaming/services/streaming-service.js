@@ -66,8 +66,8 @@ class StreamingService extends Service {
           () => isStreaming,
           this.addLiveRoleToMember(member),
           this.removeLiveRoleFromMember(member),
-        )
-      )
+        ),
+      );
   }
 
   addLiveRoleToMember(member) {

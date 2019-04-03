@@ -41,42 +41,46 @@ module.exports = {
 
     return userService.findUser(userString)
       .map((user) => {
-        if (!user) { throw new Error(ERRORS.USER_NOT_FOUND); }
+        if (!user) {
+          throw new Error(ERRORS.USER_NOT_FOUND);
+        }
         return user;
       })
       .flatMap((user) =>
         Rx.Observable
           .fromPromise(guild.fetchBans())
           .map((bans) => {
-            if (bans.get(user.id)) { throw new Error(ERRORS.USER_ALREADY_BANNED); }
+            if (bans.get(user.id)) {
+              throw new Error(ERRORS.USER_ALREADY_BANNED);
+            }
             return user;
-          })
+          }),
       )
       .flatMap((user) =>
         Rx.Observable
           .fromPromise(
-            guild.ban(user, { reason: `${reason || '`none given`'} | Banned by ${context.author.tag}`, days})
+            guild.ban(user, {reason: `${reason || '`none given`'} | Banned by ${context.author.tag}`, days}),
           )
-          .map(user)
+          .map(user),
       )
       .flatMap((user) => response.send({content: `${user.tag} has been banned`}))
       .catch((error) => {
         if (error.name === 'DiscordAPIError') {
           switch (error.message) {
-            case "Missing Permissions":
+            case 'Missing Permissions':
               response.content =
                 `Whoops, I do not have permission to ban users. Can you check if I have the ` +
-                  `"Ban members" permission?`;
+                `"Ban members" permission?`;
               break;
-            case "Privilege is too low...":
+            case 'Privilege is too low...':
               response.content =
                 `I'm sorry, but I don't have permission to ban that user. They have higher permissions then me.`;
               break;
             default:
               response.content = `Err... Discord returned an unexpected error when I tried to ban that user.`;
               context.nix.messageOwner(
-                "I got this error when I tried to ban a user:",
-                {embed: context.nix.createEmbedForError(error)}
+                'I got this error when I tried to ban a user:',
+                {embed: context.nix.createEmbedForError(error)},
               );
           }
 

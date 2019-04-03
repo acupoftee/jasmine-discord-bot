@@ -18,15 +18,16 @@
   "scripts": {
     "start": "npm run bot",
     "bot": "node --preserve-symlinks ./index.js",
-    "test": "./node_modules/.bin/mocha",
-    "lint": "./node_modules/.bin/eslint **/*.js",
-    "lint-watch": "./node_modules/.bin/esw **/*.js -w",
+    "test": "mocha",
+    "lint": "eslint .",
+    "lint-watch": "esw . -w",
     "validate": "npm-run-all --parallel test lint"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-subset": "^1.6.0",
     "eslint": "^4.14.0",
+    "eslint-plugin-chai-expect": "^2.0.1",
     "eslint-watch": "^4.0.2",
     "husky": "^1.3.1",
     "mocha": "^5.2.0",

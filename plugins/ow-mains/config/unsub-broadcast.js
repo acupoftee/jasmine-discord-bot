@@ -19,7 +19,7 @@ module.exports = {
     if (!broadcastType) {
       return {
         status: 400,
-        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
+        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
       };
     }
 

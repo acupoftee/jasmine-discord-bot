@@ -12,12 +12,12 @@ module.exports = {
     return Rx.Observable
       .combineLatest(
         autoBanService.isAutoBanEnabled(guild),
-        autoBanService.getRules(guild)
+        autoBanService.getRules(guild),
       )
       .map(([autoBanEnabled, rules]) => {
         let message = [
           `**Autoban Rules:**`,
-          `(Autoban enabled: ${autoBanEnabled})`
+          `(Autoban enabled: ${autoBanEnabled})`,
         ];
 
         Object.entries(rules).forEach(([rule, value]) => {
@@ -28,7 +28,7 @@ module.exports = {
       })
       .map((content) => ({
         status: 200, 
-        content
+        content,
       }));
-  }
+  },
 };

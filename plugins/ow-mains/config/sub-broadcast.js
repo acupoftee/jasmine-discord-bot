@@ -25,14 +25,14 @@ module.exports = {
     let broadcastType = Object.keys(BROADCAST_TYPES).find((t) => t.toLowerCase() === typeString.toLowerCase());
     if (!broadcastType) {
       return Rx.Observable.of({
-        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`
+        content: `${typeString} is not a valid broadcast type. Valid types: ${Object.keys(BROADCAST_TYPES).join(', ')}`,
       });
     }
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
       return Rx.Observable.of({
-        content: "I was not able to find that channel"
+        content: "I was not able to find that channel",
       });
     }
 
@@ -41,7 +41,7 @@ module.exports = {
       .setGuildData(guild.id, datakey, channel.id)
       .flatMap(() => channel.send(`I will send ${broadcastType} broadcasts here.`))
       .map(() => ({
-        content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`
+        content: `I have enabled ${broadcastType} broadcasts in the channel ${channel}`,
       }))
       .catch((error) => {
         switch (error.name) {
@@ -49,7 +49,7 @@ module.exports = {
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
                 status: 400,
-                content: `Whoops, I do not have permission to talk in that channel.`
+                content: `Whoops, I do not have permission to talk in that channel.`,
               });
             }
             else {

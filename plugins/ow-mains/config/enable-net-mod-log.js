@@ -27,14 +27,14 @@ module.exports = {
 
     if (token !== NET_MOD_LOG_TOKEN) {
       return {
-        content: `I'm sorry, but that token is not valid for the network mod log`
+        content: `I'm sorry, but that token is not valid for the network mod log`,
       };
     }
 
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
       return {
-        content: "I was not able to find that channel"
+        content: "I was not able to find that channel",
       };
     }
 
@@ -43,7 +43,7 @@ module.exports = {
       .flatMap(() => channel.send('I will post the network moderation log here now.'))
       .flatMap(() => ({
         status: 200,
-        content: `This server will now receive the network moderation log.`
+        content: `This server will now receive the network moderation log.`,
       }))
       .catch((error) => {
         switch (error.name) {
@@ -51,7 +51,7 @@ module.exports = {
             if (error.message === "Missing Permissions") {
               return Rx.Observable.return({
                 status: 400,
-                content: `Whoops, I do not have permission to talk in that channel.`
+                content: `Whoops, I do not have permission to talk in that channel.`,
               });
             }
             else {

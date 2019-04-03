@@ -7,18 +7,28 @@
     }
   },
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
+  "extends": "eslint:recommended",
   "rules": {
-    "no-console": [ "error" ],
-    "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "always-multiline",
-      "exports": "always-multiline",
-      "functions": "always-multiline"
-    }],
-    "semi": ["error", "always"],
-    "arrow-parens": ["error", "always"]
+    "no-console": "error",
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "always-multiline"
+      }
+    ],
+    "semi": "error",
+    "arrow-parens": "error",
+    "no-template-curly-in-string": "error",
+    "no-process-exit": "error",
+    "block-spacing": "error",
+    "arrow-spacing": "error",
+    "no-confusing-arrow": "error"
   }
 }

@@ -13,7 +13,7 @@ module.exports = {
       .removeLiveRole(guild)
       .map(() => ({
         status: 200,
-        content: `Live streamers will no longer receive a role`
+        content: `Live streamers will no longer receive a role`,
       }));
   },
 };

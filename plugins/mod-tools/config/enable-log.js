@@ -30,7 +30,7 @@ module.exports = {
     let channel = guild.channels.find((c) => c.toString() === channelString || c.id.toString() === channelString);
     if (!channel) {
       return Rx.Observable.of({
-        content: "I was not able to find that channel"
+        content: "I was not able to find that channel",
       });
     }
 
@@ -45,14 +45,14 @@ module.exports = {
       .setGuildData(guild.id, logType.channelDatakey, channel.id)
       .flatMap(() => channel.send(`I will post the ${logType.name} here now.`))
       .map(() => ({
-        content: `I have enabled the ${logType.name} in the channel ${channel}`
+        content: `I have enabled the ${logType.name} in the channel ${channel}`,
       }))
       .catch((error) => {
         switch (error.name) {
           case 'DiscordAPIError':
             if (error.message === "Missing Access") {
               return Rx.Observable.of({
-                content: `Whoops, I do not have permission to talk in that channel.`
+                content: `Whoops, I do not have permission to talk in that channel.`,
               });
             }
             else {

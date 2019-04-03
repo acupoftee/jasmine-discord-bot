@@ -53,7 +53,7 @@ class NetModLogService extends Service {
             }
           });
       })
-      .filter((log) => !log.reason.match(/\[AutoBan\]/i))
+      .filter((log) => !log.reason.match(/\[AutoBan]/i))
       .map((log) => {
         let reason = log.reason;
 
@@ -73,7 +73,6 @@ class NetModLogService extends Service {
           {name: 'Guild Name', value: guild.name},
           {name: 'Guild ID', value: guild.id},
           {name: 'Banned User', value: user.tag.toString()},
-          {name: 'Banned Reason', value: log.reason},
         ]);
         return Rx.Observable.empty();
       });

@@ -66,7 +66,7 @@ class TopicService extends Service {
    * @returns {string} A channel name safe string
    */
   channelNameSafeString(string) {
-    return string.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-')
+    return string.replace(/[^\w_-]/g, ' ').trim().replace(/\s+/g, '-');
   }
 }
 

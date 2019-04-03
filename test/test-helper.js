@@ -35,7 +35,9 @@ function stubJasmine(config = {}) {
     setPresence: sinon.fake.resolves({}),
   };
 
-  sinon.stub(jasmine, 'handleError').callsFake((error) => { throw error; });
+  sinon.stub(jasmine, 'handleError').callsFake((error) => {
+    throw error;
+  });
   sinon.stub(jasmine.discord, 'login').resolves({});
 
   jasmine.discord.login = () => {

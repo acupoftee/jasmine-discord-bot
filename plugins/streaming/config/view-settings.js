@@ -15,7 +15,7 @@ module.exports = {
     return Rx.Observable
       .zip(
         this.streamingService.getLiveRole(guild),
-        this.streamingService.getStreamerRole(guild)
+        this.streamingService.getStreamerRole(guild),
       )
       .map(([liveRole, streamerRole]) => {
         let embed = new Discord.RichEmbed();
@@ -26,8 +26,8 @@ module.exports = {
         return {
           status: 200,
           content: `Here are the current settings for the streaming module:`,
-          embed
-        }
+          embed,
+        };
       });
   },
 };

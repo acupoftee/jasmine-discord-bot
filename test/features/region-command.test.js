@@ -90,7 +90,9 @@ describe('Feature: !region', function () {
           expect(this.message.reply).to.have.been.calledWith(
             'I\'ve updated your region to test',
           );
-          expect(this.member.addRole).to.have.been.called;
+          expect(this.member.addRole).to.have.been.calledWith(
+            this.role,
+          );
         })
         .subscribe(() => done(), (error) => done(error));
     });

@@ -38,16 +38,15 @@ module.exports = {
         if (error.name === 'DiscordAPIError') {
           response.type = 'message';
 
-          if (error.message === "Missing Permissions" || error.message === "Privilege is too low...") {
+          if (error.message === 'Missing Permissions' || error.message === 'Privilege is too low...') {
             response.content =
               `Whoops, I do not have permission to update your username. Ether I'm missing the "Manage Nicknames", ` +
               `or your permissions outrank mine.`;
             return response.send();
-          }
-          else if (error.message.includes("Invalid Form Body")) {
+          } else if (error.message.includes('Invalid Form Body')) {
             return response.send({
-              content: "I'm sorry, but I can't append the platform tag to your name as it would exceed discord's " +
-                "character limit for nicknames."
+              content: 'I\'m sorry, but I can\'t append the platform tag to your name as it would exceed discord\'s ' +
+                'character limit for nicknames.',
             });
           }
 
@@ -56,12 +55,12 @@ module.exports = {
             `I got this error when I tried to update ${context.author.tag}'s platform:`,
             {
               embed: context.nix.createEmbedForError(error, [
-                {name: "guild", inline: true, value: context.guild.name},
-                {name: "channel", inline: true, value: context.channel.name},
-                {name: "command", inline: true, value: "platform"},
-                {name: "user", inline: true, value: context.author.tag},
-              ])
-            }
+                {name: 'guild', inline: true, value: context.guild.name},
+                {name: 'channel', inline: true, value: context.channel.name},
+                {name: 'command', inline: true, value: 'platform'},
+                {name: 'user', inline: true, value: context.author.tag},
+              ]),
+            },
           );
 
           return response.send();
@@ -90,8 +89,8 @@ function setPlatformTag(member, newPlatform) {
 
   let platformTag = '[' + newPlatform.tag + ']';
 
-  if (currentNickname.search(/\[\w+\]$/) !== -1) {
-    newNickname = currentNickname.replace(/\[\w+\]$/, platformTag);
+  if (currentNickname.search(/\[\w+]$/) !== -1) {
+    newNickname = currentNickname.replace(/\[\w+]$/, platformTag);
   } else {
     newNickname = currentNickname + ' ' + platformTag;
   }

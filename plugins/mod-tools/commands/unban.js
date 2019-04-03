@@ -54,10 +54,10 @@ module.exports = {
                     {name: "guild", inline: true, value: context.guild.name},
                     {name: "channel", inline: true, value: context.channel.name},
                     {name: "command", inline: true, value: "unban"},
-                    {name: "user to unban", inline: true, value: user.tag},
+                    {name: "user to unban", inline: true, value: userString},
                     {name: "user unbanning", inline: true, value: context.author.tag},
-                  ])
-                }
+                  ]),
+                },
               );
           }
 

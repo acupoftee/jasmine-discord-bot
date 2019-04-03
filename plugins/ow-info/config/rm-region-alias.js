@@ -1,7 +1,7 @@
 const Rx = require('rx');
 
 const {
-  AliasNotFoundError
+  AliasNotFoundError,
 } = require('../errors');
 
 module.exports = {

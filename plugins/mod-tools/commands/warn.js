@@ -53,7 +53,7 @@ module.exports = {
             content: 'You have been issued a warning.',
             embed: warningEmbed,
           }))
-          .map(user)
+          .map(user),
       )
       .flatMap((user) => modLogService.addWarnEntry(guild, user, reason, context.author).map(user))
       .flatMap((user) => {
@@ -75,10 +75,10 @@ module.exports = {
                     {name: "guild", inline: true, value: context.guild.name},
                     {name: "channel", inline: true, value: context.channel.name},
                     {name: "command", inline: true, value: "ban"},
-                    {name: "user to ban", inline: true, value: user.tag},
+                    {name: "user to ban", inline: true, value: userString},
                     {name: "user banning", inline: true, value: context.author.tag},
                   ]),
-                }
+                },
               );
           }
 

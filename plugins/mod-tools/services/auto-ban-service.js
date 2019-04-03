@@ -17,7 +17,7 @@ class AutoBanService extends Service {
       {
         name: AUTO_BAN_RULES.BAN_DISCORD_INVITE,
         test: (member) => {
-          let hasLink = this.memberNameMatches(member, /discord\.gg[\/\\]/i);
+          let hasLink = this.memberNameMatches(member, /discord\.gg[/\\]/i);
           this.nix.logger.debug(`${member.user.tag} has Discord invite in name: ${hasLink}`);
           return hasLink;
         },
@@ -26,7 +26,7 @@ class AutoBanService extends Service {
       {
         name: AUTO_BAN_RULES.BAN_TWITCH_LINK,
         test: (member) => {
-          let hasLink = this.memberNameMatches(member, /twitch\.tv[\/\\]/i);
+          let hasLink = this.memberNameMatches(member, /twitch\.tv[/\\]/i);
           this.nix.logger.debug(`${member.user.tag} has Twitch link in name: ${hasLink}`);
           return hasLink;
         },
@@ -57,7 +57,7 @@ class AutoBanService extends Service {
           {name: "Guild", value: member.guild.toString()},
         ]);
         return Rx.Observable.empty();
-      })
+      });
   }
 
   handleGuildMemberUpdate(oldMember, newMember) {
@@ -72,7 +72,7 @@ class AutoBanService extends Service {
           {name: "Guild", value: error.member.guild.toString()},
         ]);
         return Rx.Observable.empty();
-      })
+      });
   }
 
   getAutoBanRule(rule) {
@@ -85,7 +85,7 @@ class AutoBanService extends Service {
 
   setAutoBansEnabled(guild, newValue) {
     return this.nix
-      .setGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED, newValue)
+      .setGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED, newValue);
   }
 
   setAutoBanRule(guild, rule, newValue) {
@@ -93,7 +93,7 @@ class AutoBanService extends Service {
 
     return this.nix
       .setGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule), newValue)
-      .map((enabled) => ([rule, enabled]))
+      .map((enabled) => ([rule, enabled]));
   }
   
   doAutoBans(member) {
@@ -110,8 +110,8 @@ class AutoBanService extends Service {
         member.guild.ban(member, {
           days: 1,
           reason: `[AutoBan] ${reason}`,
-        })
-      )
+        }),
+      );
   }
 
   runRule(rule, member) {
@@ -120,19 +120,19 @@ class AutoBanService extends Service {
       .flatMap(() => this.isAutoBanRuleEnabled(member.guild, rule.name))
       .filter(Boolean)
       .filter(() => rule.test(member))
-      .map(() => rule.reason)
+      .map(() => rule.reason);
   }
 
   isAutoBanEnabled(guild) {
     return this.nix
-      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED)
+      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_ENABLED);
   }
 
   isAutoBanRuleEnabled(guild, rule) {
     rule = this.getAutoBanRule(rule);
 
     return this.nix
-      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule))
+      .getGuildData(guild.id, DATAKEYS.AUTO_BAN_RULE(rule));
   }
 
   getRules(guild) {
@@ -142,7 +142,7 @@ class AutoBanService extends Service {
       .reduce((rules, [rule, enabled]) => {
         rules[rule] = enabled;
         return rules;
-      }, {})
+      }, {});
   }
 
   memberNameMatches(member, regex) {

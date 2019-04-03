@@ -30,7 +30,7 @@ module.exports = [
     alias: [
       'OCE',
       'AUS',
-      'Australia'
+      'Australia',
     ],
   },
 ];
