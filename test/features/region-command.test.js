@@ -70,6 +70,23 @@ describe('Feature: !region', function () {
     }
   });
 
+  context('when the region arg is missing', function () {
+    beforeEach(function () {
+      this.message.content = `!region`;
+    });
+
+    it('responds with an error message', function (done) {
+      this.jasmine.discord.emit('message', this.message);
+      this.jasmine.shutdown()
+        .map(() => {
+          expect(this.channel.send).to.have.been.calledWith(
+            `I'm sorry, but I'm missing some information for that command:`,
+          );
+        })
+        .subscribe(() => done(), (error) => done(error));
+    });
+  });
+
   context('when the region is mapped to a role', function () {
     beforeEach(function (done) {
       this.role = {
