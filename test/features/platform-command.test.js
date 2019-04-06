@@ -1,5 +1,8 @@
 const Rx = require('rx');
-const Collection = require('discord.js').Collection;
+
+const {
+  MockMessage,
+} = require('../mocks/discord-mocks');
 
 const platforms = require('./../../plugins/ow-info/data/platforms');
 
@@ -7,40 +10,9 @@ describe('Feature: !platform', function () {
   beforeEach(function () {
     this.jasmine = stubJasmine();
 
-    this.guild = {
-      id: '00001',
-      name: 'TestGuild',
-      roles: new Collection(),
-    };
-
-    this.user = {
-      id: '00001',
-      username: 'TestUser',
-    };
-
-    this.member = {
-      id: this.user.id,
-      user: this.user,
-      setNickname: sinon.fake.resolves({}),
-    };
-
-    this.channel = {
-      type: 'text',
-      guild: this.guild,
-      send: sinon.fake.resolves({}),
-      permissionsFor: sinon.fake.returns({
-        has: () => true,
-      }),
-    };
-
-    this.message = {
+    this.message = new MockMessage({
       content: '!platform',
-      channel: this.channel,
-      guild: this.guild,
-      member: this.member,
-      author: this.user,
-      reply: sinon.fake.resolves({}),
-    };
+    });
 
     this.listen = (done, tests) => {
       this.jasmine
@@ -78,7 +50,7 @@ describe('Feature: !platform', function () {
         .map(() => this.jasmine.discord.emit('message', this.message))
         .flatMap(() => this.jasmine.shutdown())
         .map(() => {
-          expect(this.channel.send).to.have.been.calledWith(
+          expect(this.message.channel.send).to.have.been.calledWith(
             `I'm sorry, but I'm missing some information for that command:`,
           );
         }));
@@ -107,7 +79,7 @@ describe('Feature: !platform', function () {
           .map(() => this.jasmine.discord.emit('message', this.message))
           .flatMap(() => this.jasmine.shutdown())
           .map(() => {
-            expect(this.member.setNickname).to.have.been.calledWith(
+            expect(this.message.member.setNickname).to.have.been.calledWith(
               `TestUser [${tag}]`,
             );
           }));
@@ -124,7 +96,7 @@ describe('Feature: !platform', function () {
               .map(() => this.jasmine.discord.emit('message', this.message))
               .flatMap(() => this.jasmine.shutdown())
               .map(() => {
-                expect(this.member.setNickname).to.have.been.calledWith(
+                expect(this.message.member.setNickname).to.have.been.calledWith(
                   `TestUser [${tag}]`,
                 );
               }));
@@ -134,7 +106,7 @@ describe('Feature: !platform', function () {
 
       context('when the user has a nickname', function () {
         beforeEach(function () {
-          this.member.nickname = "UserNickname";
+          this.message.member.nickname = 'UserNickname';
         });
 
         it(`adds the tag [${tag}] to the nickname`, function (done) {
@@ -142,7 +114,7 @@ describe('Feature: !platform', function () {
             .map(() => this.jasmine.discord.emit('message', this.message))
             .flatMap(() => this.jasmine.shutdown())
             .map(() => {
-              expect(this.member.setNickname).to.have.been.calledWith(
+              expect(this.message.member.setNickname).to.have.been.calledWith(
                 `UserNickname [${tag}]`,
               );
             }));
@@ -154,7 +126,7 @@ describe('Feature: !platform', function () {
   context('when the user has a tag', function () {
     beforeEach(function () {
       this.message.content = `!platform PC`;
-      this.member.nickname = "UserNickname [NULL]";
+      this.message.member.nickname = 'UserNickname [NULL]';
     });
 
     it(`replaces the tag`, function (done) {
@@ -162,7 +134,7 @@ describe('Feature: !platform', function () {
         .map(() => this.jasmine.discord.emit('message', this.message))
         .flatMap(() => this.jasmine.shutdown())
         .map(() => {
-          expect(this.member.setNickname).to.have.been.calledWith(
+          expect(this.message.member.setNickname).to.have.been.calledWith(
             `UserNickname [PC]`,
           );
         }));
