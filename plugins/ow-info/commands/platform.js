@@ -28,7 +28,13 @@ module.exports = {
       return response.send();
     }
 
-    return setPlatformTag(context.member, foundPlatform)
+    return Rx.Observable
+      .if(
+        () => context.member,
+        Rx.Observable.of(context.member),
+        Rx.Observable.of('').flatMap((context.guild.fetchMember(context.author))),
+      )
+      .flatMap((member) => setPlatformTag(member, foundPlatform))
       .map((platform) => {
         response.type = 'reply';
         response.content = 'I\'ve updated your platform to ' + platform.name;

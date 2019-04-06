@@ -140,4 +140,33 @@ describe('Feature: !platform', function () {
         }));
     });
   });
+
+  context('when the user was not cached by Discord.js', function () {
+    beforeEach(function () {
+      this.message.content = '!platform PC';
+
+      this.member = this.message.member;
+      this.message.guild.fetchMember = sinon.fake(() => {
+        return new Promise((resolve) => resolve(this.member));
+      });
+      delete this.message.member;
+    });
+
+    it('fetches the member and works normally', function (done) {
+      this.listen(done, Rx.Observable.of('')
+        .map(() => this.jasmine.discord.emit('message', this.message))
+        .flatMap(() => this.jasmine.shutdown())
+        .map(() => {
+          expect(this.message.guild.fetchMember).to.have.been.calledWith(
+            this.message.author,
+          );
+          expect(this.message.reply).to.have.been.calledWith(
+            `I've updated your platform to PC`,
+          );
+          expect(this.member.setNickname).to.have.been.calledWith(
+            `TestUser [PC]`,
+          );
+        }));
+    });
+  });
 });
