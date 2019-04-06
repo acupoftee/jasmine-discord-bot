@@ -28,9 +28,12 @@ class MockUser {
 class MockGuildMember {
   constructor(options = {}) {
     Object.assign(this, {
-      user: new MockUser(),
       guild: new MockGuild(),
+      roles: new Collection(),
+      user: new MockUser(),
 
+      addRole: sinon.fake.resolves({}),
+      removeRoles: sinon.fake.resolves({}),
       setNickname: sinon.fake.resolves({}),
 
       ...options,
@@ -45,14 +48,12 @@ class MockGuildMember {
 class MockGuildChannel {
   constructor(options = {}) {
     Object.assign(this, {
-      type: 'text',
-      name: 'test-channel',
       guild: new MockGuild(),
+      name: 'test-channel',
+      type: 'text',
 
+      permissionsFor: sinon.fake.returns({has: () => true}),
       send: sinon.fake.resolves({}),
-      permissionsFor: sinon.fake.returns({
-        has: () => true,
-      }),
 
       ...options,
     });

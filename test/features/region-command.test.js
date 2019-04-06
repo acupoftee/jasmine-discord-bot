@@ -1,45 +1,12 @@
 const Rx = require('rx');
-const Collection = require('discord.js').Collection;
+
+const {MockMessage} = require('../mocks/discord-mocks');
 
 describe('Feature: !region', function () {
   beforeEach(function (done) {
     this.jasmine = stubJasmine();
 
-    this.guild = {
-      id: '00001',
-      name: 'TestGuild',
-      roles: new Collection(),
-    };
-
-    this.user = {
-      id: '00001',
-    };
-
-    this.member = {
-      id: this.user.id,
-      guild: this.guild,
-      removeRoles: sinon.fake.resolves({}),
-      addRole: sinon.fake.resolves({}),
-      roles: new Collection(),
-    };
-
-    this.channel = {
-      type: 'text',
-      guild: this.guild,
-      send: sinon.fake.resolves({}),
-      permissionsFor: sinon.fake.returns({
-        has: () => true,
-      }),
-    };
-
-    this.message = {
-      content: '!region test',
-      channel: this.channel,
-      guild: this.guild,
-      member: this.member,
-      author: this.user,
-      reply: sinon.fake.resolves({}),
-    };
+    this.message = new MockMessage();
 
     this.jasmine
       .listen(
@@ -53,8 +20,8 @@ describe('Feature: !region', function () {
         commandService.handleCmdError = (error) => Rx.Observable.throw(error);
 
         return Rx.Observable.of('')
-          .flatMap(() => this.jasmine.onNixJoinGuild(this.guild))
-          .flatMap(() => moduleService.enableModule(this.guild.id, 'ow-info'));
+          .flatMap(() => this.jasmine.onNixJoinGuild(this.message.guild))
+          .flatMap(() => moduleService.enableModule(this.message.guild.id, 'ow-info'));
       })
       .subscribe(
         () => done(),
@@ -79,7 +46,7 @@ describe('Feature: !region', function () {
       this.jasmine.discord.emit('message', this.message);
       this.jasmine.shutdown()
         .map(() => {
-          expect(this.channel.send).to.have.been.calledWith(
+          expect(this.message.channel.send).to.have.been.calledWith(
             `I'm sorry, but I'm missing some information for that command:`,
           );
         })
@@ -89,14 +56,16 @@ describe('Feature: !region', function () {
 
   context('when the region is mapped to a role', function () {
     beforeEach(function (done) {
+      this.message.content = `!region test`;
+
       this.role = {
         id: 'role-0001',
       };
 
-      this.guild.roles.set(this.role.id, this.role);
+      this.message.guild.roles.set(this.role.id, this.role);
 
       let regionService = this.jasmine.getService('ow-info', 'RegionService');
-      regionService.mapRegion(this.guild, 'test', this.role)
+      regionService.mapRegion(this.message.guild, 'test', this.role)
         .subscribe(() => done(), (error) => done(error));
     });
 
@@ -107,7 +76,7 @@ describe('Feature: !region', function () {
           expect(this.message.reply).to.have.been.calledWith(
             'I\'ve updated your region to test',
           );
-          expect(this.member.addRole).to.have.been.calledWith(
+          expect(this.message.member.addRole).to.have.been.calledWith(
             this.role,
           );
         })
@@ -116,13 +85,17 @@ describe('Feature: !region', function () {
   });
 
   context('when the region is not mapped to a role', function () {
+    beforeEach(function () {
+      this.message.content = `!region test`;
+    });
+
     it('returns an error message', function (done) {
       this.jasmine.discord.emit('message', this.message);
       this.jasmine.shutdown()
-        .do(() => expect(this.channel.send).to.have.been.calledWith(
+        .do(() => expect(this.message.channel.send).to.have.been.calledWith(
           'I\'m sorry, but \'test\' is not an available region.',
         ))
-        .do(() => expect(this.member.addRole).not.to.have.been.called)
+        .do(() => expect(this.message.member.addRole).not.to.have.been.called)
         .subscribe(() => done(), (error) => done(error));
     });
   });
