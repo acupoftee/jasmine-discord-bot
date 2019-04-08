@@ -3,30 +3,33 @@ const Rx = require('rx');
 const {MockMessage} = require('../mocks/discord-mocks');
 
 describe('Feature: !region', function () {
-  beforeEach(function (done) {
+  beforeEach(function () {
     this.jasmine = stubJasmine();
 
     this.message = new MockMessage();
 
-    this.jasmine
-      .listen(
-        () => {},
-        (error) => done(error),
-      )
-      .flatMap(() => {
-        let moduleService = this.jasmine.getService('core', 'ModuleService');
-        let commandService = this.jasmine.getService('core', 'CommandService');
+    let jasmineInitalized = false;
+    const initJasmine = () => {
+      if (jasmineInitalized) return Rx.Observable.of('');
+      jasmineInitalized = true;
 
-        commandService.handleCmdError = (error) => Rx.Observable.throw(error);
+      let moduleService = this.jasmine.getService('core', 'ModuleService');
+      let commandService = this.jasmine.getService('core', 'CommandService');
 
-        return Rx.Observable.of('')
-          .flatMap(() => this.jasmine.onNixJoinGuild(this.message.guild))
-          .flatMap(() => moduleService.enableModule(this.message.guild.id, 'ow-info'));
-      })
-      .subscribe(
-        () => done(),
-        (error) => done(error),
-      );
+      commandService.handleCmdError = (error) => Rx.Observable.throw(error);
+
+      return Rx.Observable.of('')
+        .flatMap(() => this.jasmine.onNixJoinGuild(this.message.guild))
+        .flatMap(() => moduleService.enableModule(this.message.guild.id, 'ow-info'));
+    };
+
+    this.listen = (done, tests) => {
+      this.jasmine
+        .listen(() => {}, (error) => done(error))
+        .flatMap(() => initJasmine())
+        .flatMap(() => tests)
+        .subscribe(() => done(), (error) => done(error));
+    };
   });
 
   afterEach(function (done) {
@@ -43,14 +46,14 @@ describe('Feature: !region', function () {
     });
 
     it('responds with an error message', function (done) {
-      this.jasmine.discord.emit('message', this.message);
-      this.jasmine.shutdown()
+      this.listen(done, Rx.Observable.of('')
+        .map(() => this.jasmine.discord.emit('message', this.message))
+        .flatMap(() => this.jasmine.shutdown())
         .map(() => {
           expect(this.message.channel.send).to.have.been.calledWith(
             `I'm sorry, but I'm missing some information for that command:`,
           );
-        })
-        .subscribe(() => done(), (error) => done(error));
+        }));
     });
   });
 
@@ -64,14 +67,17 @@ describe('Feature: !region', function () {
 
       this.message.guild.roles.set(this.role.id, this.role);
 
-      let regionService = this.jasmine.getService('ow-info', 'RegionService');
-      regionService.mapRegion(this.message.guild, 'test', this.role)
-        .subscribe(() => done(), (error) => done(error));
+      this.listen(done, Rx.Observable.of('')
+        .flatMap(() => {
+          let regionService = this.jasmine.getService('ow-info', 'RegionService');
+          return regionService.mapRegion(this.message.guild, 'test', this.role);
+        }));
     });
 
     it('adds the role to the user', function (done) {
-      this.jasmine.discord.emit('message', this.message);
-      this.jasmine.shutdown()
+      this.listen(done, Rx.Observable.of('')
+        .map(() => this.jasmine.discord.emit('message', this.message))
+        .flatMap(() => this.jasmine.shutdown())
         .map(() => {
           expect(this.message.reply).to.have.been.calledWith(
             'I\'ve updated your region to test',
@@ -79,8 +85,7 @@ describe('Feature: !region', function () {
           expect(this.message.member.addRole).to.have.been.calledWith(
             this.role,
           );
-        })
-        .subscribe(() => done(), (error) => done(error));
+        }));
     });
   });
 
@@ -90,13 +95,15 @@ describe('Feature: !region', function () {
     });
 
     it('returns an error message', function (done) {
-      this.jasmine.discord.emit('message', this.message);
-      this.jasmine.shutdown()
-        .do(() => expect(this.message.channel.send).to.have.been.calledWith(
-          'I\'m sorry, but \'test\' is not an available region.',
-        ))
-        .do(() => expect(this.message.member.addRole).not.to.have.been.called)
-        .subscribe(() => done(), (error) => done(error));
+      this.listen(done, Rx.Observable.of('')
+        .map(() => this.jasmine.discord.emit('message', this.message))
+        .flatMap(() => this.jasmine.shutdown())
+        .map(() => {
+          expect(this.message.channel.send).to.have.been.calledWith(
+            'I\'m sorry, but \'test\' is not an available region.',
+          );
+          expect(this.message.member.addRole).not.to.have.been.called;
+        }));
     });
   });
 });
