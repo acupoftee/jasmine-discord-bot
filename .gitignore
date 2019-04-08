@@ -1,13 +1,7 @@
 /node_modules/
 /data/
 
-/.idea/workspace.xml
 
-/config/private.js
-
-*.log
-
-\.idea/
-
+config.js
 pm2.sh
-\.nyc_output/
+.idea/workspace.xml

@@ -1,10 +1,13 @@
-# Next
-**Minor Features:**
-- update nix-core to latest version
+# v4.0.0
+**Major Features:**
 - Add Streaming module
     - use `!config module enable streaming` to enable
     - `!config streaming setLiveRole {role}` to set a role to assign to users that go live
     - `!config streaming setStreamerRole {role}` to restrict the live role to approved users
+
+**Minor Features:**
+- update nix-core to latest version
+
 
 
 # v3.5.1

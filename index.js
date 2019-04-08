@@ -1,41 +1,12 @@
-'use strict';
-const fs = require('fs');
+/* eslint no-process-exit: off */
 
-const Nix = require('nix-core');
-const config = require('./config/config.js');
-const packageJson = require('./package');
+const config = require('./config.js');
+const Jasmine = require('./jasmine');
 
-let nix = new Nix(config);
+let jasmine = new Jasmine(config);
 
-// Load every module in the modules folder
-fs.readdirSync('./modules')
-  .forEach((file) => {
-    nix.addModule(require('./modules/' + file));
-  });
-
-nix.listen()
-  .subscribe(
-    () => nix.discord.user.setPresence({game: {name: `v${packageJson.version}`}}),
-    (error) => onNixError(error),
-    () => onNixComplete()
+jasmine.listen().subscribe(
+  () => {},
+  () => process.exit(1),
+  () => process.exit(0),
 );
-
-function onNixError(error) {
-  console.error(error);
-  nix.messageOwner('Shutting down due to unhandled error: ' + error)
-    .subscribe(
-      () => {},
-      () => {},
-      () => process.exit(1)
-    );
-}
-
-function onNixComplete() {
-  console.log('Shutting down');
-  nix.messageOwner('Jasmine shutting down')
-    .subscribe(
-      () => {},
-      () => {},
-      () => process.exit(0)
-    );
-}

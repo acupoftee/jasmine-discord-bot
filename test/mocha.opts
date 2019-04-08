@@ -1,2 +1,2 @@
 --require ./test/test-helper.js
-modules/**/*.test.js
+test/**/*.test.js
