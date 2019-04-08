@@ -1,7 +1,7 @@
 const chai = require('chai');
+const chaiSubset = require('chai-subset');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
-const chaiSubset = require('chai-subset');
 
 const Jasmine = require('../jasmine');
 const observableMatchers = require('./observable-matchers');

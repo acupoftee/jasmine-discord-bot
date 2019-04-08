@@ -1900,9 +1900,9 @@ nise@^1.4.5:
     path-to-regexp "^1.7.0"
     text-encoding "^0.6.4"
 
-"nix-core@github:nix-core/nix-core#v2.1.2":
-  version "2.1.1"
-  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/db075dec1bfacd1b7e8920d672bce855346b7855"
+"nix-core@github:nix-core/nix-core#v2.2.0":
+  version "2.2.0"
+  resolved "https://codeload.github.com/nix-core/nix-core/tar.gz/83eadf949a276ee55490271fce2df54d7c794b95"
   dependencies:
     winston "^3.0.0"
 
